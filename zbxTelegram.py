@@ -48,7 +48,6 @@ def xml_parsing(data):
         error_processing({"num": 1, "class": str(type(err)), "disc": "Error XML format", "msg": str([err])})
 
 
-
 def watermark_text(img):
     img = io.BytesIO(img.read())
     img = Image.open(img)
@@ -116,6 +115,7 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
 
     return tags_list
 
+
 def create_links_list(settings_triggerurl):
     url_list = []
     try:
@@ -127,6 +127,7 @@ def create_links_list(settings_triggerurl):
         url_list.append(body_messages_no_url)
 
     return url_list
+
 
 def send_messages(sent_to, message, graphs_png):
     try:
@@ -144,15 +145,12 @@ def send_messages(sent_to, message, graphs_png):
         error_processing({"num": 1, "class": str(type(err)), "disc": "Error send messages", "msg": str([err])})
 
 
-
 def main(args):
     try:
         if args[0] and args[1] and args[2]:
             print(args)
     except Exception as err:
         error_processing({"num": 1, "class": str(type(err)), "disc": "Error! Arguments is empty!", "msg": str([err])})
-
-
 
     sent_to = args[0]
     subject = args[1]
@@ -183,6 +181,7 @@ def main(args):
     send_messages(sent_to, message, graphs_png)
 
     exit(0)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
