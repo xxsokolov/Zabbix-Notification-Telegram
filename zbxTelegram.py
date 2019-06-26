@@ -13,10 +13,11 @@ import requests
 import re, sys, os, time
 import io
 from PIL import Image, ImageDraw, ImageFont
+import json
 
 
 def error_processing(err):
-    print(dict(error=err['num'], classes=err['class'],disc=err['disc'], message=err['msg'])), exit(err['num'])
+    print(json.dumps(err)), exit(err['num'])
 
 
 def xml_parsing(data):
@@ -44,7 +45,8 @@ def xml_parsing(data):
                 }
 
     except Exception as err:
-        error_processing({'num': 1, 'class': type(err), 'disc': "Error XML format", 'msg': [err]})
+        error_processing({"num": 1, "class": str(type(err)), "disc": "Error XML format", "msg": str([err])})
+
 
 
 def watermark_text(img):
@@ -139,7 +141,8 @@ def send_messages(sent_to, message, graphs_png):
         exit(0)
 
     except Exception as err:
-        error_processing({'num': 1, 'class': type(err), 'disc': "Error send messages", 'msg': [err]})
+        error_processing({"num": 1, "class": str(type(err)), "disc": "Error send messages", "msg": str([err])})
+
 
 
 def main(args):
@@ -147,7 +150,9 @@ def main(args):
         if args[0] and args[1] and args[2]:
             print(args)
     except Exception as err:
-        error_processing({'num': 1, 'class': type(err), 'disc': "Error! Arguments is empty!", 'msg': [err]})
+        error_processing({"num": 1, "class": str(type(err)), "disc": "Error! Arguments is empty!", "msg": str([err])})
+
+
 
     sent_to = args[0]
     subject = args[1]
