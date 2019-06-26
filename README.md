@@ -72,15 +72,25 @@ ls -la
 <img src="https://imgur.com/JNKkJCG.png"></img>
 
 
-
-* Проверим отправку
-```bash
-/usr/lib/zabbix/alertscripts/zbxTelegram.py
-```
-
 ### Configuration 
 
+* Настройка **zbxTelegram_config.py**
+
+`tg_proxy` = Настрока прокси сервера
+
+`tg_token` = token to access the HTTP API
+
 **Настройка Actions**
+
+* Default subject
+
+`{Problem} {TRIGGER.SEVERITY} {{TRIGGER.SEVERITY}}: {EVENT.NAME}`
+
+`{Problem}` - мапинг значенией Problem\Resolved в emoji (config: zabbix_status_emoji_map)
+
+`{{TRIGGER.SEVERITY}}` - мапинг значенией Severity в emoji (config: zabbix_status_emoji_map)
+
+* Default message
 
 Для настройки оповещения используется XML разметка _(Исходные данные Вы найдете в actions.example)_
 
@@ -90,8 +100,8 @@ ls -la
 <body>
    <messages>
       Текст сообщения
-   <messages>
-<body>      
+   </messages>
+</body>
 ``` 
 
 ```xml
