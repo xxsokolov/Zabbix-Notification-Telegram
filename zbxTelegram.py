@@ -15,6 +15,10 @@ import io
 from PIL import Image, ImageDraw, ImageFont
 
 
+def error_processing(err):
+    print(dict(error=err['num'], classes=err['class'],disc=err['disc'], message=err['msg'])), exit(err['num'])
+
+
 def xml_parsing(data):
     try:
         data = dict(xmltodict.parse(data, process_namespaces=True)['root'])
@@ -39,8 +43,8 @@ def xml_parsing(data):
                 'eventid': settings_eventid
                 }
 
-    except ValueError as err:
-        print(dict(error="1", disc="Error XML format", message='{}'.format([err]))), exit(1)
+    except Exception as err:
+        error_processing({'num': 1, 'class': type(err), 'disc': "Error XML format", 'msg': [err]})
 
 
 def watermark_text(img):
@@ -134,12 +138,16 @@ def send_messages(sent_to, message, graphs_png):
             bot.send_photo(sent_to, graphs_png.get('img'), caption=message, parse_mode="HTML")
         exit(0)
 
-    except telebot.apihelper.ApiException as err:
-        print(dict(error="2", disc="Error send", message='{}'.format([err]))), exit(2)
+    except Exception as err:
+        error_processing({'num': 1, 'class': type(err), 'disc': "Error send messages", 'msg': [err]})
 
 
 def main(args):
-    print(args)
+    try:
+        if args[0] and args[1] and args[2]:
+            print(args)
+    except Exception as err:
+        error_processing({'num': 1, 'class': type(err), 'disc': "Error! Arguments is empty!", 'msg': [err]})
 
     sent_to = args[0]
     subject = args[1]
