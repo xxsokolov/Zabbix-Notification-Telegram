@@ -78,6 +78,46 @@ ls -la
 /usr/lib/zabbix/alertscripts/zbxTelegram.py
 ```
 
+### Configuration 
+
+**Настройка Actions**
+
+Для настройки оповещения используется XML разметка _(Исходные данные Вы найдете в actions.example)_
+
+Она состоит из основных секций:
+
+```xml
+<body>
+   <messages>
+      Текст сообщения
+   <messages>
+<body>      
+``` 
+
+```xml
+<settings> 
+       Настройки
+</settings>
+``` 
+
+**Описание настроек**
+
+`<graphs></graphs>` - прикреплять график (True\False)
+
+`<graphs_period></graphs_period>` - период графика в секундах
+
+`<itemid></itemid>` - передача itemid {ITEM.ID1}
+
+`<triggerid></triggerid>` - передача triggerid {TRIGGER.ID}
+
+`<eventid></eventid>`- передача eventid {EVENT.ID}
+
+`<title></title>` - заголовок графика {HOST.HOST} - {EVENT.NAME}
+
+`<triggerurl>/triggerurl>` - передача url из триггера {TRIGGER.URL}
+
+`<tags></tags>` - передача списка тэгов из триггера {EVENT.TAGS}
+
 
 #### Нотиф:
 

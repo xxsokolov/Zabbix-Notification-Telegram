@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+	<body>
+		<messages>
+<![CDATA[
+Host: {HOST.HOST} [{HOST.IP}]
+Last value: {ITEM.LASTVALUE1} ({TIME})
+DESC: {INVENTORY.NOTES1}
+Duration: {EVENT.AGE}]]>
+		</messages>
+	</body>
+	<settings>
+		<graphs>true</graphs>
+		<graphs_period>10800</graphs_period>
+		<itemid>{ITEM.ID1}</itemid>
+		<triggerid>{TRIGGER.ID}</triggerid>
+		<eventid>{EVENT.ID}</eventid>
+		<title><![CDATA[{HOST.HOST} - {EVENT.NAME}]]></title>
+                <triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
+		<tags><![CDATA[{EVENT.TAGS}]]></tags>
+	</settings>
+</root>
