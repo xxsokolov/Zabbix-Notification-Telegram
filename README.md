@@ -6,8 +6,8 @@
 - [x] Отправка нотификации ОДНИМ СООБЩЕНИЕМ, методом sendPhoto
 - [x] Гибкая настройка шаблона в теле сообщения
 - [x] Данные передаются XML
-- [x] Формирование спика линков в теле сообщения
-- [x] Формирование спика тэгов в теле сообщения
+- [x] Формирование списка линков в теле сообщения
+- [x] Формирование списка тэгов в теле сообщения
 - [x] Emoji мапинг статуса и важности события
 
 ### Plans
@@ -17,7 +17,7 @@
 
 ### Installation
 
-* Склонируем свежий релиз с GitHub
+* С клонируем свежий релиз с GitHub
 ```bash
 git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git
 ```
@@ -43,7 +43,7 @@ pip install -r .requirements
 deactivate
 ```
 
-* Скопируем исполняемые файлы в деррикторию alertscripts:
+* Скопируем исполняемые файлы в директорию alertscripts:
 
 ```bash
 cp -r * /usr/lib/zabbix/alertscripts/
@@ -77,10 +77,6 @@ ls -la
 ```bash
 /usr/lib/zabbix/alertscripts/zbxTelegram.py
 ```
-
-### Configuration 
-
-Файл
 
 
 #### Нотиф:
