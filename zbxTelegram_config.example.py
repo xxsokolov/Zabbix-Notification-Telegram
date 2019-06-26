@@ -8,7 +8,6 @@
 
 tg_proxy = {'https': 'socks5://username:password@domen:port'}
 tg_token = '123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'
-tg_groupid = '-2342343242342'
 
 watermark_label = 'Dmitry Sokolov (@xxsokolov)'
 watermark_font = '/font/ArialMT.ttf'

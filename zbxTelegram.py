@@ -135,7 +135,7 @@ def send_messages(sent_to, message, graphs_png):
         apihelper.proxy = tg_proxy
 
         if not graphs_png:
-            bot.send_message(chat_id=tg_groupid,text=message)
+            bot.send_message(chat_id=sent_to, text=message)
 
         if message and graphs_png and graphs_png:
             bot.send_photo(sent_to, graphs_png.get('img'), caption=message, parse_mode="HTML")
