@@ -76,7 +76,9 @@ ls -la
 
 * Настройка **zbxTelegram_config.py**
 
-`tg_proxy` = Настрока прокси сервера
+`tg_proxy` = Отправка через прокси True/False
+
+`tg_proxy_server` = прокси сервера
 
 `tg_token` = token to access the HTTP API
 

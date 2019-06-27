@@ -132,7 +132,8 @@ def create_links_list(settings_triggerurl):
 def send_messages(sent_to, message, graphs_png):
     try:
         bot = telebot.TeleBot(tg_token)
-        apihelper.proxy = tg_proxy
+        if tg_proxy:
+            apihelper.proxy = tg_proxy
 
         if not graphs_png:
             bot.send_message(chat_id=sent_to, text=message)
