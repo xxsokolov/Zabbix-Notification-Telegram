@@ -6,10 +6,11 @@
 #  https://t.me/ZbxNTg #
 ########################
 
-tg_proxy = False
+tg_proxy = True
 tg_proxy_server = {'https': 'socks5://username:password@domen:port'}
 tg_token = '123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'
 
+watermark = True
 watermark_label = 'Dmitry Sokolov (@xxsokolov)'
 watermark_font = '/font/ArialMT.ttf'
 watermark_fill = 255

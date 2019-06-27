@@ -49,8 +49,10 @@ def xml_parsing(data):
 
 
 def watermark_text(img):
-    img = io.BytesIO(img.read())
+    img = io.BytesIO(img)
     img = Image.open(img)
+    if img.height < 20:
+        return False
     font = ImageFont.truetype(os.path.dirname(sys.argv[0])+watermark_font, 14)
 
     line_height = sum(font.getmetrics())
@@ -72,22 +74,26 @@ def watermark_text(img):
 
 
 def get_chart_png(itemid, graff_name, period=None):
-    data_api = {"name": zabbix_api_login, "password": zabbix_api_pass, "enter": "Sign in"}
+    try:
+        data_api = {"name": zabbix_api_login, "password": zabbix_api_pass, "enter": "Sign in"}
 
-    req_cookie = requests.post(zabbix_api_url + "/", data=data_api, verify=True)
-    cookie = req_cookie.cookies
-    response = requests.get(zabbix_graff_chart.format(name=graff_name,
-                                                      itemid=itemid,
-                                                      zabbix_server=zabbix_api_url,
-                                                      range_time= graphs_period_default if not period else period),
-                            cookies=cookie,
-                            verify=True)
+        req_cookie = requests.post(zabbix_api_url + "/", data=data_api, verify=True)
+        cookie = req_cookie.cookies
+        response = requests.get(zabbix_graff_chart.format(name=graff_name,
+                                                          itemid=itemid,
+                                                          zabbix_server=zabbix_api_url,
+                                                          range_time= graphs_period_default if not period else period),
+                                cookies=cookie,
+                                verify=True)
 
-    attachment = io.BytesIO
-    response.raw.decode_content = True
-    data = attachment(response.content)
-    data = watermark_text(data)  # Накладываем ватермарку
-    return dict(img=data, url=response.url)  # возвращаем словарь с картинко и урл
+        if watermark:
+            wmt = watermark_text(response.content)
+            if wmt:
+                return dict(img=wmt, url=response.url)
+            else:
+                return dict(img=response.content, url=response.url)
+    except Exception as err:
+        error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chart png", "msg": str([err])})
 
 
 def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_triggerid):
@@ -158,11 +164,13 @@ def send_messages(sent_to, message, graphs_png):
 
         sent_id = get_send_id(sent_to, bot.get_updates())
 
-        if not graphs_png:
-            bot.send_message(chat_id=sent_id, text=message)
+        if not graphs_png.get('img'):
+            bot.send_message(chat_id=sent_id,text=message, parse_mode="HTML",disable_web_page_preview=True)
+            # print(['send_message',sent_to, sent_id, message])
 
         if message and graphs_png and graphs_png:
-            bot.send_photo(sent_id, graphs_png.get('img'), caption=message, parse_mode="HTML")
+            bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
+            # print(['send_photo',sent_to, sent_id, message])
         exit(0)
 
     except Exception as err:
