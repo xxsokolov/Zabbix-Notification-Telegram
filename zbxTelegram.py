@@ -129,17 +129,40 @@ def create_links_list(settings_triggerurl):
     return url_list
 
 
+def get_send_id(sent_to, get_update, chat = None):
+    try:
+        if re.search('^[0-9]+$',sent_to) or re.search('^-[0-9]+$',sent_to):
+            return sent_to
+
+        for line in get_update:
+            if line.message:
+                chat = line.message.chat
+            elif line.edited_message:
+                chat = line.edited_message.chat
+
+            if chat.type in ["group", "supergroup"] and chat.title and chat.title == sent_to:
+                return chat.id
+
+            if chat.type in ["private"] and chat.username == sent_to.replace("@", ""):
+                return chat.id
+
+    except Exception as err:
+        error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chat.id", "msg": str([err])})
+
+
 def send_messages(sent_to, message, graphs_png):
     try:
         bot = telebot.TeleBot(tg_token)
         if tg_proxy:
             apihelper.proxy = tg_proxy_server
 
+        sent_id = get_send_id(sent_to, bot.get_updates())
+
         if not graphs_png:
-            bot.send_message(chat_id=sent_to, text=message)
+            bot.send_message(chat_id=sent_id, text=message)
 
         if message and graphs_png and graphs_png:
-            bot.send_photo(sent_to, graphs_png.get('img'), caption=message, parse_mode="HTML")
+            bot.send_photo(sent_id, graphs_png.get('img'), caption=message, parse_mode="HTML")
         exit(0)
 
     except Exception as err:
