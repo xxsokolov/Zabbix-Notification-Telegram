@@ -26,22 +26,27 @@ def xml_parsing(data):
 
         message = data['body']['messages']
         settings_tags = data['settings']['tags']
-        # settings_graphs = data['settings']['graphs']
+        settings_graphs = data['settings']['graphs']
+        settings_graphs_links = data['settings']['graphslinks']
         settings_graphs_period = data['settings']['graphs_period']
         settings_itemid = data['settings']['itemid']
         settings_triggerid = data['settings']['triggerid']
         settings_eventid = data['settings']['eventid']
+        settings_actionid = data['settings']['actionid']
         settings_title = data['settings']['title']
         settings_trigger_url = data['settings']['triggerurl']
 
         return {'title': settings_title,
                 'message': message,
                 'tags': settings_tags,
+                'settings_graphs': settings_graphs.capitalize(),
+                'settings_graphs_links':settings_graphs_links.capitalize(),
                 'graphs_period': settings_graphs_period,
                 'itemid': settings_itemid,
                 'triggerid': settings_triggerid,
                 'triggerurl': settings_trigger_url,
-                'eventid': settings_eventid
+                'eventid': settings_eventid,
+                'actionid': settings_actionid
                 }
 
     except Exception as err:
@@ -96,7 +101,7 @@ def get_chart_png(itemid, graff_name, period=None):
         error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chart png", "msg": str([err])})
 
 
-def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_triggerid):
+def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_triggerid, settings_actionid):
     tags_list = []
     try:
         if settings_tags and (re.search(r'\w', settings_tags)):
@@ -115,42 +120,92 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
     except ValueError:
         tags_list.append(body_messages_no_tags)
 
-    tags_list.append('#eid_' + settings_eventid)
-    tags_list.append('#iid_' + settings_itemid)
-    tags_list.append('#tid_' + settings_triggerid)
+    if body_messages_add_tags_event:
+        tags_list.append('#eid_' + settings_eventid)
+
+    if body_messages_add_tags_item:
+        tags_list.append('#iid_' + settings_itemid)
+
+    if body_messages_add_tags_trigger:
+        tags_list.append('#tid_' + settings_triggerid)
+
+    if body_messages_add_tags_action:
+        tags_list.append('#aid_' + settings_actionid)
 
     return tags_list
 
 
-def create_links_list(settings_triggerurl):
-    url_list = []
+def create_links_list(settings_triggerurl, type):
+    # url_list = []
     try:
         if settings_triggerurl and (re.search(r'\w', settings_triggerurl)):
-            url_list.append(body_messages_url.format(settings_triggerurl))
+            return body_messages_url.format(url=settings_triggerurl,
+                                            icon=type)
         else:
-            url_list.append(body_messages_no_url)
+            return body_messages_no_url
     except ValueError:
-        url_list.append(body_messages_no_url)
+        return body_messages_no_url
 
-    return url_list
+    # return url_list
+
+def get_cache(title):
+    r = open(".{}/{}".format(project_dir, project_cache_file), 'w+').read()
+
+    if r:
+        cache = json.loads(r)
+
+        for name, value in cache.items():
+            if title == name:
+                return value['id']
+    else:
+        return False
 
 
-def get_send_id(sent_to, get_update, chat = None):
+def set_cache(title, send_id, sent_type):
+    cache = []
+    f = open(".{}/{}".format(project_dir, project_cache_file), 'w+')
+    if f.newlines is None:
+        cache = {title: dict(type=str(sent_type), id=str(send_id))}
+    else:
+        cache[title] = dict(type=str(sent_type), id=str(send_id))
+
+    f.seek(0)
+    f.write(json.dumps(cache))
+    f.close()
+    return True
+
+def get_send_id(send_to):
     try:
-        if re.search('^[0-9]+$',sent_to) or re.search('^-[0-9]+$',sent_to):
-            return sent_to
+        chat = None
+        if re.search('^[0-9]+$', send_to) or re.search('^-[0-9]+$', send_to):
+            return send_to
+        elif re.search('^@+[a-z0-9]+$', send_to):
+            send_to = send_to.replace("@", "")
 
-        for line in get_update:
+        send_id = get_cache(send_to)
+
+        if send_id:
+            return send_id
+
+        bot = telebot.TeleBot(tg_token)
+        for line in bot.get_updates(timeout=3):
             if line.message:
                 chat = line.message.chat
             elif line.edited_message:
                 chat = line.edited_message.chat
 
-            if chat.type in ["group", "supergroup"] and chat.title and chat.title == sent_to:
+            if chat.type in ["group", "supergroup"] and chat.title and chat.title == send_to:
+                if not send_id:
+                    set_cache(send_to, chat.id, chat.type)
                 return chat.id
 
-            if chat.type in ["private"] and chat.username == sent_to.replace("@", ""):
+            if chat.type in ["private"] and chat.username == send_to.replace("@", ""):
+                if not send_id:
+                    set_cache(send_to, chat.id, chat.type)
                 return chat.id
+
+        raise ValueError('Not found username in cache and get_updates.')
+
 
     except Exception as err:
         error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chat.id", "msg": str([err])})
@@ -162,16 +217,18 @@ def send_messages(sent_to, message, graphs_png):
         if tg_proxy:
             apihelper.proxy = tg_proxy_server
 
-        sent_id = get_send_id(sent_to, bot.get_updates())
+        sent_id = get_send_id(sent_to)
 
-        if not graphs_png.get('img'):
-            bot.send_message(chat_id=sent_id,text=message, parse_mode="HTML",disable_web_page_preview=True)
-            # print(['send_message',sent_to, sent_id, message])
+        if message and sent_to:
+            if graphs_png:
+                if graphs_png.get('img'):
+                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
+                    print(['send_photo', sent_to, sent_id, message])
+                    exit(0)
 
-        if message and graphs_png and graphs_png:
-            bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
-            # print(['send_photo',sent_to, sent_id, message])
-        exit(0)
+            bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True)
+            print(['send_message', sent_to, sent_id, message])
+            exit(0)
 
     except Exception as err:
         error_processing({"num": 1, "class": str(type(err)), "disc": "Error send messages", "msg": str([err])})
@@ -191,17 +248,30 @@ def main(args):
     tags_list = create_tags_list(data_zabbix['tags'],
                                  data_zabbix['eventid'],
                                  data_zabbix['itemid'],
-                                 data_zabbix['triggerid'])
+                                 data_zabbix['triggerid'],
+                                 data_zabbix['actionid'])
 
-    url_list = create_links_list(data_zabbix['triggerurl'])
+    url_list = [create_links_list(data_zabbix['triggerurl'], type=body_messages_url_notes)]
+
+    if eval(data_zabbix['settings_graphs_links']):
+        url_list.append(
+            create_links_list(
+                zabbix_graff_link.format(
+                    zabbix_server=zabbix_api_url,
+                    itemid=data_zabbix['itemid'],
+                    range_time=data_zabbix['graphs_period']), type=body_messages_url_ld_graphs
+        ))
 
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
         period_hour=time.strftime("%H", time.gmtime(graphs_period_default if not data_zabbix['graphs_period'] else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
-    graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
-                        graff_name=graphs_name,
-                        period=data_zabbix['graphs_period'])
+    if eval(data_zabbix['settings_graphs']):
+        graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
+                                   graff_name=graphs_name,
+                                   period=data_zabbix['graphs_period'])
+    else:
+        graphs_png = False
 
     message = body_messages.format(
         subject = subject.format_map(zabbix_status_emoji_map),
