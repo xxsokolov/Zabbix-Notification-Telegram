@@ -10,13 +10,15 @@ Duration: {EVENT.AGE}]]>
 		</messages>
 	</body>
 	<settings>
-		<graphs>true</graphs>
+		<graphs>True</graphs>
 		<graphs_period>10800</graphs_period>
 		<itemid>{ITEM.ID1}</itemid>
 		<triggerid>{TRIGGER.ID}</triggerid>
 		<eventid>{EVENT.ID}</eventid>
+		<actionid>{ACTION.ID}</actionid>
 		<title><![CDATA[{HOST.HOST} - {EVENT.NAME}]]></title>
-                <triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
+        <triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
+        <graphslinks>True</graphslinks>
 		<tags><![CDATA[{EVENT.TAGS}]]></tags>
 	</settings>
 </root>

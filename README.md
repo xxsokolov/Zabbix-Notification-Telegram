@@ -2,20 +2,27 @@
 
 Отправка оповещений из Zabbix в  Telegram
 
+[Installation](#Installation)
+[Plans](#Plans)
+[Installation](#Installation)
+[Configuration](#Configuration)
+
 ### Key Features
-- [x] Отправка нотификации ОДНИМ СООБЩЕНИЕМ, методом sendPhoto
+- [x] Отправка гафиков и последних значений **в одном сообщении**
 - [x] Гибкая настройка шаблона в теле сообщения
-- [x] Данные передаются XML
+- [x] Передача данных из экшена XML разметкой
 - [x] Формирование списка линков в теле сообщения
 - [x] Формирование списка тэгов в теле сообщения
 - [x] Emoji мапинг статуса и важности события
+- [x] Наложение ватермарки на изобоажение 
 
-### Plans
+
+<a name="Plans"><h3>Plans</h2></a>
 - Обработка быстрых команд ботом
 - Отправка показателей по запросу от бота
 - Gitlab CI\CD
 
-### Installation
+<a name="Installation"><h3>Installation</h2></a>
 
 * С клонируем свежий релиз с GitHub
 ```bash
@@ -71,8 +78,9 @@ ls -la
 ```
 <img src="https://imgur.com/JNKkJCG.png"></img>
 
+ 
+<a name="Configuration"><h3>Configuration</h2></a>
 
-### Configuration 
 
 * Настройка **zbxTelegram_config.py**
 
