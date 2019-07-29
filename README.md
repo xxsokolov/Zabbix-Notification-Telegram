@@ -8,13 +8,14 @@
 [Configuration](#Configuration)
 
 ### Key Features
-- [x] Отправка гафиков и последних значений **в одном сообщении**
+- [x] Отправка графиков и последних значений **в одном сообщении**
 - [x] Гибкая настройка шаблона в теле сообщения
 - [x] Передача данных из экшена XML разметкой
 - [x] Формирование списка линков в теле сообщения
 - [x] Формирование списка тэгов в теле сообщения
 - [x] Emoji мапинг статуса и важности события
-- [x] Наложение ватермарки на изобоажение 
+- [x] Наложение ватермарки на изображение
+- [x] Формирование и обновление кэшфайла (group -> supergroup)
 
 
 <a name="Plans"><h3>Plans</h2></a>
@@ -96,9 +97,9 @@ ls -la
 
 `{Problem} {TRIGGER.SEVERITY} {{TRIGGER.SEVERITY}}: {EVENT.NAME}`
 
-`{Problem}` - мапинг значенией Problem\Resolved в emoji (config: zabbix_status_emoji_map)
+`{Problem}` - мапинг значений Problem\Resolved в emoji (config: zabbix_status_emoji_map)
 
-`{{TRIGGER.SEVERITY}}` - мапинг значенией Severity в emoji (config: zabbix_status_emoji_map)
+`{{TRIGGER.SEVERITY}}` - мапинг значений Severity в emoji (config: zabbix_status_emoji_map)
 
 * Default message
 
@@ -134,7 +135,9 @@ ls -la
 
 `<title></title>` - заголовок графика {HOST.HOST} - {EVENT.NAME}
 
-`<triggerurl>/triggerurl>` - передача url из триггера {TRIGGER.URL}
+`<triggerurl></triggerurl>` - передача url из триггера {TRIGGER.URL}
+
+`<graphslinks></graphslinks>` - прикрепить ссылку на History (True\False)
 
 `<tags></tags>` - передача списка тэгов из триггера {EVENT.TAGS}
 
