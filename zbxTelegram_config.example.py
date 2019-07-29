@@ -8,6 +8,7 @@
 
 project_dir = '/zbxTelegram_files'
 project_cache_file = 'id.cache'
+log_file = '/zbxTelegram_files/znt.log'
 
 tg_proxy = True
 tg_proxy_server = {'https': 'socks5://username:password@domen:port'}

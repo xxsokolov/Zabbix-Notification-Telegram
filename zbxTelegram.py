@@ -14,7 +14,34 @@ import re, sys, os, time
 import io
 from PIL import Image, ImageDraw, ImageFont
 import json
+import logging
 
+
+class System:
+    def __init__(self, debug=False):
+        # configuring log
+        if debug:
+            self.log_level=logging.DEBUG
+        else:
+            self.log_level=logging.INFO
+
+        log_format = logging.Formatter('[%(asctime)s] - PID:%(process)s - %(funcName)s() - %(filename)s:%(lineno)d - %(levelname)s: %(message)s')
+        self.log = logging.getLogger()
+        self.log.setLevel(self.log_level)
+
+        # writing to stdout
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        stdout_handler.setLevel(self.log_level)
+        stdout_handler.setFormatter(log_format)
+        # writing to file
+        file_handler = logging.FileHandler(filename=os.path.dirname(sys.argv[0])+log_file, mode='a')
+        file_handler.setLevel(self.log_level)
+        file_handler.setFormatter(log_format)
+
+        self.log.addHandler(stdout_handler)
+        self.log.addHandler(file_handler)
+
+loggings = System().log
 
 def error_processing(err):
     print(json.dumps(err)), exit(err['num'])
@@ -149,7 +176,7 @@ def create_links_list(settings_triggerurl, type):
     # return url_list
 
 def get_cache(title):
-    r = open(".{}/{}".format(project_dir, project_cache_file), 'w+').read()
+    r = open(".{}/{}".format(project_dir, project_cache_file), 'r').read()
 
     if r:
         cache = json.loads(r)
@@ -161,18 +188,31 @@ def get_cache(title):
         return False
 
 
-def set_cache(title, send_id, sent_type):
-    cache = []
-    f = open(".{}/{}".format(project_dir, project_cache_file), 'w+')
-    if f.newlines is None:
+def set_cache(title, send_id, sent_type, cache=None, update=None):
+    f = open(".{}/{}".format(project_dir, project_cache_file), 'r+')
+    r = f.read()
+    if r:
+        cache = json.loads(r)
+    if not cache:
         cache = {title: dict(type=str(sent_type), id=str(send_id))}
     else:
         cache[title] = dict(type=str(sent_type), id=str(send_id))
-
     f.seek(0)
-    f.write(json.dumps(cache))
+    f.write(json.dumps(cache,sort_keys=True, indent=4))
     f.close()
+    if update:
+        loggings.info("Updated id for {} ({}): old '{}' -> new '{}' in cache file".format(title, sent_type,update, send_id ))
+    else:
+        loggings.info("Add new id for {} ({}) in cache file".format(title,sent_type))
     return True
+
+
+def exp_update_cache(sent_to, sent_id, err):
+    for key, value in json.loads(err.result.text).items():
+        if key == 'parameters' and value['migrate_to_chat_id']:
+            loggings.error("Group id migrate to {}".format(value['migrate_to_chat_id']))
+            set_cache(sent_to, value['migrate_to_chat_id'], 'supergroup', update=sent_id)
+
 
 def get_send_id(send_to):
     try:
@@ -204,11 +244,10 @@ def get_send_id(send_to):
                     set_cache(send_to, chat.id, chat.type)
                 return chat.id
 
-        raise ValueError('Not found username in cache and get_updates.')
-
-
+        raise ValueError('Username not found in cache file or no bot access (send message to bot)')
     except Exception as err:
-        error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chat.id", "msg": str([err])})
+        loggings.error("Exception occurred: {}".format(err)), exit(1)
+        # error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chat.id", "msg": str([err])})
 
 
 def send_messages(sent_to, message, graphs_png):
@@ -222,24 +261,35 @@ def send_messages(sent_to, message, graphs_png):
         if message and sent_to:
             if graphs_png:
                 if graphs_png.get('img'):
-                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
-                    print(['send_photo', sent_to, sent_id, message])
+                    try:
+                        bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
+                        loggings.info("Send photo to {} ({})".format(sent_to, sent_id))
+                    except Exception as err:
+                        exp_update_cache(sent_to,sent_id,err)
+                        send_messages(sent_to, message, graphs_png)
                     exit(0)
 
-            bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True)
-            print(['send_message', sent_to, sent_id, message])
+            try:
+                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True)
+                loggings.info("Send message to {} ({})".format(sent_to, sent_id))
+            except Exception as err:
+                exp_update_cache(sent_to, sent_id, err)
+                send_messages(sent_to, message, graphs_png)
             exit(0)
 
     except Exception as err:
-        error_processing({"num": 1, "class": str(type(err)), "disc": "Error send messages", "msg": str([err])})
+        loggings.error("Exception occurred: {}".format(err)), exit(1)
+        # error_processing({"num": 1, "class": str(type(err)), "disc": "Error send messages", "msg": str([err])})
 
 
 def main(args):
     try:
         if args[0] and args[1] and args[2]:
-            print(args)
+            loggings.info("Send to {} action: {}".format(args[0], args[1]))
+            # print(args)
     except Exception as err:
-        error_processing({"num": 1, "class": str(type(err)), "disc": "Error! Arguments is empty!", "msg": str([err])})
+        loggings.error("Exception occurred: {}".format(err)), exit(1)
+        # error_processing({"num": 1, "class": str(type(err)), "disc": "Error! Arguments is empty!", "msg": str([err])})
 
     sent_to = args[0]
     subject = args[1]
