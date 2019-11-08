@@ -15,7 +15,7 @@ tg_proxy_server = {'https': 'socks5://username:password@domen:port'}
 tg_token = '123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'
 
 watermark = True
-watermark_label = 'Dmitry Sokolov (@xxsokolov)'
+watermark_label = 'Dmitry Sokolov (https://github.com/xxsokolov)'
 watermark_font = '/zbxTelegram_files/ArialMT.ttf'
 watermark_fill = 255
 watermark_rotate = 0
@@ -35,9 +35,9 @@ body_messages_add_tags_item = True
 body_messages_add_tags_trigger = True
 body_messages_add_tags_action= True
 
-zabbix_api_url = 'http://zbx.brc.local/'
-zabbix_api_login = 'zabbix_autocreator'
-zabbix_api_pass = '6BJsxQB6G6WPsgLM'
+zabbix_api_url = 'http://zbx.local/'
+zabbix_api_login = 'Admin'
+zabbix_api_pass = 'zabbix'
 graphs_period_default = 43200  # 24h
 zabbix_graff_chart = '{zabbix_server}chart3.php?' \
                      'name={name}&' \
