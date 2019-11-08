@@ -2,9 +2,10 @@
 
 Отправка оповещений из Zabbix в  Telegram
 
-[Installation](#Installation)
 [Plans](#Plans)
+
 [Installation](#Installation)
+
 [Configuration](#Configuration)
 
 ### Key Features
