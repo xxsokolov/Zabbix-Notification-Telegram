@@ -43,18 +43,18 @@ class System:
 
 loggings = System().log
 
-def error_processing(err):
-    print(json.dumps(err)), exit(err['num'])
-
 
 def xml_parsing(data):
     try:
         data = dict(xmltodict.parse(data, process_namespaces=True)['root'])
 
         message = data['body']['messages']
-        settings_tags = data['settings']['tags']
-        settings_graphs = data['settings']['graphs']
-        settings_graphs_links = data['settings']['graphslinks']
+
+        settings_graphs_bool = data['settings']['graphs']
+        settings_graphlinks_bool = data['settings']['graphlinks']
+        settings_triggerlinks_bool = data['settings']['triggerlinks']
+        settings_tag_bool = data['settings']['tag']
+
         settings_graphs_period = data['settings']['graphs_period']
         settings_itemid = data['settings']['itemid']
         settings_triggerid = data['settings']['triggerid']
@@ -62,22 +62,18 @@ def xml_parsing(data):
         settings_actionid = data['settings']['actionid']
         settings_title = data['settings']['title']
         settings_trigger_url = data['settings']['triggerurl']
+        settings_tags = data['settings']['tags']
 
-        return {'title': settings_title,
-                'message': message,
-                'tags': settings_tags,
-                'settings_graphs': settings_graphs.capitalize(),
-                'settings_graphs_links':settings_graphs_links.capitalize(),
-                'graphs_period': settings_graphs_period,
-                'itemid': settings_itemid,
-                'triggerid': settings_triggerid,
-                'triggerurl': settings_trigger_url,
-                'eventid': settings_eventid,
-                'actionid': settings_actionid
-                }
+        return dict(title=settings_title, message=message, tags=settings_tags,
+                    settings_graphs_bool=eval(settings_graphs_bool.capitalize()),
+                    settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
+                    settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
+                    settings_tag_bool=eval(settings_tag_bool.capitalize()), graphs_period=settings_graphs_period,
+                    itemid=settings_itemid, triggerid=settings_triggerid, triggerurl=settings_trigger_url,
+                    eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
-        error_processing({"num": 1, "class": str(type(err)), "disc": "Error XML format", "msg": str([err])})
+        loggings.error("Exception occurred: {}".format(err)), exit(1)
 
 
 def watermark_text(img):
@@ -125,7 +121,7 @@ def get_chart_png(itemid, graff_name, period=None):
             else:
                 return dict(img=response.content, url=response.url)
     except Exception as err:
-        error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chart png", "msg": str([err])})
+        loggings.error("Exception occurred: {}".format(err)), exit(1)
 
 
 def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_triggerid, settings_actionid):
@@ -159,21 +155,27 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
     if body_messages_add_tags_action:
         tags_list.append('#aid_' + settings_actionid)
 
-    return tags_list
+    return ', '.join(tags_list)
 
 
-def create_links_list(settings_triggerurl, type):
-    # url_list = []
+def create_links_list(_bool=None, url=None, _type=None, url_list=None):
     try:
-        if settings_triggerurl and (re.search(r'\w', settings_triggerurl)):
-            return body_messages_url.format(url=settings_triggerurl,
-                                            icon=type)
+        if _bool:
+            if url and (re.search(r'\w', url)):
+                return [body_messages_url_template.format(url=url, icon=_type)]
+            else:
+                return [body_messages_no_url]
+        elif url_list:
+            _list = []
+            for key, value in url_list.items():
+                if value:
+                    _list.append(value[0])
+            return _list
         else:
-            return body_messages_no_url
+            return False
     except ValueError:
-        return body_messages_no_url
+        return [body_messages_no_url]
 
-    # return url_list
 
 def get_cache(title):
     r = open(".{}/{}".format(project_dir, project_cache_file), 'r').read()
@@ -247,7 +249,6 @@ def get_send_id(send_to):
         raise ValueError('Username not found in cache file or no bot access (send message to bot)')
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err)), exit(1)
-        # error_processing({"num": 1, "class": str(type(err)), "disc": "Error get chat.id", "msg": str([err])})
 
 
 def send_messages(sent_to, message, graphs_png):
@@ -279,44 +280,44 @@ def send_messages(sent_to, message, graphs_png):
 
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err)), exit(1)
-        # error_processing({"num": 1, "class": str(type(err)), "disc": "Error send messages", "msg": str([err])})
 
 
 def main(args):
     try:
         if args[0] and args[1] and args[2]:
             loggings.info("Send to {} action: {}".format(args[0], args[1]))
-            # print(args)
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err)), exit(1)
-        # error_processing({"num": 1, "class": str(type(err)), "disc": "Error! Arguments is empty!", "msg": str([err])})
 
     sent_to = args[0]
     subject = args[1]
     data_zabbix = xml_parsing(args[2])
 
+    # if tags_list
     tags_list = create_tags_list(data_zabbix['tags'],
                                  data_zabbix['eventid'],
                                  data_zabbix['itemid'],
                                  data_zabbix['triggerid'],
                                  data_zabbix['actionid'])
 
-    url_list = [create_links_list(data_zabbix['triggerurl'], type=body_messages_url_notes)]
+    graph_url = create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
+                                  url=zabbix_graff_link.format(
+                                      zabbix_server=zabbix_api_url,
+                                      itemid=data_zabbix['itemid'],
+                                      range_time=data_zabbix['graphs_period']),
+                                  _type=body_messages_url_ld_graphs
+                                  )
 
-    if eval(data_zabbix['settings_graphs_links']):
-        url_list.append(
-            create_links_list(
-                zabbix_graff_link.format(
-                    zabbix_server=zabbix_api_url,
-                    itemid=data_zabbix['itemid'],
-                    range_time=data_zabbix['graphs_period']), type=body_messages_url_ld_graphs
-        ))
+    trigger_url = create_links_list(_bool=data_zabbix.get('settings_triggerlinks_bool'),
+                                 url=data_zabbix.get('triggerurl'), _type=body_messages_url_notes)
+
+    url_list = create_links_list(url_list=dict(graph_url=graph_url, trigger_url=trigger_url))
 
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
         period_hour=time.strftime("%H", time.gmtime(graphs_period_default if not data_zabbix['graphs_period'] else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
-    if eval(data_zabbix['settings_graphs']):
+    if data_zabbix.get('settings_graphs_bool'):
         graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                    graff_name=graphs_name,
                                    period=data_zabbix['graphs_period'])
@@ -325,13 +326,11 @@ def main(args):
 
     message = body_messages.format(
         subject = subject.format_map(zabbix_status_emoji_map),
-        messages = data_zabbix['message'],
-        links = ' '.join(url_list),
-        tags = ', '.join(tags_list))
-
+        messages = '{body}{links}{tags}'.format(body=data_zabbix['message'],
+        links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
+        tags = '\n\n' + tags_list if body_messages_tags else ''))
 
     send_messages(sent_to, message, graphs_png)
-
     exit(0)
 
 

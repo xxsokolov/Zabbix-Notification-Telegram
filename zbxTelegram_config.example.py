@@ -22,13 +22,15 @@ watermark_rotate = 0
 watermark_expand = True
 watermark_text_color = (60, 60, 60)
 
-body_messages = '<b>{subject}</b>\n\n{messages}\nLinks: {links}\n\n{tags}'
+body_messages = '<b>{subject}</b>\n\n{messages}'
 body_messages_title = '{title} ({period_hour}h)'
-body_messages_url = '<a href="{url}">{icon}</a>'
+body_messages_url = True
+body_messages_url_template = '<a href="{url}">{icon}</a>'
 body_messages_no_url = '➖'
 body_messages_url_notes = 'ℹ️'
 body_messages_url_ld_graphs = '📊'
 
+body_messages_tags = True
 body_messages_no_tags = '#no_tags'
 body_messages_add_tags_event = True
 body_messages_add_tags_item = True
