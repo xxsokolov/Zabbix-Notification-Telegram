@@ -14,6 +14,7 @@ import re, sys, os, time
 import io
 from PIL import Image, ImageDraw, ImageFont
 import json
+from errno import ENOENT
 import logging
 
 
@@ -31,6 +32,7 @@ class System:
 
         # writing to stdout
         stdout_handler = logging.StreamHandler(sys.stdout)
+        # stdout_handler = logging.StreamHandler(codecs.getwriter("utf-8")(sys.stdout.detach()))
         stdout_handler.setLevel(self.log_level)
         stdout_handler.setFormatter(log_format)
         # writing to file
@@ -178,10 +180,19 @@ def create_links_list(_bool=None, url=None, _type=None, url_list=None):
 
 
 def get_cache(title):
-    r = open(".{}/{}".format(project_dir, project_cache_file), 'r').read()
+    read_cache = None
+    try:
+        if not os.path.exists(".{}/{}".format(project_dir, project_cache_file)):
+            raise IOError(ENOENT, 'No such file or directory', ".{}/{}".format(project_dir, project_cache_file))
+    except Exception as err:
+        loggings.error("Exception occurred: {}".format(err))
+        open(".{}/{}".format(project_dir, project_cache_file), 'a').close()
+        loggings.info("File {} created in {}".format(project_cache_file, project_dir))
+    else:
+        read_cache = open(".{}/{}".format(project_dir, project_cache_file), 'r').read()
 
-    if r:
-        cache = json.loads(r)
+    if read_cache:
+        cache = json.loads(read_cache)
 
         for name, value in cache.items():
             if title == name:
@@ -246,7 +257,7 @@ def get_send_id(send_to):
                     set_cache(send_to, chat.id, chat.type)
                 return chat.id
 
-        raise ValueError('Username not found in cache file or no bot access (send message to bot)')
+        raise ValueError('Username not found in cache file or no bot access (send message to @{})'.format(bot.get_me().username))
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err)), exit(1)
 
@@ -260,15 +271,14 @@ def send_messages(sent_to, message, graphs_png):
         sent_id = get_send_id(sent_to)
 
         if message and sent_to:
-            if graphs_png:
-                if graphs_png.get('img'):
-                    try:
-                        bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
-                        loggings.info("Send photo to {} ({})".format(sent_to, sent_id))
-                    except Exception as err:
-                        exp_update_cache(sent_to,sent_id,err)
-                        send_messages(sent_to, message, graphs_png)
-                    exit(0)
+            if graphs_png and graphs_png.get('img'):
+                try:
+                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
+                    loggings.info("Send photo to {} ({})".format(sent_to, sent_id))
+                except Exception as err:
+                    exp_update_cache(sent_to,sent_id,err)
+                    send_messages(sent_to, message, graphs_png)
+                exit(0)
 
             try:
                 bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True)
@@ -327,8 +337,8 @@ def main(args):
     message = body_messages.format(
         subject = subject.format_map(zabbix_status_emoji_map),
         messages = '{body}{links}{tags}'.format(body=data_zabbix['message'],
-        links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
-        tags = '\n\n' + tags_list if body_messages_tags else ''))
+        links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else None,
+        tags = '\n\n' + tags_list if body_messages_tags else None))
 
     send_messages(sent_to, message, graphs_png)
     exit(0)
