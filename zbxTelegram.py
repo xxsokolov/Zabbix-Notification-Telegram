@@ -342,7 +342,7 @@ def main(args):
         subject = subject.format_map(zabbix_status_emoji_map),
         messages = '{body}{links}{tags}'.format(body=data_zabbix['message'],
         links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else None,
-        tags = '\n\n' + tags_list if body_messages_tags else None))
+        tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else None))
 
     send_messages(sent_to, message, graphs_png)
     exit(0)
