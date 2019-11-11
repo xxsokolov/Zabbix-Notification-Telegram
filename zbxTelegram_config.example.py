@@ -6,6 +6,8 @@
 #  https://t.me/ZbxNTg #
 ########################
 
+config_debug_mode = True
+config_exc_info = True
 project_dir = '/zbxTelegram_files'
 project_cache_file = 'id.cache'
 log_file = '/zbxTelegram_files/znt.log'
