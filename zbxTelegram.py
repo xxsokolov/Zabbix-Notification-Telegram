@@ -216,7 +216,7 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
     if update:
         loggings.info("Updated id for {} ({}): old '{}' -> new '{}' in cache file".format(title, sent_type,update, send_id ))
     else:
-        loggings.info("Add new id for {} ({}) in cache file".format(title,sent_type))
+        loggings.info("Add new id {} for {} ({}) in cache file".format(send_id,title,sent_type))
     return True
 
 
@@ -232,9 +232,13 @@ def get_send_id(send_to):
         chat = None
         if re.search('^[0-9]+$', send_to) or re.search('^-[0-9]+$', send_to):
             return send_to
-        elif re.search('^@+[a-z0-9]+$', send_to):
+        elif re.search('^@+[a-zA-Z0-9_]{5,}$', send_to):
             send_to = send_to.replace("@", "")
-
+        elif re.search('^[a-zA-Z0-9_]{5,}$', send_to):
+            send_to = send_to.replace("@", "")
+        else:
+            raise ValueError('Username {} name does not match. You cant use a-z,A-Z,0-9 and underscores. '
+                             'The presence/absence of the @ symbol is not important'.format(send_to))
         send_id = get_cache(send_to)
 
         if send_id:
