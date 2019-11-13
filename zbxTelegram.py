@@ -36,7 +36,7 @@ class System:
         stdout_handler.setLevel(self.log_level)
         stdout_handler.setFormatter(log_format)
         # writing to file
-        file_handler = logging.FileHandler(filename=os.path.dirname(sys.argv[0])+log_file, mode='a')
+        file_handler = logging.FileHandler(filename=config_log_file, mode='a')
         file_handler.setLevel(self.log_level)
         file_handler.setFormatter(log_format)
 
@@ -83,7 +83,7 @@ def watermark_text(img):
     img = Image.open(img)
     if img.height < 20:
         return False
-    font = ImageFont.truetype(os.path.dirname(sys.argv[0])+watermark_font, 14)
+    font = ImageFont.truetype(watermark_font, 14)
 
     line_height = sum(font.getmetrics())
 
@@ -182,14 +182,14 @@ def create_links_list(_bool=None, url=None, _type=None, url_list=None):
 def get_cache(title):
     read_cache = None
     try:
-        if not os.path.exists(".{}/{}".format(project_dir, project_cache_file)):
-            raise IOError(ENOENT, 'No such file or directory', ".{}/{}".format(project_dir, project_cache_file))
+        if not os.path.exists(config_cache_file):
+            raise IOError(ENOENT, 'No such file or directory', config_cache_file)
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info)
-        open(".{}/{}".format(project_dir, project_cache_file), 'a').close()
-        loggings.info("File {} created in {}".format(project_cache_file, project_dir))
+        open(config_cache_file, 'a').close()
+        loggings.info("Cache file created in {}".format(config_cache_file))
     else:
-        read_cache = open(".{}/{}".format(project_dir, project_cache_file), 'r').read()
+        read_cache = open(config_cache_file, 'r').read()
 
     if read_cache:
         cache = json.loads(read_cache)
@@ -202,7 +202,7 @@ def get_cache(title):
 
 
 def set_cache(title, send_id, sent_type, cache=None, update=None):
-    f = open(".{}/{}".format(project_dir, project_cache_file), 'r+')
+    f = open(config_cache_file, 'r+')
     r = f.read()
     if r:
         cache = json.loads(r)

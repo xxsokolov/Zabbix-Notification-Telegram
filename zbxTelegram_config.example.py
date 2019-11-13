@@ -8,9 +8,8 @@
 
 config_debug_mode = False
 config_exc_info = False
-project_dir = '/zbxTelegram_files'
-project_cache_file = 'id.cache'
-log_file = '/zbxTelegram_files/znt.log'
+config_cache_file = './zbxTelegram_files/id.cache'
+config_log_file = './zbxTelegram_files/znt.log'
 
 tg_proxy = True
 tg_proxy_server = {'https': 'socks5://username:password@domen:port'}
@@ -18,7 +17,7 @@ tg_token = '123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'
 
 watermark = True
 watermark_label = 'Dmitry Sokolov (https://github.com/xxsokolov)'
-watermark_font = '/zbxTelegram_files/ArialMT.ttf'
+watermark_font = './zbxTelegram_files/ArialMT.ttf'
 watermark_fill = 255
 watermark_rotate = 0
 watermark_expand = True
