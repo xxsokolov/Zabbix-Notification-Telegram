@@ -122,6 +122,8 @@ def get_chart_png(itemid, graff_name, period=None):
                 return dict(img=wmt, url=response.url)
             else:
                 return dict(img=response.content, url=response.url)
+        else:
+            return dict(img=response.content, url=response.url)
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
