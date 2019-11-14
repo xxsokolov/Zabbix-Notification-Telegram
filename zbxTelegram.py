@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 import json
 from errno import ENOENT
 import logging
+import unicodedata
 
 
 class System:
@@ -236,11 +237,10 @@ def get_send_id(send_to):
             return send_to
         elif re.search('^@+[a-zA-Z0-9_]{5,}$', send_to):
             send_to = send_to.replace("@", "")
-        elif re.search('^[a-zA-Z0-9_]{5,}$', send_to):
-            send_to = send_to.replace("@", "")
-        else:
-            raise ValueError('Username {} name does not match. You cant use a-z,A-Z,0-9 and underscores. '
-                             'The presence/absence of the @ symbol is not important'.format(send_to))
+        elif not send_to:
+            raise ValueError('Username or groupname is not specified. You can use for username '
+                             '@[a-z,A-Z,0-9 and underscores] and for groupname any characters. ')
+
         send_id = get_cache(send_to)
 
         if send_id:
@@ -263,7 +263,9 @@ def get_send_id(send_to):
                     set_cache(send_to, chat.id, chat.type)
                 return chat.id
 
-        raise ValueError('Username not found in cache file or no bot access (send message to @{})'.format(bot.get_me().username))
+        raise ValueError('Username or groupname not found in the cache file. No access occured or bot is not added to '
+                         'group "{sendto}" (Add bot group and send message to {bot})'.format(bot=bot.get_me().username,
+                                                                                                sendto=send_to))
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
