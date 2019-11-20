@@ -307,6 +307,13 @@ def main(args):
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
+    if args[1] == 'test' or args[2] == 'test':
+        send_messages(sent_to=args[0], message='🚨 Test 💛: Service is not running\nHost: testhost [192.168.0.77]\n'
+                                               'Last value: Stop (10:00:00 )\nDuration: 0m\n\n#Test, '
+                                               '#eid_130144443, #iid_60605, #tid_39303, #aid_22',
+                      graphs_png=dict(img=open('./zbxTelegram_files/test.png',mode='rb').read()))
+        exit(0)
+
     sent_to = args[0]
     subject = args[1]
     data_zabbix = xml_parsing(args[2])
