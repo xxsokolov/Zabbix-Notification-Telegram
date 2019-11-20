@@ -108,14 +108,14 @@ def get_chart_png(itemid, graff_name, period=None):
     try:
         data_api = {"name": zabbix_api_login, "password": zabbix_api_pass, "enter": "Sign in"}
 
-        req_cookie = requests.post(zabbix_api_url + "/", data=data_api, verify=True)
+        req_cookie = requests.post(zabbix_api_url, data=data_api, verify=False)
         cookie = req_cookie.cookies
         response = requests.get(zabbix_graff_chart.format(name=graff_name,
                                                           itemid=itemid,
                                                           zabbix_server=zabbix_api_url,
                                                           range_time= graphs_period_default if not period else period),
                                 cookies=cookie,
-                                verify=True)
+                                verify=False)
 
         if watermark:
             wmt = watermark_text(response.content)
@@ -311,7 +311,10 @@ def main(args):
         send_messages(sent_to=args[0], message='🚨 Test 💛: Service is not running\nHost: testhost [192.168.0.77]\n'
                                                'Last value: Stop (10:00:00 )\nDuration: 0m\n\n#Test, '
                                                '#eid_130144443, #iid_60605, #tid_39303, #aid_22',
-                      graphs_png=dict(img=open(os.path.abspath('./zbxTelegram_files/test.png'), mode='rb').read()))
+                      graphs_png=dict(
+                          img=open(
+                              file=os.path.dirname(os.path.realpath(__file__))+'/zbxTelegram_files/test.png',
+                              mode='rb').read()))
         exit(0)
 
     sent_to = args[0]
@@ -340,7 +343,10 @@ def main(args):
 
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
-        period_hour=time.strftime("%H", time.gmtime(graphs_period_default if not data_zabbix['graphs_period'] else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
+        period_hour=time.strftime(
+            "%H", time.gmtime(
+                graphs_period_default if not data_zabbix['graphs_period']
+                else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
     if data_zabbix.get('settings_graphs_bool'):
         graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
