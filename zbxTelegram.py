@@ -44,6 +44,11 @@ class System:
         self.log.addHandler(stdout_handler)
         self.log.addHandler(file_handler)
 
+
+class FailSafeDict(dict):
+    def __missing__(self, key):
+        return '{{key not found: {}}}'.format(key)
+
 loggings = System(config_debug_mode).log
 
 
@@ -313,7 +318,7 @@ def main(args):
                                                '#eid_130144443, #iid_60605, #tid_39303, #aid_22',
                       graphs_png=dict(
                           img=open(
-                              file=os.path.dirname(os.path.realpath(__file__))+'/zbxTelegram_files/test.png',
+                              file='{0}/zbxTelegram_files/test.png'.format(os.path.dirname(os.path.realpath(__file__))),
                               mode='rb').read()))
         exit(0)
 
@@ -356,7 +361,7 @@ def main(args):
         graphs_png = False
 
     message = body_messages.format(
-        subject = subject.format_map(zabbix_status_emoji_map),
+        subject = subject.format_map(FailSafeDict(zabbix_status_emoji_map)),
         messages = '{body}{links}{tags}'.format(body=data_zabbix['message'],
         links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
         tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
