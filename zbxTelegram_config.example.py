@@ -58,6 +58,7 @@ zabbix_graff_link = "{zabbix_server}history.php?action=showgraph&itemids[]={item
 zabbix_status_emoji_map = {
     "Problem": "🚨",
     "Resolved":"✅",
+    "Update": "🚧",
     "Information": "💙",
     "Warning":"💛",
     "Average":"🧡",
