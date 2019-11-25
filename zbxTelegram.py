@@ -142,10 +142,10 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
                 if tags:
                     if tags.find(':') != -1:
                         tag, value = tags.split(':')
-                        tags_list.append('#{tag}_{value}'.format(tag=re.sub('[^a-zA-Z0-9 \n\.]', '', tag),
-                                                                 value=re.sub('[^a-zA-Z0-9 \n\.]', '', value)))
+                        tags_list.append('#{tag}_{value}'.format(tag=tag.replace(" ", "_"),
+                                                                 value=value.replace(" ", "_")))
                     else:
-                        tags_list.append('#{tag}'.format(tag=re.sub('[^a-zA-Z0-9 \n\.]', '', tags)))
+                        tags_list.append('#{tag}'.format(tag=tags.replace(" ", "_")))
                 else:
                     tags_list.append(body_messages_no_tags)
         else:
@@ -154,18 +154,18 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
         tags_list.append(body_messages_no_tags)
 
     if body_messages_add_tags_event:
-        tags_list.append('#eid_' + settings_eventid)
+        tags_list.append(body_messages_tag_eventid + settings_eventid)
 
     if body_messages_add_tags_item:
-        tags_list.append('#iid_' + settings_itemid)
+        tags_list.append(body_messages_tag_itemid + settings_itemid)
 
     if body_messages_add_tags_trigger:
-        tags_list.append('#tid_' + settings_triggerid)
+        tags_list.append(body_messages_tag_triggerid + settings_triggerid)
 
     if body_messages_add_tags_action:
-        tags_list.append('#aid_' + settings_actionid)
+        tags_list.append(body_messages_tag_actionid + settings_actionid)
 
-    return ', '.join(tags_list)
+    return body_messages_tags_delimiter.join(tags_list)
 
 
 def create_links_list(_bool=None, url=None, _type=None, url_list=None):
