@@ -32,11 +32,16 @@ body_messages_url_notes = 'ℹ️'
 body_messages_url_ld_graphs = '📊'
 
 body_messages_tags = True
-body_messages_no_tags = '#no_tags'
 body_messages_add_tags_event = True
 body_messages_add_tags_item = True
 body_messages_add_tags_trigger = True
 body_messages_add_tags_action= True
+body_messages_no_tags = '#no_tags'
+body_messages_tags_delimiter = ' '
+body_messages_tag_eventid = '#eid_'
+body_messages_tag_itemid = '#iid_'
+body_messages_tag_triggerid = '#tid_'
+body_messages_tag_actionid = '#aid_'
 
 zabbix_api_url = 'http://zbx.local/'
 zabbix_api_login = 'Admin'
