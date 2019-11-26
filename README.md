@@ -16,7 +16,7 @@
 - [x] Формирование списка тэгов в теле сообщения
 - [x] Emoji мапинг статуса и важности события
 - [x] Наложение ватермарки на изображение
-- [x] Формирование и обновление кэшфайла (group -> supergroup)
+- [x] Формирование и обновление кэшфайла (privat, group -> supergroup)
 
 
 <a name="Plans"><h3>Plans</h2></a>
@@ -26,20 +26,24 @@
 
 <a name="Installation"><h3>Installation</h2></a>
 
-* С клонируем свежий релиз с GitHub
-```bash
-git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git
-```
-
 * Перейдем в директорию
 ```bash
-cd Zabbix-Notification-Telegram/
+cd /usr/lib/zabbix/alertscripts/
+```
+
+* С клонируем свежий релиз с GitHub
+```bash
+git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ```
 
 * Создадим виртуальное окружение
 ```bash
 virtualenv venv --python=python3
-```
+``` 
+или 
+```bash
+python3 -m venv venv
+``` 
 
 * Активируем виртуальное окружение
 ```bash
@@ -52,16 +56,14 @@ pip install -r .requirements
 deactivate
 ```
 
-* Скопируем исполняемые файлы в директорию alertscripts:
-
+* Переименуем файл конфигурации:
 ```bash
-cp -r * /usr/lib/zabbix/alertscripts/
+mv zbxTelegram_config.example.py zbxTelegram_config.py
 ```
-_Путь указан в -_  `zabbix_server.conf -> AlertScriptsPath=`
 
-* Перейдем в директорию alertscripts
+* Выдаем права
 ```bash
-cd /usr/lib/zabbix/alertscripts/
+chown -R zabbix:zabbix ../alertscripts
 ```
 
 * Разрешим выполнять файл скрипта
@@ -69,17 +71,10 @@ cd /usr/lib/zabbix/alertscripts/
 chmod +x zbxTelegram.py
 ```
 
-* Переименуем файл конфигурации
+* Редактируем конфигурационный файл 
 ```bash
-cp zbxTelegram_config.example.py zbxTelegram_config.py
+vim zbxTelegram_config.py
 ```
-
-* Проверим файлы в директории:
-```bash
-ls -la
-```
-<img src="https://imgur.com/JNKkJCG.png"></img>
-
  
 <a name="Configuration"><h3>Configuration</h2></a>
 
@@ -88,9 +83,16 @@ ls -la
 
 `tg_proxy` = Отправка через прокси True/False
 
-`tg_proxy_server` = прокси сервера
+`tg_proxy_server`  = прокси сервера
 
-`tg_token` = token to access the HTTP API
+`tg_token` = token to access the Telegram API
+
+`zabbix_api_url` = Путь до Zabbix
+
+`zabbix_api_login` = Логин
+
+`zabbix_api_pass` = Пароль
+
 
 **Настройка Actions**
 
@@ -98,7 +100,11 @@ ls -la
 
 `{Problem} {TRIGGER.SEVERITY} {{TRIGGER.SEVERITY}}: {EVENT.NAME}`
 
-`{Problem}` - мапинг значений Problem\Resolved в emoji (config: zabbix_status_emoji_map)
+`{Resolved} {TRIGGER.SEVERITY} {{TRIGGER.SEVERITY}} {EVENT.NAME}`
+
+`{Update} {TRIGGER.SEVERITY} {{TRIGGER.SEVERITY}} {EVENT.NAME}`
+
+`{Problem}` - мапинг значений Problem\Resolved\Update в emoji (config: zabbix_status_emoji_map)
 
 `{{TRIGGER.SEVERITY}}` - мапинг значений Severity в emoji (config: zabbix_status_emoji_map)
 
@@ -122,9 +128,27 @@ ls -la
 </settings>
 ``` 
 
+**Тестирование**
+* Из консоли
+```bash
+./zbxTelegram.py @username test test
+
+[2019-11-26 11:48:37,723] - PID:73794 - main() - zbxTelegram.py:311 - INFO: Send to @username action: test
+[2019-11-26 11:48:38,653] - PID:73794 - send_messages() - zbxTelegram.py:290 - INFO: Send photo to @username (00000000)
+```
+* Из media type
+<img src="https://imgur.com/6ej0d40.png">
+
+
 **Описание настроек**
 
 `<graphs></graphs>` - прикреплять график (True\False)
+
+`<graphlinks>True</graphlinks>` - прикрепить ссылку url на History (True\False)
+
+`<triggerlinks>True</triggerlinks>` - прикрепить ссылку url из триггера (True\False)
+
+`<tag>True</tag>` - прикрепить теги (True\False)
 
 `<graphs_period></graphs_period>` - период графика в секундах
 
@@ -138,17 +162,10 @@ ls -la
 
 `<triggerurl></triggerurl>` - передача url из триггера {TRIGGER.URL}
 
-`<graphslinks></graphslinks>` - прикрепить ссылку на History (True\False)
-
 `<tags></tags>` - передача списка тэгов из триггера {EVENT.TAGS}
 
 
 #### Нотиф:
-
 <img src="https://imgur.com/fQpq77E.png">
-
-#### Настройка алерта:
-
-<img src="https://imgur.com/9ke7VyX.png">
 
 ###### Жду всех в **Telegram**: https://t.me/ZbxNTg
