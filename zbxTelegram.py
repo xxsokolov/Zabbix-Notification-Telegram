@@ -268,8 +268,8 @@ def get_send_id(send_to):
                     set_cache(send_to, chat.id, chat.type)
                 return chat.id
 
-        raise ValueError('Username or groupname not found in the cache file. No access occured or bot is not added to '
-                         'group "{sendto}" (Add bot group and send message to {bot})'.format(bot=bot.get_me().username,
+        raise ValueError('Username or groupname not found in the cache file. No access occurred or bot is not added to '
+                         'group "{sendto}" (Add bot group and/or send message to {bot})'.format(bot=bot.get_me().username,
                                                                                                 sendto=send_to))
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
