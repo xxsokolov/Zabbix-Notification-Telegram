@@ -63,7 +63,7 @@ mv zbxTelegram_config.example.py zbxTelegram_config.py
 
 * Выдаем права
 ```bash
-chown -R zabbix:zabbix ../alertscripts
+chown -R zabbix:zabbix zbxTelegram.py zbxTelegram_config.py zbxTelegram_files/ 
 ```
 
 * Разрешим выполнять файл скрипта
@@ -76,10 +76,12 @@ chmod +x zbxTelegram.py
 vim zbxTelegram_config.py
 ```
  
+ 
 <a name="Configuration"><h3>Configuration</h2></a>
 
 
-* Настройка **zbxTelegram_config.py**
+**Настройка zbxTelegram_config.py**
+
 
 `tg_proxy` = Отправка через прокси True/False
 
@@ -94,7 +96,26 @@ vim zbxTelegram_config.py
 `zabbix_api_pass` = Пароль
 
 
+**Настройка Media types**
+
+
+_Name_: ZNT
+
+_Type_: Script
+
+_Script name_: zbxTelegram.py
+
+_Script parameters_:
+
+`{ALERT.SENDTO}`
+
+`{ALERT.SUBJECT}`
+
+`{ALERT.MESSAGE}`
+
+
 **Настройка Actions**
+
 
 * Default subject
 
@@ -128,7 +149,9 @@ vim zbxTelegram_config.py
 </settings>
 ``` 
 
+
 **Тестирование**
+
 * Из консоли
 ```bash
 ./zbxTelegram.py @username test test
