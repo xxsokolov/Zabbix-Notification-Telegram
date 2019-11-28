@@ -63,6 +63,7 @@ def xml_parsing(data):
         settings_graphlinks_bool = data['settings']['graphlinks']
         settings_triggerlinks_bool = data['settings']['triggerlinks']
         settings_tag_bool = data['settings']['tag']
+        settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
         settings_itemid = data['settings']['itemid']
@@ -73,13 +74,15 @@ def xml_parsing(data):
         settings_trigger_url = data['settings']['triggerurl']
         settings_tags = data['settings']['tags']
 
+
         return dict(title=settings_title, message=message, tags=settings_tags,
                     settings_graphs_bool=eval(settings_graphs_bool.capitalize()),
                     settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
                     settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
-                    settings_tag_bool=eval(settings_tag_bool.capitalize()), graphs_period=settings_graphs_period,
-                    itemid=settings_itemid, triggerid=settings_triggerid, triggerurl=settings_trigger_url,
-                    eventid=settings_eventid, actionid=settings_actionid)
+                    settings_tag_bool=eval(settings_tag_bool.capitalize()),
+                    settings_keyboard_bool=eval(settings_keyboard.capitalize()),
+                    graphs_period=settings_graphs_period, itemid=settings_itemid, triggerid=settings_triggerid,
+                    triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
@@ -286,7 +289,7 @@ def gen_markup():
     return markup
 
 
-def send_messages(sent_to, message, graphs_png):
+def send_messages(sent_to, message, graphs_png, settings_keyboard):
     try:
         bot = telebot.TeleBot(tg_token)
         if tg_proxy:
@@ -297,20 +300,37 @@ def send_messages(sent_to, message, graphs_png):
         if message and sent_to:
             if graphs_png and graphs_png.get('img'):
                 try:
-                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML", reply_markup=gen_markup() if zabbix_keyboard else None)
-                    loggings.info("Send photo to {} ({})".format(sent_to, sent_id))
+                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
+                                   reply_markup=gen_markup() if zabbix_keyboard and settings_keyboard else None)
+                    loggings.info("Send photo to {} ({}). Bot @{}({})".format(sent_to, sent_id,bot.get_me().username,
+                                                                              bot.get_me().id))
+                    exit(0)
+                except telebot.apihelper.ApiException as err:
+                    loggings.error("Exception occurred: {}. Bot @{}({})".format(err,bot.get_me().username,
+                                                                                bot.get_me().id),
+                                   exc_info=config_exc_info), exit(1)
                 except Exception as err:
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info)
                     exp_update_cache(sent_to,sent_id,err)
-                    send_messages(sent_to, message, graphs_png)
-                exit(0)
+                    send_messages(sent_to, message, graphs_png, settings_keyboard)
+
 
             try:
-                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True, reply_markup=gen_markup() if zabbix_keyboard else None)
-                loggings.info("Send message to {} ({})".format(sent_to, sent_id))
+                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
+                                 reply_markup=gen_markup() if zabbix_keyboard and settings_keyboard  else None)
+                loggings.info("Send photo to {} ({}). Bot @{}({})".format(sent_to, sent_id, bot.get_me().username,
+                                                                          bot.get_me().id))
+                exit(0)
+            except telebot.apihelper.ApiException as err:
+                loggings.error(
+                    "Exception occurred: {}. Bot @{}({})".format(err, bot.get_me().username, bot.get_me().id),
+                    exc_info=config_exc_info), exit(1)
             except Exception as err:
                 exp_update_cache(sent_to, sent_id, err)
-                send_messages(sent_to, message, graphs_png)
-            exit(0)
+                send_messages(sent_to, message, graphs_png, settings_keyboard)
+
+
+        raise ValueError('sent_to or message not found')
 
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
@@ -377,7 +397,7 @@ def main(args):
         links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
         tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
 
-    send_messages(sent_to, message, graphs_png)
+    send_messages(sent_to, message, graphs_png, data_zabbix.get('settings_keyboard_bool'))
     exit(0)
 
 
