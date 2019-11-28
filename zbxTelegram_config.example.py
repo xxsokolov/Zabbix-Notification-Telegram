@@ -48,6 +48,7 @@ zabbix_keyboard_button_message = 'Message'
 zabbix_keyboard_button_acknowledge = 'Acknowledge'
 zabbix_keyboard_button_severity = 'Change severity'
 zabbix_keyboard_button_history = 'History'
+zabbix_keyboard_row_width = 3
 
 zabbix_api_url = 'http://zbx.local/'
 zabbix_api_login = 'Admin'

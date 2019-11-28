@@ -278,7 +278,7 @@ def get_send_id(send_to):
 
 def gen_markup():
     markup = InlineKeyboardMarkup()
-    markup.row_width = 3
+    markup.row_width = zabbix_keyboard_row_width
     markup.add(InlineKeyboardButton(zabbix_keyboard_button_message, callback_data="ikb_messages"),
                InlineKeyboardButton(zabbix_keyboard_button_acknowledge, callback_data="ikb_acknowledge"),
                InlineKeyboardButton(zabbix_keyboard_button_severity, callback_data="ikb_severity"),
