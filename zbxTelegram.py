@@ -7,6 +7,7 @@
 ########################
 import telebot
 from telebot import apihelper
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import xmltodict
 from zbxTelegram_config import *
 import requests
@@ -275,6 +276,16 @@ def get_send_id(send_to):
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
+def gen_markup():
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 3
+    markup.add(InlineKeyboardButton(zabbix_keyboard_button_message, callback_data="ikb_messages"),
+               InlineKeyboardButton(zabbix_keyboard_button_acknowledge, callback_data="ikb_acknowledge"),
+               InlineKeyboardButton(zabbix_keyboard_button_severity, callback_data="ikb_severity"),
+               InlineKeyboardButton(zabbix_keyboard_button_history, callback_data="ikb_history"))
+    return markup
+
+
 def send_messages(sent_to, message, graphs_png):
     try:
         bot = telebot.TeleBot(tg_token)
@@ -286,7 +297,7 @@ def send_messages(sent_to, message, graphs_png):
         if message and sent_to:
             if graphs_png and graphs_png.get('img'):
                 try:
-                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
+                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML", reply_markup=gen_markup() if zabbix_keyboard else None)
                     loggings.info("Send photo to {} ({})".format(sent_to, sent_id))
                 except Exception as err:
                     exp_update_cache(sent_to,sent_id,err)
@@ -294,7 +305,7 @@ def send_messages(sent_to, message, graphs_png):
                 exit(0)
 
             try:
-                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True)
+                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True, reply_markup=gen_markup() if zabbix_keyboard else None)
                 loggings.info("Send message to {} ({})".format(sent_to, sent_id))
             except Exception as err:
                 exp_update_cache(sent_to, sent_id, err)
