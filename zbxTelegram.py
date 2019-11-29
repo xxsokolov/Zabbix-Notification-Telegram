@@ -282,17 +282,24 @@ def get_send_id(send_to):
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
-def gen_markup():
+def gen_markup(eventid):
     markup = InlineKeyboardMarkup()
     markup.row_width = zabbix_keyboard_row_width
-    markup.add(InlineKeyboardButton(zabbix_keyboard_button_message, callback_data="ikb_messages"),
-               InlineKeyboardButton(zabbix_keyboard_button_acknowledge, callback_data="ikb_acknowledge"),
-               InlineKeyboardButton(zabbix_keyboard_button_severity, callback_data="ikb_severity"),
-               InlineKeyboardButton(zabbix_keyboard_button_history, callback_data="ikb_history"))
+    markup.add(
+        InlineKeyboardButton(zabbix_keyboard_button_message,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_messages",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_acknowledge,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_acknowledge",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_severity,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_severity",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_history,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_history",eventid=eventid)))),
+        InlineKeyboardButton('More',
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_more",eventid=eventid)))))
     return markup
 
 
-def send_messages(sent_to, message, graphs_png, settings_keyboard):
+def send_messages(sent_to, message, graphs_png, eventid, settings_keyboard):
     try:
         bot = telebot.TeleBot(tg_token)
         if tg_proxy:
@@ -302,9 +309,9 @@ def send_messages(sent_to, message, graphs_png, settings_keyboard):
             if graphs_png and graphs_png.get('img'):
                 try:
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
-                                   reply_markup=gen_markup() if zabbix_keyboard and settings_keyboard else None)
+                                   reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
                 except telebot.apihelper.ApiException as err:
-                    if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
+                    if 'migrate_to_chat_id' in json.loads(err.result.text):
                         migrate_group_id(sent_to, sent_id, err)
                         send_messages(sent_to, message, graphs_png, settings_keyboard)
                     else:
@@ -318,7 +325,7 @@ def send_messages(sent_to, message, graphs_png, settings_keyboard):
                     exit(0)
             try:
                 bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
-                                 reply_markup=gen_markup() if zabbix_keyboard and settings_keyboard  else None)
+                                 reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard  else None)
             except telebot.apihelper.ApiException as err:
                 if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
                     migrate_group_id(sent_to, sent_id, err)
@@ -398,7 +405,7 @@ def main(args):
         links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
         tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
 
-    send_messages(sent_to, message, graphs_png, data_zabbix.get('settings_keyboard_bool'))
+    send_messages(sent_to, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)
 
 
