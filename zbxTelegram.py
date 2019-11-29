@@ -221,7 +221,10 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
     if not cache:
         cache = {title: dict(type=str(sent_type), id=str(send_id))}
     else:
-        cache[title] = dict(type=str(sent_type), id=str(send_id))
+        if not update:
+            cache[title] = dict(type=str(sent_type), id=str(send_id))
+        else:
+            cache[title] = dict(type=str(sent_type), id=str(send_id), old=str(update))
     f.seek(0)
     f.write(json.dumps(cache,sort_keys=True, indent=4))
     f.close()
@@ -232,10 +235,10 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
     return True
 
 
-def exp_update_cache(sent_to, sent_id, err):
+def migrate_group_id(sent_to, sent_id, err):
     for key, value in json.loads(err.result.text).items():
         if key == 'parameters' and value['migrate_to_chat_id']:
-            loggings.error("Group id migrate to {}".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
+            loggings.error("Group chat was upgraded to a supergroup chat ({})".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
             set_cache(sent_to, value['migrate_to_chat_id'], 'supergroup', update=sent_id)
 
 
@@ -294,44 +297,42 @@ def send_messages(sent_to, message, graphs_png, settings_keyboard):
         bot = telebot.TeleBot(tg_token)
         if tg_proxy:
             apihelper.proxy = tg_proxy_server
-
         sent_id = get_send_id(sent_to)
-
         if message and sent_to:
             if graphs_png and graphs_png.get('img'):
                 try:
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
                                    reply_markup=gen_markup() if zabbix_keyboard and settings_keyboard else None)
-                    loggings.info("Send photo to {} ({}). Bot @{}({})".format(sent_to, sent_id,bot.get_me().username,
-                                                                              bot.get_me().id))
-                    exit(0)
                 except telebot.apihelper.ApiException as err:
-                    loggings.error("Exception occurred: {}. Bot @{}({})".format(err,bot.get_me().username,
-                                                                                bot.get_me().id),
-                                   exc_info=config_exc_info), exit(1)
+                    if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
+                        migrate_group_id(sent_to, sent_id, err)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                    else:
+                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
+                        exit(1)
                 except Exception as err:
                     loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info)
-                    exp_update_cache(sent_to,sent_id,err)
-                    send_messages(sent_to, message, graphs_png, settings_keyboard)
-
-
+                else:
+                    loggings.info('Bot @{busername}({bid}) send photo to "{sent_to}" ({sent_id}).'.format(
+                        sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                    exit(0)
             try:
                 bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
                                  reply_markup=gen_markup() if zabbix_keyboard and settings_keyboard  else None)
-                loggings.info("Send photo to {} ({}). Bot @{}({})".format(sent_to, sent_id, bot.get_me().username,
-                                                                          bot.get_me().id))
-                exit(0)
             except telebot.apihelper.ApiException as err:
-                loggings.error(
-                    "Exception occurred: {}. Bot @{}({})".format(err, bot.get_me().username, bot.get_me().id),
-                    exc_info=config_exc_info), exit(1)
+                if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
+                    migrate_group_id(sent_to, sent_id, err)
+                    send_messages(sent_to, message, graphs_png, settings_keyboard)
+                else:
+                    loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
+                    exit(1)
             except Exception as err:
-                exp_update_cache(sent_to, sent_id, err)
+                migrate_group_id(sent_to, sent_id, err)
                 send_messages(sent_to, message, graphs_png, settings_keyboard)
-
-
-        raise ValueError('sent_to or message not found')
-
+            else:
+                loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
+                    sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                exit(0)
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
