@@ -7,6 +7,7 @@
 ########################
 import telebot
 from telebot import apihelper
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import xmltodict
 from zbxTelegram_config import *
 import requests
@@ -62,6 +63,7 @@ def xml_parsing(data):
         settings_graphlinks_bool = data['settings']['graphlinks']
         settings_triggerlinks_bool = data['settings']['triggerlinks']
         settings_tag_bool = data['settings']['tag']
+        settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
         settings_itemid = data['settings']['itemid']
@@ -72,13 +74,15 @@ def xml_parsing(data):
         settings_trigger_url = data['settings']['triggerurl']
         settings_tags = data['settings']['tags']
 
+
         return dict(title=settings_title, message=message, tags=settings_tags,
                     settings_graphs_bool=eval(settings_graphs_bool.capitalize()),
                     settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
                     settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
-                    settings_tag_bool=eval(settings_tag_bool.capitalize()), graphs_period=settings_graphs_period,
-                    itemid=settings_itemid, triggerid=settings_triggerid, triggerurl=settings_trigger_url,
-                    eventid=settings_eventid, actionid=settings_actionid)
+                    settings_tag_bool=eval(settings_tag_bool.capitalize()),
+                    settings_keyboard_bool=eval(settings_keyboard.capitalize()),
+                    graphs_period=settings_graphs_period, itemid=settings_itemid, triggerid=settings_triggerid,
+                    triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
@@ -217,7 +221,10 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
     if not cache:
         cache = {title: dict(type=str(sent_type), id=str(send_id))}
     else:
-        cache[title] = dict(type=str(sent_type), id=str(send_id))
+        if not update:
+            cache[title] = dict(type=str(sent_type), id=str(send_id))
+        else:
+            cache[title] = dict(type=str(sent_type), id=str(send_id), old=str(update))
     f.seek(0)
     f.write(json.dumps(cache,sort_keys=True, indent=4))
     f.close()
@@ -228,10 +235,10 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
     return True
 
 
-def exp_update_cache(sent_to, sent_id, err):
+def migrate_group_id(sent_to, sent_id, err):
     for key, value in json.loads(err.result.text).items():
         if key == 'parameters' and value['migrate_to_chat_id']:
-            loggings.error("Group id migrate to {}".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
+            loggings.error("Group chat was upgraded to a supergroup chat ({})".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
             set_cache(sent_to, value['migrate_to_chat_id'], 'supergroup', update=sent_id)
 
 
@@ -275,32 +282,64 @@ def get_send_id(send_to):
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
-def send_messages(sent_to, message, graphs_png):
+def gen_markup(eventid):
+    markup = InlineKeyboardMarkup()
+    markup.row_width = zabbix_keyboard_row_width
+    markup.add(
+        InlineKeyboardButton(zabbix_keyboard_button_message,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_messages",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_acknowledge,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_acknowledge",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_severity,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_severity",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_history,
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_history",eventid=eventid)))),
+        InlineKeyboardButton('More',
+                             callback_data='{}'.format(json.dumps(dict(action="ikb_more",eventid=eventid)))))
+    return markup
+
+
+def send_messages(sent_to, message, graphs_png, eventid, settings_keyboard):
     try:
         bot = telebot.TeleBot(tg_token)
         if tg_proxy:
             apihelper.proxy = tg_proxy_server
-
         sent_id = get_send_id(sent_to)
-
         if message and sent_to:
             if graphs_png and graphs_png.get('img'):
                 try:
-                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML")
-                    loggings.info("Send photo to {} ({})".format(sent_to, sent_id))
+                    bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
+                                   reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
+                except telebot.apihelper.ApiException as err:
+                    if 'migrate_to_chat_id' in json.loads(err.result.text):
+                        migrate_group_id(sent_to, sent_id, err)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                    else:
+                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
+                        exit(1)
                 except Exception as err:
-                    exp_update_cache(sent_to,sent_id,err)
-                    send_messages(sent_to, message, graphs_png)
-                exit(0)
-
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info)
+                else:
+                    loggings.info('Bot @{busername}({bid}) send photo to "{sent_to}" ({sent_id}).'.format(
+                        sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                    exit(0)
             try:
-                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True)
-                loggings.info("Send message to {} ({})".format(sent_to, sent_id))
+                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
+                                 reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard  else None)
+            except telebot.apihelper.ApiException as err:
+                if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
+                    migrate_group_id(sent_to, sent_id, err)
+                    send_messages(sent_to, message, graphs_png, settings_keyboard)
+                else:
+                    loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
+                    exit(1)
             except Exception as err:
-                exp_update_cache(sent_to, sent_id, err)
-                send_messages(sent_to, message, graphs_png)
-            exit(0)
-
+                migrate_group_id(sent_to, sent_id, err)
+                send_messages(sent_to, message, graphs_png, settings_keyboard)
+            else:
+                loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
+                    sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                exit(0)
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
@@ -366,7 +405,7 @@ def main(args):
         links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
         tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
 
-    send_messages(sent_to, message, graphs_png)
+    send_messages(sent_to, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)
 
 

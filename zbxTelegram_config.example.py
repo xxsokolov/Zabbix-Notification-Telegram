@@ -43,6 +43,13 @@ body_messages_tag_itemid = '#iid_'
 body_messages_tag_triggerid = '#tid_'
 body_messages_tag_actionid = '#aid_'
 
+zabbix_keyboard = False
+zabbix_keyboard_button_message = 'Message'
+zabbix_keyboard_button_acknowledge = 'Acknowledge'
+zabbix_keyboard_button_severity = 'Change severity'
+zabbix_keyboard_button_history = 'History'
+zabbix_keyboard_row_width = 3
+
 zabbix_api_url = 'http://zbx.local/'
 zabbix_api_login = 'Admin'
 zabbix_api_pass = 'zabbix'
