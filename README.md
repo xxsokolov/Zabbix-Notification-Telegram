@@ -11,6 +11,8 @@
 ### Key Features
 - [x] Отправка графиков и последних значений **в одном сообщении**
 - [x] Гибкая настройка шаблона в теле сообщения
+- [x] Обработка быстрых команд ботом <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
+- [x] Отправка показателей по запросу от бота <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
 - [x] Передача данных из экшена XML разметкой
 - [x] Формирование списка линков в теле сообщения
 - [x] Формирование списка тэгов в теле сообщения
@@ -20,8 +22,6 @@
 
 
 <a name="Plans"><h3>Plans</h2></a>
-- Обработка быстрых команд ботом
-- Отправка показателей по запросу от бота
 - Gitlab CI\CD
 
 <a name="Installation"><h3>Installation</h2></a>
@@ -189,6 +189,6 @@ _Script parameters_:
 
 
 #### Нотиф:
-<img src="https://imgur.com/fQpq77E.png">
+<img src="https://imgur.com/ayKo62v.png">
 
 ###### Жду всех в **Telegram**: https://t.me/ZbxNTg
