@@ -296,7 +296,7 @@ def gen_markup(eventid):
     return markup
 
 
-def send_messages(sent_to, message, graphs_png, eventid, settings_keyboard):
+def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboard = None):
     try:
         bot = telebot.TeleBot(tg_token)
         if tg_proxy:

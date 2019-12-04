@@ -46,7 +46,6 @@ body_messages_tag_actionid = '#aid_'
 zabbix_keyboard = False
 zabbix_keyboard_button_message = 'Message'
 zabbix_keyboard_button_acknowledge = 'Acknowledge'
-zabbix_keyboard_button_severity = 'Change severity'
 zabbix_keyboard_button_history = 'History'
 zabbix_keyboard_row_width = 3
 
