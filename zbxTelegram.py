@@ -11,6 +11,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import xmltodict
 from zbxTelegram_config import *
 import requests
+import urllib3
 import re, sys, os, time
 import io
 from PIL import Image, ImageDraw, ImageFont
@@ -51,7 +52,7 @@ class FailSafeDict(dict):
         return '{{key not found: {}}}'.format(key)
 
 loggings = System(config_debug_mode).log
-
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def xml_parsing(data):
     try:
@@ -287,19 +288,15 @@ def gen_markup(eventid):
     markup.row_width = zabbix_keyboard_row_width
     markup.add(
         InlineKeyboardButton(zabbix_keyboard_button_message,
-                             callback_data='{}'.format(json.dumps(dict(action="ikb_messages",eventid=eventid)))),
+                             callback_data='{}'.format(json.dumps(dict(action="Messages",eventid=eventid)))),
         InlineKeyboardButton(zabbix_keyboard_button_acknowledge,
-                             callback_data='{}'.format(json.dumps(dict(action="ikb_acknowledge",eventid=eventid)))),
-        InlineKeyboardButton(zabbix_keyboard_button_severity,
-                             callback_data='{}'.format(json.dumps(dict(action="ikb_severity",eventid=eventid)))),
+                             callback_data='{}'.format(json.dumps(dict(action="Acknowledge",eventid=eventid)))),
         InlineKeyboardButton(zabbix_keyboard_button_history,
-                             callback_data='{}'.format(json.dumps(dict(action="ikb_history",eventid=eventid)))),
-        InlineKeyboardButton('More',
-                             callback_data='{}'.format(json.dumps(dict(action="ikb_more",eventid=eventid)))))
+                             callback_data='{}'.format(json.dumps(dict(action="History",eventid=eventid)))))
     return markup
 
 
-def send_messages(sent_to, message, graphs_png, eventid, settings_keyboard):
+def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboard = None):
     try:
         bot = telebot.TeleBot(tg_token)
         if tg_proxy:
