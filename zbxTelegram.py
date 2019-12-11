@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw, ImageFont
 import json
 from errno import ENOENT
 import logging
-import unicodedata
+import html
 
 
 class System:
@@ -147,10 +147,10 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
                 if tags:
                     if tags.find(':') != -1:
                         tag, value = tags.split(':')
-                        tags_list.append('#{tag}_{value}'.format(tag=tag.replace(" ", "_"),
-                                                                 value=value.replace(" ", "_")))
+                        tags_list.append('#{tag}_{value}'.format(tag=re.sub("\W+", "_",tag),
+                                                                 value=re.sub("\W+", "_",value)))
                     else:
-                        tags_list.append('#{tag}'.format(tag=tags.replace(" ", "_")))
+                        tags_list.append('#{tag}'.format(tag=re.sub("\W+", "_",tags)))
                 else:
                     tags_list.append(body_messages_no_tags)
         else:
@@ -288,11 +288,11 @@ def gen_markup(eventid):
     markup.row_width = zabbix_keyboard_row_width
     markup.add(
         InlineKeyboardButton(zabbix_keyboard_button_message,
-                             callback_data='{}'.format(json.dumps(dict(action="Messages",eventid=eventid)))),
+                             callback_data='{}'.format(json.dumps(dict(action="messages",eventid=eventid)))),
         InlineKeyboardButton(zabbix_keyboard_button_acknowledge,
-                             callback_data='{}'.format(json.dumps(dict(action="Acknowledge",eventid=eventid)))),
+                             callback_data='{}'.format(json.dumps(dict(action="acknowledge",eventid=eventid)))),
         InlineKeyboardButton(zabbix_keyboard_button_history,
-                             callback_data='{}'.format(json.dumps(dict(action="History",eventid=eventid)))))
+                             callback_data='{}'.format(json.dumps(dict(action="history",eventid=eventid)))))
     return markup
 
 
@@ -349,7 +349,7 @@ def main(args):
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
     if args[1] == 'test' or args[2] == 'test':
-        send_messages(sent_to=args[0], message='🚨 Test 💛: Service is not running\nHost: testhost [192.168.0.77]\n'
+        send_messages(sent_to=args[0], message='🚨 Test 💛: Service is not &lt; running\nHost: testhost [192.168.0.77]\n'
                                                'Last value: Stop (10:00:00 )\nDuration: 0m\n\n#Test, '
                                                '#eid_130144443, #iid_60605, #tid_39303, #aid_22',
                       graphs_png=dict(
@@ -397,10 +397,12 @@ def main(args):
         graphs_png = False
 
     message = body_messages.format(
-        subject = subject.format_map(FailSafeDict(zabbix_status_emoji_map)),
-        messages = '{body}{links}{tags}'.format(body=data_zabbix['message'],
-        links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
-        tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
+        subject = html.escape(subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
+        messages = '{body}{links}{tags}'.format(
+            body=html.escape(data_zabbix['message']),
+            links = '\nLinks: {}'.format(
+                ' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
+            tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
 
     send_messages(sent_to, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)
