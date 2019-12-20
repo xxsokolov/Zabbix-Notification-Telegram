@@ -53,6 +53,9 @@ class FailSafeDict(dict):
 
 loggings = System(config_debug_mode).log
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+bot = telebot.TeleBot(tg_token)
+if tg_proxy:
+    apihelper.proxy = tg_proxy_server
 
 def xml_parsing(data):
     try:
@@ -259,8 +262,7 @@ def get_send_id(send_to):
         if send_id:
             return send_id
 
-        bot = telebot.TeleBot(tg_token)
-        for line in bot.get_updates(timeout=3):
+        for line in bot.get_updates(timeout=5,offset=0):
             if line.message:
                 chat = line.message.chat
             elif line.edited_message:
@@ -292,30 +294,31 @@ def gen_markup(eventid):
         InlineKeyboardButton(zabbix_keyboard_button_acknowledge,
                              callback_data='{}'.format(json.dumps(dict(action="acknowledge",eventid=eventid)))),
         InlineKeyboardButton(zabbix_keyboard_button_history,
-                             callback_data='{}'.format(json.dumps(dict(action="history",eventid=eventid)))))
+                             callback_data='{}'.format(json.dumps(dict(action="history",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_history,
+                             callback_data='{}'.format(json.dumps(dict(action="last value",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_history,
+                             callback_data='{}'.format(json.dumps(dict(action="graphs",eventid=eventid)))))
     return markup
 
 
 def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboard = None):
     try:
-        bot = telebot.TeleBot(tg_token)
-        if tg_proxy:
-            apihelper.proxy = tg_proxy_server
         sent_id = get_send_id(sent_to)
         if message and sent_to:
             if graphs_png and graphs_png.get('img'):
                 try:
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
                                    reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
-                except telebot.apihelper.ApiException as err:
+                except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in json.loads(err.result.text):
                         migrate_group_id(sent_to, sent_id, err)
                         send_messages(sent_to, message, graphs_png, settings_keyboard)
                     else:
-                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
+                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info),
                         exit(1)
                 except Exception as err:
-                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info)
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
                 else:
                     loggings.info('Bot @{busername}({bid}) send photo to "{sent_to}" ({sent_id}).'.format(
                         sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
@@ -323,7 +326,7 @@ def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboar
             try:
                 bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
                                  reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard  else None)
-            except telebot.apihelper.ApiException as err:
+            except apihelper.ApiException as err:
                 if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
                     migrate_group_id(sent_to, sent_id, err)
                     send_messages(sent_to, message, graphs_png, settings_keyboard)
@@ -331,8 +334,7 @@ def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboar
                     loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
                     exit(1)
             except Exception as err:
-                migrate_group_id(sent_to, sent_id, err)
-                send_messages(sent_to, message, graphs_png, settings_keyboard)
+                loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
             else:
                 loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
                     sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
@@ -349,7 +351,7 @@ def main(args):
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
     if args[1] == 'test' or args[2] == 'test':
-        send_messages(sent_to=args[0], message='🚨 Test 💛: Service is not &lt; running\nHost: testhost [192.168.0.77]\n'
+        send_messages(sent_to=args[0], message='🚨 Test 💛: Service is not running\nHost: testhost [192.168.0.77]\n'
                                                'Last value: Stop (10:00:00 )\nDuration: 0m\n\n#Test, '
                                                '#eid_130144443, #iid_60605, #tid_39303, #aid_22',
                       graphs_png=dict(
