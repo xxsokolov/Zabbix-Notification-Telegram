@@ -311,7 +311,7 @@ def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboar
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
                                    reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
                 except apihelper.ApiException as err:
-                    if 'migrate_to_chat_id' in json.loads(err.result.text):
+                    if 'migrate_to_chat_id' in err.result.text:
                         migrate_group_id(sent_to, sent_id, err)
                         send_messages(sent_to, message, graphs_png, settings_keyboard)
                     else:
