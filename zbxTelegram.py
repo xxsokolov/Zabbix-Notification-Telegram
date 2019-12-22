@@ -421,7 +421,8 @@ def main(args):
                                    period=data_zabbix['graphs_period'])
         else:
             graphs_png_group = []
-            for item_id in data_zabbix.get('itemid').split():
+            #  get the unique itemid
+            for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
                 graphs_png_group.append(InputMediaPhoto(get_chart_png(itemid=item_id,
                                            graff_name=graphs_name,
                                            period=data_zabbix['graphs_period']).get('img')))
