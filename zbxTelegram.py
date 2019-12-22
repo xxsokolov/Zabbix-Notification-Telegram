@@ -165,8 +165,9 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
         tags_list.append(body_messages_tag_eventid + settings_eventid)
 
     if body_messages_add_tags_item:
-        for itemid in settings_itemid.split():
-            tags_list.append(body_messages_tag_itemid + itemid)
+        for item_id in list(set([x for x in settings_itemid.split()])):
+            if re.findall("\d+",item_id):
+                tags_list.append(body_messages_tag_itemid + item_id)
 
     if body_messages_add_tags_trigger:
         tags_list.append(body_messages_tag_triggerid + settings_triggerid)
