@@ -423,9 +423,10 @@ def main(args):
             graphs_png_group = []
             #  get the unique itemid
             for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
-                graphs_png_group.append(InputMediaPhoto(get_chart_png(itemid=item_id,
-                                           graff_name=graphs_name,
-                                           period=data_zabbix['graphs_period']).get('img')))
+                if re.findall("\d+",item_id):
+                    graphs_png_group.append(InputMediaPhoto(get_chart_png(itemid=item_id,
+                                               graff_name=graphs_name,
+                                               period=data_zabbix['graphs_period']).get('img')))
             graphs_png = graphs_png_group
     else:
         graphs_png = False
