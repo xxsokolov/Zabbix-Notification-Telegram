@@ -7,7 +7,7 @@
 ########################
 import telebot
 from telebot import apihelper
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 import xmltodict
 from zbxTelegram_config import *
 import requests
@@ -165,7 +165,8 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
         tags_list.append(body_messages_tag_eventid + settings_eventid)
 
     if body_messages_add_tags_item:
-        tags_list.append(body_messages_tag_itemid + settings_itemid)
+        for itemid in settings_itemid.split():
+            tags_list.append(body_messages_tag_itemid + itemid)
 
     if body_messages_add_tags_trigger:
         tags_list.append(body_messages_tag_triggerid + settings_triggerid)
@@ -306,7 +307,26 @@ def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboar
     try:
         sent_id = get_send_id(sent_to)
         if message and sent_to:
-            if graphs_png and graphs_png.get('img'):
+            if  graphs_png and type(graphs_png) is list:
+                try:
+                    print('Send group')
+                    graphs_png[0].caption = message
+                    graphs_png[0].parse_mode = "HTML"
+                    bot.send_media_group(chat_id=sent_id, media=graphs_png)
+                except apihelper.ApiException as err:
+                    if 'migrate_to_chat_id' in err.result.text:
+                        migrate_group_id(sent_to, sent_id, err)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                    else:
+                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info),
+                        exit(1)
+                except Exception as err:
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
+                else:
+                    loggings.info('Bot @{busername}({bid}) send media group to "{sent_to}" ({sent_id}).'.format(
+                        sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                    exit(0)
+            elif graphs_png and graphs_png.get('img'):
                 try:
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
                                    reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
@@ -323,22 +343,24 @@ def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboar
                     loggings.info('Bot @{busername}({bid}) send photo to "{sent_to}" ({sent_id}).'.format(
                         sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
                     exit(0)
-            try:
-                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
-                                 reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard  else None)
-            except apihelper.ApiException as err:
-                if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
-                    migrate_group_id(sent_to, sent_id, err)
-                    send_messages(sent_to, message, graphs_png, settings_keyboard)
-                else:
-                    loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
-                    exit(1)
-            except Exception as err:
-                loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
             else:
-                loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
-                    sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
-                exit(0)
+                try:
+                    bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
+                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard  else None)
+                except apihelper.ApiException as err:
+                    if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
+                        migrate_group_id(sent_to, sent_id, err)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                    else:
+                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
+                        exit(1)
+                except Exception as err:
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
+                else:
+                    loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
+                        sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                    exit(0)
+
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
@@ -347,6 +369,7 @@ def main(args):
     try:
         if args[0] and args[1] and args[2]:
             loggings.info("Send to {} action: {}".format(args[0], args[1]))
+            loggings.debug("Send to {}\naction: {}\nxml: {}".format(args[0],args[1],args[2]))
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
@@ -392,9 +415,17 @@ def main(args):
                 else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
     if data_zabbix.get('settings_graphs_bool'):
-        graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
+        if len(data_zabbix['itemid'].split()) == 1:
+            graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                    graff_name=graphs_name,
                                    period=data_zabbix['graphs_period'])
+        else:
+            graphs_png_group = []
+            for item_id in data_zabbix.get('itemid').split():
+                graphs_png_group.append(InputMediaPhoto(get_chart_png(itemid=item_id,
+                                           graff_name=graphs_name,
+                                           period=data_zabbix['graphs_period']).get('img')))
+            graphs_png = graphs_png_group
     else:
         graphs_png = False
 
