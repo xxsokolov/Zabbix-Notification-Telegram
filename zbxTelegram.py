@@ -244,7 +244,7 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
 def migrate_group_id(sent_to, sent_id, err):
     for key, value in json.loads(err.result.text).items():
         if key == 'parameters' and value['migrate_to_chat_id']:
-            loggings.error("Group chat was upgraded to a supergroup chat ({})".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
+            loggings.warning("Group chat was upgraded to a supergroup chat ({})".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
             set_cache(sent_to, value['migrate_to_chat_id'], 'supergroup', update=sent_id)
 
 
@@ -310,7 +310,6 @@ def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboar
         if message and sent_to:
             if  graphs_png and type(graphs_png) is list:
                 try:
-                    print('Send group')
                     graphs_png[0].caption = message
                     graphs_png[0].parse_mode = "HTML"
                     bot.send_media_group(chat_id=sent_id, media=graphs_png)
