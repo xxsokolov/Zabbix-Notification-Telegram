@@ -66,16 +66,19 @@ def xml_parsing(data):
         settings_graphs_bool = data['settings']['graphs']
         settings_graphlinks_bool = data['settings']['graphlinks']
         settings_triggerlinks_bool = data['settings']['triggerlinks']
+        settings_hostlinks_bool = data['settings']['hostlinks']
         settings_tag_bool = data['settings']['tag']
         settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
+        settings_hostid = data['settings']['hostid']
         settings_itemid = data['settings']['itemid']
         settings_triggerid = data['settings']['triggerid']
         settings_eventid = data['settings']['eventid']
         settings_actionid = data['settings']['actionid']
         settings_title = data['settings']['title']
         settings_trigger_url = data['settings']['triggerurl']
+
         settings_tags = data['settings']['tags']
 
 
@@ -83,9 +86,10 @@ def xml_parsing(data):
                     settings_graphs_bool=eval(settings_graphs_bool.capitalize()),
                     settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
                     settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
+                    settings_hostlinks_bool=eval(settings_hostlinks_bool.capitalize()),
                     settings_tag_bool=eval(settings_tag_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
-                    graphs_period=settings_graphs_period, itemid=settings_itemid, triggerid=settings_triggerid,
+                    graphs_period=settings_graphs_period, hostid=settings_hostid,itemid=settings_itemid, triggerid=settings_triggerid,
                     triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
@@ -182,19 +186,15 @@ def create_links_list(_bool=None, url=None, _type=None, url_list=None):
     try:
         if _bool:
             if url and (re.search(r'\w', url)):
-                return [body_messages_url_template.format(url=url, icon=_type)]
+                return body_messages_url_template.format(url=url, icon=_type)
             else:
-                return [body_messages_no_url]
+                return body_messages_no_url
         elif url_list:
-            _list = []
-            for key, value in url_list.items():
-                if value:
-                    _list.append(value[0])
-            return _list
+            return url_list
         else:
             return False
     except ValueError:
-        return [body_messages_no_url]
+        return body_messages_no_url
 
 
 def get_cache(title):
@@ -395,18 +395,27 @@ def main(args):
                                  data_zabbix['triggerid'],
                                  data_zabbix['actionid'])
 
-    graph_url = create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
-                                  url=zabbix_graff_link.format(
-                                      zabbix_server=zabbix_api_url,
-                                      itemid=data_zabbix['itemid'],
-                                      range_time=data_zabbix['graphs_period']),
-                                  _type=body_messages_url_ld_graphs
-                                  )
 
     trigger_url = create_links_list(_bool=data_zabbix.get('settings_triggerlinks_bool'),
-                                 url=data_zabbix.get('triggerurl'), _type=body_messages_url_notes)
+                                    url=data_zabbix.get('triggerurl'), _type=body_messages_url_notes)
 
-    url_list = create_links_list(url_list=dict(graph_url=graph_url, trigger_url=trigger_url))
+    host_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
+                                 url=zabbix_host_link.format(
+                                              zabbix_server=zabbix_api_url,
+                                              hostid=data_zabbix.get('hostid')),
+                                 _type=body_messages_url_host)
+    url_list = []
+    for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
+        if re.findall("\d+",item_id):
+            url_list.append(create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
+                                          url=zabbix_graff_link.format(
+                                              zabbix_server=zabbix_api_url,
+                                              itemid=item_id,
+                                              range_time=data_zabbix['graphs_period']),
+                                          _type=body_messages_url_ld_graphs
+                                          ))
+    url_list.append(trigger_url) if trigger_url else None
+    url_list.append(host_url) if host_url else None
 
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
@@ -436,8 +445,7 @@ def main(args):
         subject = html.escape(subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
         messages = '{body}{links}{tags}'.format(
             body=html.escape(data_zabbix['message']),
-            links = '\nLinks: {}'.format(
-                ' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
+            links = '\nLinks: {}'.format(' '.join(sorted(url_list))) if body_messages_url and len(url_list) != 0 else '',
             tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
 
     send_messages(sent_to, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
