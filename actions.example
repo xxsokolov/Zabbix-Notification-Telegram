@@ -18,7 +18,7 @@ Duration: {EVENT.AGE}]]>
 		<keyboard>True</keyboard>
 		<graphs_period>10800</graphs_period>
 		<host>{HOST.ID1}</host>
-		<itemid>{ITEM.ID1}</itemid>
+		<itemid>{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}</itemid>
 		<triggerid>{TRIGGER.ID}</triggerid>
 		<eventid>{EVENT.ID}</eventid>
 		<actionid>{ACTION.ID}</actionid>
