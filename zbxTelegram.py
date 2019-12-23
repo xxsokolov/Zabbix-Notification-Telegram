@@ -71,7 +71,7 @@ def xml_parsing(data):
         settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
-        settings_hostid = data['settings']['hostid']
+        settings_host = data['settings']['host']
         settings_itemid = data['settings']['itemid']
         settings_triggerid = data['settings']['triggerid']
         settings_eventid = data['settings']['eventid']
@@ -89,7 +89,7 @@ def xml_parsing(data):
                     settings_hostlinks_bool=eval(settings_hostlinks_bool.capitalize()),
                     settings_tag_bool=eval(settings_tag_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
-                    graphs_period=settings_graphs_period, hostid=settings_hostid,itemid=settings_itemid, triggerid=settings_triggerid,
+                    graphs_period=settings_graphs_period, host=settings_host,itemid=settings_itemid, triggerid=settings_triggerid,
                     triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
@@ -402,7 +402,7 @@ def main(args):
     host_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
                                  url=zabbix_host_link.format(
                                               zabbix_server=zabbix_api_url,
-                                              hostid=data_zabbix.get('hostid')),
+                                              host=data_zabbix.get('host')),
                                  _type=body_messages_url_host)
     url_list = []
     for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):

@@ -65,7 +65,7 @@ zabbix_graff_chart = '{zabbix_server}chart3.php?' \
                      'showtriggers=1&' \
                      'showworkperiod=1'
 
-zabbix_host_link = "{zabbix_server}hosts.php?form=update&hostid={hostid}&groupid=0"
+zabbix_host_link = "{zabbix_server}zabbix.php?action=search&search={host}"
 zabbix_graff_link = "{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"
 
 zabbix_status_emoji_map = {
