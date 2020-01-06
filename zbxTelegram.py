@@ -7,7 +7,7 @@
 ########################
 import telebot
 from telebot import apihelper
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 import xmltodict
 from zbxTelegram_config import *
 import requests
@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw, ImageFont
 import json
 from errno import ENOENT
 import logging
-import unicodedata
+import html
 
 
 class System:
@@ -53,6 +53,9 @@ class FailSafeDict(dict):
 
 loggings = System(config_debug_mode).log
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+bot = telebot.TeleBot(tg_token)
+if tg_proxy:
+    apihelper.proxy = tg_proxy_server
 
 def xml_parsing(data):
     try:
@@ -63,16 +66,19 @@ def xml_parsing(data):
         settings_graphs_bool = data['settings']['graphs']
         settings_graphlinks_bool = data['settings']['graphlinks']
         settings_triggerlinks_bool = data['settings']['triggerlinks']
+        settings_hostlinks_bool = data['settings']['hostlinks']
         settings_tag_bool = data['settings']['tag']
         settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
+        settings_host = data['settings']['host']
         settings_itemid = data['settings']['itemid']
         settings_triggerid = data['settings']['triggerid']
         settings_eventid = data['settings']['eventid']
         settings_actionid = data['settings']['actionid']
         settings_title = data['settings']['title']
         settings_trigger_url = data['settings']['triggerurl']
+
         settings_tags = data['settings']['tags']
 
 
@@ -80,9 +86,10 @@ def xml_parsing(data):
                     settings_graphs_bool=eval(settings_graphs_bool.capitalize()),
                     settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
                     settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
+                    settings_hostlinks_bool=eval(settings_hostlinks_bool.capitalize()),
                     settings_tag_bool=eval(settings_tag_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
-                    graphs_period=settings_graphs_period, itemid=settings_itemid, triggerid=settings_triggerid,
+                    graphs_period=settings_graphs_period, host=settings_host,itemid=settings_itemid, triggerid=settings_triggerid,
                     triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
@@ -147,10 +154,10 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
                 if tags:
                     if tags.find(':') != -1:
                         tag, value = tags.split(':')
-                        tags_list.append('#{tag}_{value}'.format(tag=tag.replace(" ", "_"),
-                                                                 value=value.replace(" ", "_")))
+                        tags_list.append('#{tag}_{value}'.format(tag=re.sub("\W+", "_",tag),
+                                                                 value=re.sub("\W+", "_",value)))
                     else:
-                        tags_list.append('#{tag}'.format(tag=tags.replace(" ", "_")))
+                        tags_list.append('#{tag}'.format(tag=re.sub("\W+", "_",tags)))
                 else:
                     tags_list.append(body_messages_no_tags)
         else:
@@ -162,7 +169,9 @@ def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_
         tags_list.append(body_messages_tag_eventid + settings_eventid)
 
     if body_messages_add_tags_item:
-        tags_list.append(body_messages_tag_itemid + settings_itemid)
+        for item_id in list(set([x for x in settings_itemid.split()])):
+            if re.findall("\d+",item_id):
+                tags_list.append(body_messages_tag_itemid + item_id)
 
     if body_messages_add_tags_trigger:
         tags_list.append(body_messages_tag_triggerid + settings_triggerid)
@@ -177,19 +186,15 @@ def create_links_list(_bool=None, url=None, _type=None, url_list=None):
     try:
         if _bool:
             if url and (re.search(r'\w', url)):
-                return [body_messages_url_template.format(url=url, icon=_type)]
+                return body_messages_url_template.format(url=url, icon=_type)
             else:
-                return [body_messages_no_url]
+                return body_messages_no_url
         elif url_list:
-            _list = []
-            for key, value in url_list.items():
-                if value:
-                    _list.append(value[0])
-            return _list
+            return url_list
         else:
             return False
     except ValueError:
-        return [body_messages_no_url]
+        return body_messages_no_url
 
 
 def get_cache(title):
@@ -239,7 +244,7 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
 def migrate_group_id(sent_to, sent_id, err):
     for key, value in json.loads(err.result.text).items():
         if key == 'parameters' and value['migrate_to_chat_id']:
-            loggings.error("Group chat was upgraded to a supergroup chat ({})".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
+            loggings.warning("Group chat was upgraded to a supergroup chat ({})".format(value['migrate_to_chat_id']), exc_info=config_exc_info)
             set_cache(sent_to, value['migrate_to_chat_id'], 'supergroup', update=sent_id)
 
 
@@ -259,8 +264,7 @@ def get_send_id(send_to):
         if send_id:
             return send_id
 
-        bot = telebot.TeleBot(tg_token)
-        for line in bot.get_updates(timeout=3):
+        for line in bot.get_updates(timeout=5,offset=0):
             if line.message:
                 chat = line.message.chat
             elif line.edited_message:
@@ -288,55 +292,75 @@ def gen_markup(eventid):
     markup.row_width = zabbix_keyboard_row_width
     markup.add(
         InlineKeyboardButton(zabbix_keyboard_button_message,
-                             callback_data='{}'.format(json.dumps(dict(action="Messages",eventid=eventid)))),
+                             callback_data='{}'.format(json.dumps(dict(action="messages",eventid=eventid)))),
         InlineKeyboardButton(zabbix_keyboard_button_acknowledge,
-                             callback_data='{}'.format(json.dumps(dict(action="Acknowledge",eventid=eventid)))),
+                             callback_data='{}'.format(json.dumps(dict(action="acknowledge",eventid=eventid)))),
         InlineKeyboardButton(zabbix_keyboard_button_history,
-                             callback_data='{}'.format(json.dumps(dict(action="History",eventid=eventid)))))
+                             callback_data='{}'.format(json.dumps(dict(action="history",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_history,
+                             callback_data='{}'.format(json.dumps(dict(action="last value",eventid=eventid)))),
+        InlineKeyboardButton(zabbix_keyboard_button_history,
+                             callback_data='{}'.format(json.dumps(dict(action="graphs",eventid=eventid)))))
     return markup
 
 
 def send_messages(sent_to, message, graphs_png, eventid = None, settings_keyboard = None):
     try:
-        bot = telebot.TeleBot(tg_token)
-        if tg_proxy:
-            apihelper.proxy = tg_proxy_server
         sent_id = get_send_id(sent_to)
         if message and sent_to:
-            if graphs_png and graphs_png.get('img'):
+            if  graphs_png and type(graphs_png) is list:
+                try:
+                    graphs_png[0].caption = message
+                    graphs_png[0].parse_mode = "HTML"
+                    bot.send_media_group(chat_id=sent_id, media=graphs_png)
+                except apihelper.ApiException as err:
+                    if 'migrate_to_chat_id' in err.result.text:
+                        migrate_group_id(sent_to, sent_id, err)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                    else:
+                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info),
+                        exit(1)
+                except Exception as err:
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
+                else:
+                    loggings.info('Bot @{busername}({bid}) send media group to "{sent_to}" ({sent_id}).'.format(
+                        sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                    exit(0)
+            elif graphs_png and graphs_png.get('img'):
                 try:
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
                                    reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
-                except telebot.apihelper.ApiException as err:
-                    if 'migrate_to_chat_id' in json.loads(err.result.text):
+                except apihelper.ApiException as err:
+                    if 'migrate_to_chat_id' in err.result.text:
+                        migrate_group_id(sent_to, sent_id, err)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                    else:
+                        loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info),
+                        exit(1)
+                except Exception as err:
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
+                else:
+                    loggings.info('Bot @{busername}({bid}) send photo to "{sent_to}" ({sent_id}).'.format(
+                        sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
+                    exit(0)
+            else:
+                try:
+                    bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
+                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard  else None)
+                except apihelper.ApiException as err:
+                    if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
                         migrate_group_id(sent_to, sent_id, err)
                         send_messages(sent_to, message, graphs_png, settings_keyboard)
                     else:
                         loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
                         exit(1)
                 except Exception as err:
-                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info)
+                    loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info),exit(1)
                 else:
-                    loggings.info('Bot @{busername}({bid}) send photo to "{sent_to}" ({sent_id}).'.format(
+                    loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
                         sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
                     exit(0)
-            try:
-                bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
-                                 reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard  else None)
-            except telebot.apihelper.ApiException as err:
-                if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
-                    migrate_group_id(sent_to, sent_id, err)
-                    send_messages(sent_to, message, graphs_png, settings_keyboard)
-                else:
-                    loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
-                    exit(1)
-            except Exception as err:
-                migrate_group_id(sent_to, sent_id, err)
-                send_messages(sent_to, message, graphs_png, settings_keyboard)
-            else:
-                loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
-                    sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
-                exit(0)
+
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
@@ -345,6 +369,7 @@ def main(args):
     try:
         if args[0] and args[1] and args[2]:
             loggings.info("Send to {} action: {}".format(args[0], args[1]))
+            loggings.debug("Send to {}\naction: {}\nxml: {}".format(args[0],args[1],args[2]))
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
@@ -369,18 +394,27 @@ def main(args):
                                  data_zabbix['triggerid'],
                                  data_zabbix['actionid'])
 
-    graph_url = create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
-                                  url=zabbix_graff_link.format(
-                                      zabbix_server=zabbix_api_url,
-                                      itemid=data_zabbix['itemid'],
-                                      range_time=data_zabbix['graphs_period']),
-                                  _type=body_messages_url_ld_graphs
-                                  )
 
     trigger_url = create_links_list(_bool=data_zabbix.get('settings_triggerlinks_bool'),
-                                 url=data_zabbix.get('triggerurl'), _type=body_messages_url_notes)
+                                    url=data_zabbix.get('triggerurl'), _type=body_messages_url_notes)
 
-    url_list = create_links_list(url_list=dict(graph_url=graph_url, trigger_url=trigger_url))
+    host_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
+                                 url=zabbix_host_link.format(
+                                              zabbix_server=zabbix_api_url,
+                                              host=data_zabbix.get('host')),
+                                 _type=body_messages_url_host)
+    url_list = []
+    for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
+        if re.findall("\d+",item_id):
+            url_list.append(create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
+                                          url=zabbix_graff_link.format(
+                                              zabbix_server=zabbix_api_url,
+                                              itemid=item_id,
+                                              range_time=data_zabbix['graphs_period']),
+                                          _type=body_messages_url_ld_graphs
+                                          ))
+    url_list.append(trigger_url) if trigger_url else None
+    url_list.append(host_url) if host_url else None
 
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
@@ -390,17 +424,28 @@ def main(args):
                 else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
     if data_zabbix.get('settings_graphs_bool'):
-        graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
+        if len(data_zabbix['itemid'].split()) == 1:
+            graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                    graff_name=graphs_name,
                                    period=data_zabbix['graphs_period'])
+        else:
+            graphs_png_group = []
+            #  get the unique itemid
+            for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
+                if re.findall("\d+",item_id):
+                    graphs_png_group.append(InputMediaPhoto(get_chart_png(itemid=item_id,
+                                               graff_name=graphs_name,
+                                               period=data_zabbix['graphs_period']).get('img')))
+            graphs_png = graphs_png_group
     else:
         graphs_png = False
 
     message = body_messages.format(
-        subject = subject.format_map(FailSafeDict(zabbix_status_emoji_map)),
-        messages = '{body}{links}{tags}'.format(body=data_zabbix['message'],
-        links = '\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
-        tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
+        subject = html.escape(subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
+        messages = '{body}{links}{tags}'.format(
+            body=html.escape(data_zabbix['message']),
+            links = '\nLinks: {}'.format(' '.join(sorted(url_list))) if body_messages_url and len(url_list) != 0 else '',
+            tags = '\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
 
     send_messages(sent_to, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)
