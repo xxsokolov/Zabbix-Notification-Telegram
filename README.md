@@ -149,6 +149,7 @@ _Script parameters_:
 </settings>
 ``` 
 
+<img src="https://imgur.com/m6DosDL.png">
 
 **Тестирование**
 
@@ -189,6 +190,7 @@ _Script parameters_:
 
 
 #### Нотиф:
+
 <img src="https://imgur.com/ayKo62v.png">
 
 ###### Жду всех в **Telegram**: https://t.me/ZbxNTg
