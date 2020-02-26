@@ -26,6 +26,11 @@
 
 <a name="Installation"><h3>Installation</h2></a>
 
+* Становимся пользователем, от имени которого будет работать скрипт на системном уровне (по-умолчанию `zabbix`)
+```bash
+sudo su - zabbix
+```
+
 * Перейдем в директорию
 ```bash
 cd /usr/lib/zabbix/alertscripts/
@@ -83,15 +88,15 @@ vim zbxTelegram_config.py
 **Настройка zbxTelegram_config.py**
 
 
-`tg_proxy` = Отправка через прокси True/False
+`tg_proxy` = Отправка через прокси True/False; по-умолчанию True
 
-`tg_proxy_server`  = прокси сервера
+`tg_proxy_server`  = Адрес прокси сервера
 
 `tg_token` = token to access the Telegram API
 
-`zabbix_api_url` = Путь до Zabbix
+`zabbix_api_url` = Путь до Zabbix (бэкслеш '/' в конце обязателен)
 
-`zabbix_api_login` = Логин
+`zabbix_api_login` = Логин пользователя с минимум правами чтения на нужные группы, откуда мы хотим получать оповещения
 
 `zabbix_api_pass` = Пароль
 
@@ -132,6 +137,8 @@ _Script parameters_:
 * Default message
 
 Для настройки оповещения используется XML разметка _(Исходные данные Вы найдете в actions.example)_
+
+В самом простом рабочем варианте контент из файла _actions.example_ копируется в настройку оповещения, поле `Default message`
 
 Она состоит из основных секций:
 
