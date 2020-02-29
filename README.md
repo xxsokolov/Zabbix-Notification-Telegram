@@ -56,9 +56,9 @@ pip install -r .requirements
 deactivate
 ```
 
-* Переименуем файл конфигурации:
+* Копируем файл конфигурации:
 ```bash
-mv zbxTelegram_config.example.py zbxTelegram_config.py
+cp zbxTelegram_config.example.py zbxTelegram_config.py
 ```
 
 * Выдаем права
