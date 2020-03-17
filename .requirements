@@ -2,3 +2,4 @@ pyTelegramBotAPI
 pillow
 pysocks
 xmltodict
+pytest

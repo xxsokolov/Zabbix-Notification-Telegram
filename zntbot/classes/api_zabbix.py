@@ -27,3 +27,7 @@ class MBZabbix:
             action=4,
             message=message
         )
+
+    def set_ack(self):
+        pass
+

@@ -18,6 +18,7 @@ tg_token = '123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'
 watermark = True
 watermark_label = 'Dmitry Sokolov (https://github.com/xxsokolov)'
 watermark_font = '/usr/lib/zabbix/alertscripts/zbxTelegram_files/ArialMT.ttf'
+watermark_minimal_height = 30
 watermark_fill = 255
 watermark_rotate = 0
 watermark_expand = True

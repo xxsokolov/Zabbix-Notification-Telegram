@@ -99,7 +99,8 @@ def xml_parsing(data):
 def watermark_text(img):
     img = io.BytesIO(img)
     img = Image.open(img)
-    if img.height < 20:
+    if img.height < watermark_minimal_height:
+        loggings.info("Cannot set watermark text, img height {} (min. {})".format(img.height, watermark_minimal_height))
         return False
     font = ImageFont.truetype(watermark_font, 14)
 
