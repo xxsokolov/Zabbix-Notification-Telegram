@@ -265,7 +265,18 @@ def get_send_id(send_to):
         if send_id:
             return send_id
 
-        for line in bot.get_updates(timeout=5,offset=0):
+        loggings.info("Telegram API: method getUpdate: started")
+        get_updates_list = bot.get_updates(timeout=10)
+        sum_del_update_id = 0
+        xxx = len([value.update_id for value in get_updates_list])
+        while len([value.update_id for value in get_updates_list]) >= 100:
+            sum_del_update_id += len([value.update_id for value in get_updates_list])
+            get_updates_list = bot.get_updates(timeout=10, offset=max([value.update_id for value in get_updates_list]))
+
+        if sum_del_update_id > 0:
+            loggings.info("In getUpdate list was cleared {} messages. Submitted for processing {}.".format(sum_del_update_id, len([value.update_id for value in get_updates_list])))
+
+        for line in get_updates_list:
             if line.message:
                 chat = line.message.chat
             elif line.edited_message:
@@ -274,11 +285,13 @@ def get_send_id(send_to):
             if chat.type in ["group", "supergroup"] and chat.title and chat.title == send_to:
                 if not send_id:
                     set_cache(send_to, chat.id, chat.type)
+                bot.get_updates(timeout=10,offset=-1)
                 return chat.id
 
             if chat.type in ["private"] and chat.username == send_to.replace("@", ""):
                 if not send_id:
                     set_cache(send_to, chat.id, chat.type)
+                bot.get_updates(timeout=10,offset=-1)
                 return chat.id
 
         raise ValueError('Username or groupname not found in the cache file. No access occurred or bot is not added to '
