@@ -268,7 +268,7 @@ def get_send_id(send_to):
         loggings.info("Telegram API: method getUpdate: started")
         get_updates_list = bot.get_updates(timeout=10)
         sum_del_update_id = 0
-        xxx = len([value.update_id for value in get_updates_list])
+        # xxx = len([value.update_id for value in get_updates_list])
         while len([value.update_id for value in get_updates_list]) >= 100:
             sum_del_update_id += len([value.update_id for value in get_updates_list])
             get_updates_list = bot.get_updates(timeout=10, offset=max([value.update_id for value in get_updates_list]))
@@ -281,8 +281,16 @@ def get_send_id(send_to):
                 chat = line.message.chat
             elif line.edited_message:
                 chat = line.edited_message.chat
+            elif line.channel_post:
+                chat = line.channel_post.chat
 
             if chat.type in ["group", "supergroup"] and chat.title and chat.title == send_to:
+                if not send_id:
+                    set_cache(send_to, chat.id, chat.type)
+                bot.get_updates(timeout=10,offset=-1)
+                return chat.id
+
+            if chat.type in ["channel"] and chat.title and chat.title == send_to:
                 if not send_id:
                     set_cache(send_to, chat.id, chat.type)
                 bot.get_updates(timeout=10,offset=-1)
