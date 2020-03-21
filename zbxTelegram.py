@@ -233,7 +233,7 @@ def set_cache(title, send_id, sent_type, cache=None, update=None):
         else:
             cache[title] = dict(type=str(sent_type), id=str(send_id), old=str(update))
     f.seek(0)
-    f.write(json.dumps(cache,sort_keys=True, indent=4))
+    f.write(json.dumps(cache,sort_keys=True, ensure_ascii=False, indent=4))
     f.close()
     if update:
         loggings.info("Updated id for {} ({}): old '{}' -> new '{}' in cache file".format(title, sent_type,update, send_id ))
