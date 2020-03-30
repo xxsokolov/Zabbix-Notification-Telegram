@@ -428,13 +428,14 @@ def main(args):
     url_list = []
     for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
         if re.findall("\d+",item_id):
-            url_list.append(create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
+            items_link = create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
                                           url=zabbix_graff_link.format(
                                               zabbix_server=zabbix_api_url,
                                               itemid=item_id,
                                               range_time=data_zabbix['graphs_period']),
                                           _type=body_messages_url_ld_graphs
-                                          ))
+                                          )
+            url_list.append(items_link) if items_link else None
     url_list.append(trigger_url) if trigger_url else None
     url_list.append(host_url) if host_url else None
 
