@@ -45,6 +45,8 @@ body_messages_tag_itemid = '#iid_'
 body_messages_tag_triggerid = '#tid_'
 body_messages_tag_actionid = '#aid_'
 
+tag_settings_no_graph = 'no_graph'
+
 zabbix_keyboard = False
 zabbix_keyboard_button_message = 'Message'
 zabbix_keyboard_button_acknowledge = 'Acknowledge'

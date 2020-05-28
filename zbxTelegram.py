@@ -446,7 +446,7 @@ def main(args):
                 graphs_period_default if not data_zabbix['graphs_period']
                 else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
-    if data_zabbix.get('settings_graphs_bool'):
+    if data_zabbix.get('settings_graphs_bool') and not tag_settings_no_graph in tags_list:
         if len(data_zabbix['itemid'].split()) == 1:
             graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                    graff_name=graphs_name,
