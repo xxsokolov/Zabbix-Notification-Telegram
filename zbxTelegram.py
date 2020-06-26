@@ -128,6 +128,11 @@ def get_chart_png(itemid, graff_name, period=None):
 
         req_cookie = requests.post(zabbix_api_url, data=data_api, verify=False)
         cookie = req_cookie.cookies
+        if 'zbx_sessionid' not in cookie:
+            loggings.error(
+                'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
+            exit(1)
+
         response = requests.get(zabbix_graff_chart.format(name=graff_name,
                                                           itemid=itemid,
                                                           zabbix_server=zabbix_api_url,
