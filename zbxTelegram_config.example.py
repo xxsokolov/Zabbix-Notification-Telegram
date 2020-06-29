@@ -29,9 +29,11 @@ body_messages_title = '{title} ({period_hour}h)'
 body_messages_url = True
 body_messages_url_template = '<a href="{url}">{icon}</a>'
 body_messages_no_url = '➖'
-body_messages_url_notes = 'ℹ️'
-body_messages_url_ld_graphs = '📊'
-body_messages_url_host = '📟'
+body_messages_url_notes = 'ℹ️'  # URL in trigger
+body_messages_url_ld_graphs = '📊'  # URL history graph item
+body_messages_url_host = '📟'  # URL host
+body_messages_url_akk = '✉️'  # URL update problem
+body_messages_url_event = '📋'  # URL in event
 
 body_messages_tags = True
 body_messages_add_tags_event = True
@@ -70,6 +72,8 @@ zabbix_graff_chart = '{zabbix_server}chart3.php?' \
 
 zabbix_host_link = "{zabbix_server}zabbix.php?action=search&search={host}"
 zabbix_graff_link = "{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"
+zabbix_akk_link = "{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"
+zabbix_event_link = "{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"
 
 zabbix_status_emoji_map = {
     "Problem": "🚨",
