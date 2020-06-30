@@ -55,7 +55,7 @@ zabbix_keyboard_button_acknowledge = 'Acknowledge'
 zabbix_keyboard_button_history = 'History'
 zabbix_keyboard_row_width = 3
 
-zabbix_api_url = 'http://zbx.local/'
+zabbix_api_url = 'http://127.0.0.1/zabbix/'
 zabbix_api_login = 'Admin'
 zabbix_api_pass = 'zabbix'
 graphs_period_default = 43200  # 24h

@@ -123,22 +123,25 @@ def watermark_text(img):
     return img_byte_arr
 
 
+def get_cookie():
+    data_api = {"name": zabbix_api_login,"password": zabbix_api_pass,"enter": "Sign in"}
+
+    req_cookie = requests.post(zabbix_api_url,data=data_api,verify=False)
+    cookie = req_cookie.cookies
+    if 'zbx_sessionid' not in cookie:
+        loggings.error(
+            'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
+        exit(1)
+    return cookie
+
+
 def get_chart_png(itemid, graff_name, period=None):
     try:
-        data_api = {"name": zabbix_api_login, "password": zabbix_api_pass, "enter": "Sign in"}
-
-        req_cookie = requests.post(zabbix_api_url, data=data_api, verify=False)
-        cookie = req_cookie.cookies
-        if 'zbx_sessionid' not in cookie:
-            loggings.error(
-                'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
-            exit(1)
-
         response = requests.get(zabbix_graff_chart.format(name=graff_name,
                                                           itemid=itemid,
                                                           zabbix_server=zabbix_api_url,
                                                           range_time= graphs_period_default if not period else period),
-                                cookies=cookie,
+                                cookies=get_cookie(),
                                 verify=False)
 
         if watermark:
@@ -400,14 +403,21 @@ def main(args):
     try:
         if args[0] and args[1] and args[2]:
             loggings.info("Send to {} action: {}".format(args[0], args[1]))
-            loggings.debug("Send to {}\naction: {}\nxml: {}".format(args[0],args[1],args[2]))
+            loggings.debug("Send to {}\naction: {}\nxml: {}".format(args[0], args[1], args[2]))
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
-    if args[1] == 'test' or args[2] == 'test':
-        send_messages(sent_to=args[0], message='🚨 Test 💛: Service is not running\nHost: testhost [192.168.0.77]\n'
-                                               'Last value: Stop (10:00:00 )\nDuration: 0m\n\n#Test, '
-                                               '#eid_130144443, #iid_60605, #tid_39303, #aid_22',
+    if args[1] in ['Test subject', 'test'] or args[2] in ['This is the test message from Zabbix', 'test']:
+        if get_cookie():
+            loggings.info('Connection check passed ({})'.format(zabbix_api_url))
+        send_messages(sent_to=args[0], message='🚨 Test 🚽💩: Test message\n'
+                                               'Host: testhost [192.168.0.0]\n'
+                                               'Last value: test (10:00:00)\n'
+                                               'Duration: 1m\n'
+                                               'Description: This message is generated with test data. '
+                                               'To check the connection to Zabbix Server, '
+                                               'specify as the topic and / or zabbix\n\n'
+                                               '#Test, #eid_130144443, #iid_60605, #tid_39303, #aid_22',
                       graphs_png=dict(
                           img=open(
                               file='{0}/zbxTelegram_files/test.png'.format(os.path.dirname(os.path.realpath(__file__))),

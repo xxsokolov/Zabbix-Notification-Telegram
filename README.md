@@ -165,7 +165,8 @@ _Script parameters_:
 ./zbxTelegram.py @username test test
 
 [2019-11-26 11:48:37,723] - PID:73794 - main() - zbxTelegram.py:311 - INFO: Send to @username action: test
-[2019-11-26 11:48:38,653] - PID:73794 - send_messages() - zbxTelegram.py:290 - INFO: Send photo to @username (00000000)
+[2019-11-26 11:48:37,723] - PID:73794 - main() - zbxTelegram.py:412 - INFO: Connection check passed (http://127.0.0.1/zabbix/)
+[2019-11-26 11:48:38,653] - PID:73794 - send_messages() - zbxTelegram.py:290 - INFO: Bot @bot(00000000) send photo to @username (00000000)
 ```
 * Из media type
 <img src="https://imgur.com/6ej0d40.png">
