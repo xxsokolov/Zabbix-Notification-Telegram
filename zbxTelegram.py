@@ -412,7 +412,8 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
 
 
 def main(args):
-    loggings.info("Send to {} action: {}".format(args.username, args.subject))
+    loggings.debug("sys.argv: {}".format(sys.argv[1:])) if loggings.debug else None
+    loggings.info("Send to {} action: {}".format(args.username, args.subject)) if not loggings.debug else None
     loggings.debug("Send to {}\naction: {}\nxml: {}".format(args.username, args.subject, args.messages))
 
     if args.subject in ['Test subject', 'test'] or args.messages in ['This is the test message from Zabbix', 'test']:
