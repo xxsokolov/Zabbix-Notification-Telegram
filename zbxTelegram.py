@@ -136,6 +136,7 @@ def get_cookie():
     if 'zbx_sessionid' not in cookie:
         loggings.error(
             'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
+        return
     return cookie
 
 
@@ -417,6 +418,10 @@ def main(args):
     if args.subject in ['Test subject', 'test'] or args.messages in ['This is the test message from Zabbix', 'test']:
         if get_cookie():
             loggings.info('Connection check passed ({})'.format(zabbix_api_url))
+            test_graph_file = '{0}/zbxTelegram_files/test.png'
+        else:
+            test_graph_file = '{0}/zbxTelegram_files/error_send_photo.png'
+
         send_messages(sent_to=args.username, message='🚨 Test 🚽💩: Test message\n'
                                                'Host: testhost [192.168.0.0]\n'
                                                'Last value: test (10:00:00)\n'
@@ -427,7 +432,7 @@ def main(args):
                                                '#Test, #eid_130144443, #iid_60605, #tid_39303, #aid_22',
                       graphs_png=dict(
                           img=open(
-                              file='{0}/zbxTelegram_files/test.png'.format(os.path.dirname(os.path.realpath(__file__))),
+                              file=test_graph_file.format(os.path.dirname(os.path.realpath(__file__))),
                               mode='rb').read()))
         exit(0)
 
