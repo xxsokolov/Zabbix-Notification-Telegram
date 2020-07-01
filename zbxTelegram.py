@@ -56,8 +56,8 @@ class FailSafeDict(dict):
         return '{{key not found: {}}}'.format(key)
 
 
-loggings = System(config_debug_mode).log
-parser = ArgParsing().create_parser()
+args = ArgParsing().create_parser().parse_args(sys.argv[1:])
+loggings = System(config_debug_mode if not args.debug else True).log
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 bot = telebot.TeleBot(tg_token)
 if tg_proxy:
@@ -411,7 +411,7 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
-def main(args):
+def main():
     loggings.debug("sys.argv: {}".format(sys.argv[1:])) if loggings.debug else None
     loggings.info("Send to {} action: {}".format(args.username, args.subject)) if not loggings.debug else None
     loggings.debug("Send to {}\naction: {}\nxml: {}".format(args.username, args.subject, args.messages))
@@ -520,4 +520,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(parser.parse_args(sys.argv[1:]))
+    main()

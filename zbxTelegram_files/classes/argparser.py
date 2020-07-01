@@ -51,9 +51,10 @@ class ArgParsing:
         # self.file_mode_parser.add_argument('-c','--config',default='./zpn_files/config.py',metavar='PATH',
         #                                    help='Путь до файла конфигурации')
 
-        self.parser.add_argument('-u', '--username', help='Путь до файла конфигурации')
-        self.parser.add_argument('-s', '--subject', help='Путь до файла конфигурации')
-        self.parser.add_argument('-m', '--messages', help='Путь до файла конфигурации')
+        self.parser.add_argument('username', nargs='?', help='Set username Telegram')
+        self.parser.add_argument('subject', nargs='?',help='Set subject')
+        self.parser.add_argument('messages', nargs='?',help='Set message')
+        self.parser.add_argument('--debug', default=False, action=EmptyIsTrue, help='Debug mode')
         # res = parser.parse_args()
 
         return self.parser
