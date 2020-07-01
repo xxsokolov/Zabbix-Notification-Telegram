@@ -388,7 +388,6 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
                 else:
                     loggings.info('Bot @{busername}({bid}) send photo to "{sent_to}" ({sent_id}).'.format(
                         sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
-                    exit(0)
             else:
                 try:
                     bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
@@ -406,7 +405,6 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
                     loggings.info('Bot @{busername}({bid}) send message to "{sent_to}" ({sent_id}).'.format(
                         sent_to=sent_to, sent_id=sent_id, busername=bot.get_me().username, bid=bot.get_me().id))
                     exit(0)
-
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
