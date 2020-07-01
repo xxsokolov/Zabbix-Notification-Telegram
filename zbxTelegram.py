@@ -420,8 +420,10 @@ def main():
         if get_cookie():
             loggings.info('Connection check passed ({})'.format(zabbix_api_url))
             test_graph_file = '{0}/zbxTelegram_files/test.png'
+            error_code = 0
         else:
             test_graph_file = '{0}/zbxTelegram_files/error_send_photo.png'
+            error_code = 1
 
         send_messages(sent_to=args.username, message='🚨 Test 🚽💩: Test message\n'
                                                'Host: testhost [192.168.0.0]\n'
@@ -435,7 +437,7 @@ def main():
                           img=open(
                               file=test_graph_file.format(os.path.dirname(os.path.realpath(__file__))),
                               mode='rb').read()))
-        exit(0)
+        exit(error_code)
 
     data_zabbix = xml_parsing(args.messages)
 
