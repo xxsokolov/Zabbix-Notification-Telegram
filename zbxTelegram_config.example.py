@@ -5,6 +5,9 @@
 # xx.sokolov@gmail.com #
 #  https://t.me/ZbxNTg #
 ########################
+__author__ = "Sokolov Dmitry"
+__maintainer__ = "Sokolov Dmitry"
+__license__ = "MIT"
 
 config_debug_mode = False
 config_exc_info = False

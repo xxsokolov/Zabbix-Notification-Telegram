@@ -5,9 +5,13 @@
 # xx.sokolov@gmail.com #
 #  https://t.me/ZbxNTg #
 ########################
+__author__ = "Sokolov Dmitry"
+__maintainer__ = "Sokolov Dmitry"
+__license__ = "MIT"
 import telebot
 from telebot import apihelper
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
+from zbxTelegram_files.classes.argparser import ArgParsing
 import xmltodict
 from zbxTelegram_config import *
 import requests
@@ -53,6 +57,7 @@ class FailSafeDict(dict):
 
 
 loggings = System(config_debug_mode).log
+parser = ArgParsing().create_parser()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 bot = telebot.TeleBot(tg_token)
 if tg_proxy:
@@ -94,7 +99,7 @@ def xml_parsing(data):
                     triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
-        loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
+        loggings.error("Exception occurred: {} (xml parsing error)".format(err), exc_info=config_exc_info), exit(1)
 
 
 def watermark_text(img):
@@ -112,7 +117,7 @@ def watermark_text(img):
     fontimage = fontimage.rotate(watermark_rotate,  resample=Image.BICUBIC, expand=True)
 
     img_size = img.crop().size
-    size = (img_size[0]-fontimage.size[0]-5,img_size[1]-fontimage.size[1]-10)
+    size = (img_size[0]-fontimage.size[0]-5, img_size[1]-fontimage.size[1]-10)
 
     img.paste(watermark_text_color, box=size, mask=fontimage)
 
@@ -125,13 +130,12 @@ def watermark_text(img):
 
 def get_cookie():
     data_api = {"name": zabbix_api_login,"password": zabbix_api_pass,"enter": "Sign in"}
-
-    req_cookie = requests.post(zabbix_api_url,data=data_api,verify=False)
+    req_cookie = requests.post(zabbix_api_url, data=data_api, verify=False)
     cookie = req_cookie.cookies
+    req_cookie.close()
     if 'zbx_sessionid' not in cookie:
         loggings.error(
             'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
-        exit(1)
     return cookie
 
 
@@ -342,7 +346,7 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
     try:
         sent_id = get_send_id(sent_to)
         if message and sent_to:
-            if graphs_png and type(graphs_png) is list:
+            if graphs_png and isinstance(graphs_png, list):
                 try:
                     graphs_png[0].caption = message
                     graphs_png[0].parse_mode = "HTML"
@@ -368,6 +372,13 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
                     if 'migrate_to_chat_id' in err.result.text:
                         migrate_group_id(sent_to, sent_id, err)
                         send_messages(sent_to, message, graphs_png, settings_keyboard)
+                    elif 'IMAGE_PROCESS_FAILED' in err.result.text:
+                        bot.send_photo(chat_id=sent_id, photo=open(
+                              file='{0}/zbxTelegram_files/error_send_photo.png'.format(
+                                  os.path.dirname(os.path.realpath(__file__))),
+                              mode='rb').read(), caption=message, parse_mode="HTML",
+                                       reply_markup=gen_markup(
+                                           eventid) if zabbix_keyboard and settings_keyboard else None)
                     else:
                         loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info),
                         exit(1)
@@ -400,17 +411,13 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
 
 
 def main(args):
-    try:
-        if args[0] and args[1] and args[2]:
-            loggings.info("Send to {} action: {}".format(args[0], args[1]))
-            loggings.debug("Send to {}\naction: {}\nxml: {}".format(args[0], args[1], args[2]))
-    except Exception as err:
-        loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
+    loggings.info("Send to {} action: {}".format(args.username, args.subject))
+    loggings.debug("Send to {}\naction: {}\nxml: {}".format(args.username, args.subject, args.messages))
 
-    if args[1] in ['Test subject', 'test'] or args[2] in ['This is the test message from Zabbix', 'test']:
+    if args.subject in ['Test subject', 'test'] or args.messages in ['This is the test message from Zabbix', 'test']:
         if get_cookie():
             loggings.info('Connection check passed ({})'.format(zabbix_api_url))
-        send_messages(sent_to=args[0], message='🚨 Test 🚽💩: Test message\n'
+        send_messages(sent_to=args.username, message='🚨 Test 🚽💩: Test message\n'
                                                'Host: testhost [192.168.0.0]\n'
                                                'Last value: test (10:00:00)\n'
                                                'Duration: 1m\n'
@@ -424,9 +431,7 @@ def main(args):
                               mode='rb').read()))
         exit(0)
 
-    sent_to = args[0]
-    subject = args[1]
-    data_zabbix = xml_parsing(args[2])
+    data_zabbix = xml_parsing(args.messages)
 
     # if tags_list
     tags_list = create_tags_list(data_zabbix['tags'],
@@ -498,15 +503,15 @@ def main(args):
         graphs_png = False
 
     message = body_messages.format(
-        subject=html.escape(subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
+        subject=html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
         messages='{body}{links}{tags}'.format(
             body=html.escape(data_zabbix['message']),
             links='\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
             tags='\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
 
-    send_messages(sent_to, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
+    send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main(parser.parse_args(sys.argv[1:]))
