@@ -13,13 +13,6 @@ import textwrap
 from argparse import RawTextHelpFormatter
 
 
-class EmptyIsTrue(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        if len(values) == 0:
-            values = True
-        setattr(namespace, self.dest, values)
-
-
 class ArgParsing:
 
     def __init__(self):
@@ -52,9 +45,9 @@ class ArgParsing:
         #                                    help='Путь до файла конфигурации')
 
         self.parser.add_argument('username', nargs='?', help='Set username Telegram')
-        self.parser.add_argument('subject', nargs='?',help='Set subject')
-        self.parser.add_argument('messages', nargs='?',help='Set message')
-        self.parser.add_argument('--debug', default=False, action=EmptyIsTrue, help='Debug mode')
+        self.parser.add_argument('subject', nargs='?', help='Set subject')
+        self.parser.add_argument('messages', nargs='?', help='Set message')
+        self.parser.add_argument('--debug', type=str, nargs='?', const=True, default=False, help='Debug mode')
         # res = parser.parse_args()
 
         return self.parser
