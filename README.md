@@ -1,6 +1,6 @@
 # Zabbix-Notification-Telegram
 
-Отправка оповещений из Zabbix в  Telegram
+Отправка оповещений из Zabbix в Telegram
 
 [Plans](#Plans)
 
@@ -10,19 +10,15 @@
 
 ### Key Features
 - [x] Отправка графиков и последних значений **в одном сообщении**
-- [x] Гибкая настройка шаблона в теле сообщения
+- [x] Передача данных из Zabbix Action XML разметкой
+- [x] Формирование списка линков в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)
+- [x] Формирование списка тэгов в теле сообщения для быстрого поиска событий в Telegram (Trigger Tags, Eventid, Itemid, Triggeid, Actionid)
+- [x] Настраиваемый Emoji мапинг статуса и важности события
+- [x] Наложение ватермарки на изображение
+- [x] Формирование и обновление кэшфайла (privat, group, group -> supergroup)
+- [x] Управление через Trigger Tags (Не прикреплять график, не отправлять уведомление и т.п.)
 - [x] Обработка быстрых команд ботом <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
 - [x] Отправка показателей по запросу от бота <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
-- [x] Передача данных из экшена XML разметкой
-- [x] Формирование списка линков в теле сообщения
-- [x] Формирование списка тэгов в теле сообщения
-- [x] Emoji мапинг статуса и важности события
-- [x] Наложение ватермарки на изображение
-- [x] Формирование и обновление кэшфайла (privat, group -> supergroup)
-
-
-<a name="Plans"><h3>Plans</h2></a>
-- Gitlab CI\CD
 
 <a name="Installation"><h3>Installation</h2></a>
 
@@ -101,7 +97,7 @@ vim zbxTelegram_config.py
 `zabbix_api_pass` = Пароль
 
 
-**Настройка Media types**
+**Настройка Media types в Zabbix**
 
 
 _Name_: ZNT
