@@ -4,9 +4,9 @@
 
 _shields.io_
 
-[Rating Popular на zabbix.com](https://www.zabbix.com/integrations/telegram#tab:3rd_party)
+[Rating Popular на www.zabbix.com](https://www.zabbix.com/integrations/telegram#tab:3rd_party)
 
-[Rating Popular на zabbix.com](https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram)
+[Rating Popular на share.zabbix.com](https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram)
 
 Support **Telegram**: https://t.me/ZbxNTg
 
