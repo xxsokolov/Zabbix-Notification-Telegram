@@ -1,6 +1,8 @@
-#<p align="center">Zabbix Notification Telegram
+# <p align="center">Zabbix Notification Telegram
 
-Отправка оповещений из Zabbix в Telegram
+<p align="center">Нотификатор оповещений в Telegram для <a href="https://www.zabbix.com/features#notification">Zabbix</a>.
+
+_shields.io_
 
 [Rating Popular на zabbix.com](https://www.zabbix.com/integrations/telegram#tab:3rd_party)
 
