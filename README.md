@@ -8,8 +8,6 @@ _shields.io_
 
 [Rating Popular на share.zabbix.com](https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram)
 
-Support **Telegram**: https://t.me/ZbxNTg
-
 ### Возможности
 - [x] Отправка графиков и последних значений **в одном сообщении**
 - [x] Передача данных из [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action) разметкой XML 
@@ -126,4 +124,14 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 Zabbix Macros
 
 ```<![CDATA[]]>```
+
+
+
+## Логирование
+## Последние изменения
+
+
+## Помощь. Обсуждение. Чат.
+
+* Присоединяйтесь [ZNTGroup](https://t.me/ZbxNTg) и [ZNTChannel](https://t.me/ZNTChannel).
 
