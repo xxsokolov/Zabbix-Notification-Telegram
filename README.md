@@ -45,23 +45,23 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 Давайте разберем каждый параметр подробно:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
 |---|---|  ---|---|
-|config_debug_mode|bool|True - | False|
-|config_exc_info|bool|True - |False|
+|config_debug_mode|bool|Логирование в режиме debug| False|
+|config_exc_info|bool|Более детальный режим debug|False|
 |config_cache_file|string|Абсолютный путь до кеш файла|'/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache'|
 |config_log_file|string|Абсолютный путь до лог файла|'/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log'|
 |tg_proxy|bool|Использовать прокси для отправки сообщений в Telegram|True|
 |tg_proxy_server|dict|Урл до Вашего прокси|{'https': 'socks5://username:password@domen:port'}
 |tg_token|string|Тот самый token, который Вы получали у [@BotFather](https://core.telegram.org/bots#botfather)|'123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'|
-|watermark|||True|
-|watermark_label|||'Dmitry Sokolov (https://github.com/xxsokolov)'|
-|watermark_font|||'/usr/lib/zabbix/alertscripts/zbxTelegram_files/ArialMT.ttf'|
-|watermark_minimal_height|||30|
-|watermark_fill|||255|
-|watermark_rotate|||0|
-|watermark_expand|||True|
-|watermark_text_color|||(60, 60, 60)|
-|body_messages|||'<b>{subject}</b>\n\n{messages}'|
-|body_messages_title|||'{title} ({period_hour}h)'|
+|watermark|bool|Наносить ватермарку на изображение графика|True|
+|watermark_label|string|Текст наносимый на изображение графика|'Dmitry Sokolov (https://github.com/xxsokolov)'|
+|watermark_font|string|Путь до файла шрифта|'/usr/lib/zabbix/alertscripts/zbxTelegram_files/ArialMT.ttf'|
+|watermark_minimal_height|string|Минимальный размер изображнеия графика для нанисения ватермарки|30|
+|watermark_fill|string||255|
+|watermark_rotate|string||0|
+|watermark_expand|bool||True|
+|watermark_text_color|string|Цвет текста в RGB|(60, 60, 60)|
+|body_messages|string|Формирование тела сообщения. *Сообщение состоит из двух частей: subject и messages(xml```<messages></messages>``` + линки + тэги)* |'<b>{subject}</b>\n\n{messages}'|
+|body_messages_title|string|Формирование загаловка изображения графика.  *```{title}``` формируется из секции xml```<title></title>``` и ```<graphs_period></graphs_period>```или ```graphs_period_default``` в конфиг файле*|'{title} ({period_hour}h)'|
 |body_messages_url|||True|
 |body_messages_url_template|||'<a href="{url}">{icon}</a>'|
 |body_messages_no_url|||'➖'|
@@ -99,7 +99,9 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_status_emoji_map|||{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "Information": "💙", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
 
 
-Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action).  
+Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action).
+:exclamation: ## <p align="center">ВАЖНО! XML имеет приимущество перед конфиг файлом [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py). :exclamation:
+
 
 Также разберем эти параметры:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
