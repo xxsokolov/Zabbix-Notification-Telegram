@@ -13,6 +13,8 @@ Duration: {EVENT.AGE}]]>
 		<graphs>True</graphs>
 		<hostlinks>True</hostlinks>
 		<graphlinks>True</graphlinks>
+		<acklinks>True</acklinks>
+		<eventlinks>True</eventlinks>
 		<triggerlinks>True</triggerlinks>
 		<tag>True</tag>
 		<keyboard>True</keyboard>
@@ -23,7 +25,7 @@ Duration: {EVENT.AGE}]]>
 		<eventid>{EVENT.ID}</eventid>
 		<actionid>{ACTION.ID}</actionid>
 		<title><![CDATA[{HOST.HOST} - {EVENT.NAME}]]></title>
-        <triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
+		<triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
 		<tags><![CDATA[{EVENT.TAGS}]]></tags>
 	</settings>
 </root>

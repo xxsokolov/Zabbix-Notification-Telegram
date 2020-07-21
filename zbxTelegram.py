@@ -74,6 +74,8 @@ def xml_parsing(data):
         settings_graphlinks_bool = data['settings']['graphlinks']
         settings_triggerlinks_bool = data['settings']['triggerlinks']
         settings_hostlinks_bool = data['settings']['hostlinks']
+        settings_acklinks_bool = data['settings']['acklinks']
+        settings_eventlinks_bool = data['settings']['eventlinks']
         settings_tag_bool = data['settings']['tag']
         settings_keyboard = data['settings']['keyboard']
 
@@ -93,9 +95,11 @@ def xml_parsing(data):
                     settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
                     settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
                     settings_hostlinks_bool=eval(settings_hostlinks_bool.capitalize()),
+                    settings_acklinks_bool=eval(settings_acklinks_bool.capitalize()),
+                    settings_eventlinks_bool=eval(settings_eventlinks_bool.capitalize()),
                     settings_tag_bool=eval(settings_tag_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
-                    graphs_period=settings_graphs_period, host=settings_host,itemid=settings_itemid, triggerid=settings_triggerid,
+                    graphs_period=settings_graphs_period, host=settings_host, itemid=settings_itemid, triggerid=settings_triggerid,
                     triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
 
     except Exception as err:
@@ -142,12 +146,13 @@ def get_cookie():
 
 def get_chart_png(itemid, graff_name, period=None):
     try:
-        response = requests.get(zabbix_graff_chart.format(name=graff_name,
-                                                          itemid=itemid,
-                                                          zabbix_server=zabbix_api_url,
-                                                          range_time= graphs_period_default if not period else period),
-                                cookies=get_cookie(),
-                                verify=False)
+        response = requests.get(zabbix_graph_chart.format(
+            name=graff_name,
+            itemid=itemid,
+            zabbix_server=zabbix_api_url,
+            range_time=zabbix_graph_period_default if not period else period),
+            cookies=get_cookie(),
+            verify=False)
 
         if watermark:
             wmt = watermark_text(response.content)
@@ -203,13 +208,13 @@ def create_links_list(_bool=None, url=None, _type=None, url_list=None):
             if url and (re.search(r'\w', url)):
                 return body_messages_url_template.format(url=url, icon=_type)
             else:
-                return body_messages_no_url
+                return body_messages_url_emoji_no_url
         elif url_list:
             return url_list
         else:
             return False
     except ValueError:
-        return body_messages_no_url
+        return body_messages_url_emoji_no_url
 
 
 def get_cache(title):
@@ -424,13 +429,12 @@ def main():
             error_code = 1
 
         send_messages(sent_to=args.username, message='🚨 Test 🚽💩: Test message\n'
-                                               'Host: testhost [192.168.0.0]\n'
-                                               'Last value: test (10:00:00)\n'
-                                               'Duration: 1m\n'
-                                               'Description: This message is generated with test data. '
-                                               'To check the connection to Zabbix Server, '
-                                               'specify as the topic and / or zabbix\n\n'
-                                               '#Test, #eid_130144443, #iid_60605, #tid_39303, #aid_22',
+                                                     'Host: testhost [192.168.0.0]\n'
+                                                     'Last value: test (10:00:00)\n'
+                                                     'Duration: 1m\n'
+                                                     'Description: This message is generated with test data. '
+                                                     'specify as the topic and / or zabbix\n\n'
+                                                     '#Test, #eid_130144443, #iid_60605, #tid_39303, #aid_22',
                       graphs_png=dict(
                           img=open(
                               file=test_graph_file.format(os.path.dirname(os.path.realpath(__file__))),
@@ -446,51 +450,52 @@ def main():
                                  data_zabbix['triggerid'],
                                  data_zabbix['actionid'])
 
-    trigger_url = create_links_list(_bool=data_zabbix.get('settings_triggerlinks_bool'),
-                                    url=data_zabbix.get('triggerurl'), _type=body_messages_url_notes)
+    trigger_url = create_links_list(_bool=True if data_zabbix.get('settings_triggerlinks_bool') and body_messages_url_notes else False,
+                                    url=data_zabbix.get('triggerurl'),
+                                    _type=body_messages_url_emoji_notes)
 
-    host_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
+    host_url = create_links_list(_bool=True if data_zabbix.get('settings_hostlinks_bool') and body_messages_url_host else False,
                                  url=zabbix_host_link.format(
                                               zabbix_server=zabbix_api_url,
                                               host=data_zabbix.get('host')),
-                                 _type=body_messages_url_host)
+                                 _type=body_messages_url_emoji_host)
 
-    akk_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
+    ack_url = create_links_list(_bool=True if data_zabbix.get('settings_acklinks_bool') and body_messages_url_ack else False,
                                 url=zabbix_akk_link.format(
                                     zabbix_server=zabbix_api_url,
                                     eventid=data_zabbix.get('eventid')),
-                                _type=body_messages_url_akk)
+                                _type=body_messages_url_emoji_akk)
 
-    event_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
+    event_url = create_links_list(_bool=True if data_zabbix.get('settings_eventlinks_bool') and body_messages_url_event else False,
                                   url=zabbix_event_link.format(
                                       zabbix_server=zabbix_api_url,
                                       eventid=data_zabbix.get('eventid'),
                                       triggerid=data_zabbix.get('triggerid')),
-                                  _type=body_messages_url_event)
+                                  _type=body_messages_url_emoji_event)
 
     url_list = []
     url_list.append(trigger_url) if trigger_url else None
     for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
         if re.findall(r"\d+", item_id):
-            items_link = create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
-                                           url=zabbix_graff_link.format(
+            items_link = create_links_list(_bool=True if data_zabbix.get('settings_graphlinks_bool') and body_messages_url_graphs else False,
+                                           url=zabbix_graph_link.format(
                                               zabbix_server=zabbix_api_url,
                                               itemid=item_id,
                                               range_time=data_zabbix['graphs_period']),
-                                           _type=body_messages_url_ld_graphs
+                                           _type=body_messages_url_emoji_graphs
                                            )
             url_list.append(items_link) if items_link else None
     url_list.append(event_url) if event_url else None
-    url_list.append(akk_url) if akk_url else None
+    url_list.append(ack_url) if ack_url else None
     url_list.append(host_url) if host_url else None
 
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
         period_hour=time.strftime("%H", time.gmtime(
-            graphs_period_default if not data_zabbix['graphs_period']
+            zabbix_graph_period_default if not data_zabbix['graphs_period']
             else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
-    if data_zabbix.get('settings_graphs_bool') and tag_settings_no_graph not in tags_list:
+    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and tag_settings_no_graph not in tags_list:
         if len(data_zabbix['itemid'].split()) == 1:
             graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                        graff_name=graphs_name,
