@@ -61,15 +61,15 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |watermark_expand|bool||True|
 |watermark_text_color|string|Цвет текста в RGB|(60, 60, 60)|
 |body_messages|string|Формирование тела сообщения. *Сообщение состоит из двух частей: subject и messages(xml```<messages></messages>``` + линки + тэги)* |'<b>{subject}</b>\n\n{messages}'|
-|body_messages_title|string|Формирование заголовка изображения графика.  *```{title}``` формируется из секции xml```<title></title>``` и ```<graphs_period></graphs_period>```или ```graphs_period_default``` в конфиг файле*|'{title} ({period_hour}h)'|
-|body_messages_url|||True|
-|body_messages_url_template|||'<a href="{url}">{icon}</a>'|
-|body_messages_no_url|||'➖'|
-|body_messages_url_notes|||'ℹ️'  # URL in trigger|
-|body_messages_url_ld_graphs|||'📊'  # URL history graph item|
-|body_messages_url_host|||'📟'  # URL host|
-|body_messages_url_akk|||'✉️'  # URL update problem|
-|body_messages_url_event|||'📋'  # URL in event|
+|body_messages_title|string|Шаблон формирования заголовка изображения графика.  *```{title}``` формируется из секции xml```<title></title>``` и ```<graphs_period></graphs_period>```или ```graphs_period_default``` в конфиг файле*|'{title} ({period_hour}h)'|
+|body_messages_url|bool|Добавлять линки в сообщение|True|
+|body_messages_url_template|sting|Шаблон формирование линка|'<a href="{url}">{icon}</a>'|
+|body_messages_no_url|emoji|Иконка при отсутствии [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'➖'|
+|body_messages_url_notes|emoji|Иконка ссылки [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'ℹ️'|
+|body_messages_url_ld_graphs|emoji|Иконка ссылки на график "Элемент данных" (item)|'📊'|
+|body_messages_url_host|emoji|Иконка ссылки на "Узел сети" (host)|'📟'|
+|body_messages_url_akk|emoji|Иконка ссылки на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|'✉️'|
+|body_messages_url_event|emoji|Иконка ссылки на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|'📋'|
 |body_messages_tags|||True|
 |body_messages_add_tags_event|||True|
 |body_messages_add_tags_item|||True|
