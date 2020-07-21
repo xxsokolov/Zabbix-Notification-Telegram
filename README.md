@@ -35,7 +35,8 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ## Создаем первое оповещение
 ### Получаем API token
 
-Наверное Вы уже [получили API token от @BotFather](https://core.telegram.org/bots#botfather). Который будем использовать в [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py): [tg_token](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L19).
+Наверное Вы уже [получили API token от @BotFather](https://core.telegram.org/bots#botfather) который будем использовать в [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py): [tg_token](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L19).
+
 Если у Вас нет бота, то мы расскажем как [это сделать быстро](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Регистрация-нового-бота-в-Telegram).
 
 ### Настраиваем нотификатор
@@ -62,7 +63,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |watermark_text_color|string|Цвет текста в RGB|(60, 60, 60)|
 |body_messages|string|Формирование тела сообщения. *Сообщение состоит из двух частей: subject и messages(xml```<messages></messages>``` + линки + тэги)* |'<b>{subject}</b>\n\n{messages}'|
 |body_messages_title|string|Шаблон формирования заголовка изображения графика.  *```{title}``` формируется из секции xml```<title></title>``` и ```<graphs_period></graphs_period>```или ```graphs_period_default``` в конфиг файле*|'{title} ({period_hour}h)'|
-|body_messages_url|bool|Добавлять линки в сообщение|True|
+|body_messages_url|bool|Добавление линков в сообщение|True|
 |body_messages_url_template|sting|Шаблон формирование линка|'<a href="{url}">{icon}</a>'|
 |body_messages_no_url|emoji|Иконка при отсутствии [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'➖'|
 |body_messages_url_notes|emoji|Иконка ссылки [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'ℹ️'|
@@ -70,33 +71,33 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |body_messages_url_host|emoji|Иконка ссылки на "Узел сети" (host)|'📟'|
 |body_messages_url_akk|emoji|Иконка ссылки на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|'✉️'|
 |body_messages_url_event|emoji|Иконка ссылки на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|'📋'|
-|body_messages_tags|||True|
-|body_messages_add_tags_event|||True|
-|body_messages_add_tags_item|||True|
-|body_messages_add_tags_trigger|||True|
-|body_messages_add_tags_action|||True|
-|body_messages_no_tags|||'#no_tags'|
-|body_messages_tags_delimiter|||' '|
-|body_messages_tag_eventid|||'#eid_'|
-|body_messages_tag_itemid|||'#iid_'|
-|body_messages_tag_triggerid|||'#tid_'|
-|body_messages_tag_actionid|||'#aid_'|
-|tag_settings_no_graph|||'no_graph'|
-|zabbix_keyboard|||False|
-|zabbix_keyboard_button_message|||'Message'|
-|zabbix_keyboard_button_acknowledge|||'Acknowledge'|
-|zabbix_keyboard_button_history|||'History'|
-|zabbix_keyboard_row_width|||3|
-|zabbix_api_url|||'http://127.0.0.1/zabbix/'|
-|zabbix_api_login|||'Admin'|
-|zabbix_api_pass|||'zabbix'|
-|graphs_period_default|||43200  # 24h|
-|zabbix_graff_chart|||[Default](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L65)|
-|zabbix_host_link|||"{zabbix_server}zabbix.php?action=search&search={host}"|
-|zabbix_graff_link|||"{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"|
-|zabbix_akk_link|||"{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"|
-|zabbix_event_link|||"{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"|
-|zabbix_status_emoji_map|||{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "Information": "💙", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
+|body_messages_tags|bool|Добавление всех тэгов в сообщение|True|
+|body_messages_add_tags_event|bool|Добавление eventid тэгов в сообщение|True|
+|body_messages_add_tags_item|bool|Добавление itemid тэгов в сообщение|True|
+|body_messages_add_tags_trigger|bool|Добавление triggerid тэгов в сообщение|True|
+|body_messages_add_tags_action|bool|Добавление actionid тэгов в сообщение|True|
+|body_messages_no_tags|sting|Тег при отсутствии тэга в узле сети|'#no_tags'|
+|body_messages_tags_delimiter|sting|Разделитель в имени и значение тэга|' '|
+|body_messages_tag_eventid|sting|Шаблон формирования тэга eventid|'#eid_'|
+|body_messages_tag_itemid|sting|Шаблон формирования тэга itemid|'#iid_'|
+|body_messages_tag_triggerid|sting|Шаблон формирования тэга triggerid|'#tid_'|
+|body_messages_tag_actionid|sting|Шаблон формирования тэга actionid|'#aid_'|
+|tag_settings_no_graph|sting|Имя тега "Не прикреплять изображение графика"|'no_graph'|
+|zabbix_keyboard|bool|Добавление кнопок к сообщению (*В стадии разработки*)|False|
+|zabbix_keyboard_button_message|sting|Имя кнопки "Добавить сообщение к событию"|'Message'|
+|zabbix_keyboard_button_acknowledge|sting|Имя кнопки "Подтверждение события"|'Acknowledge'|
+|zabbix_keyboard_button_history|sting|Имя кнопки "Прислать сообщение (пять последних событий)" по данному эелементу данных|'History'|
+|zabbix_keyboard_row_width|int|Количество кнопок в строке|3|
+|zabbix_api_url|sting|Урл до Zabbix сервера|'http://127.0.0.1/zabbix/'|
+|zabbix_api_login|sting|Учетная запись|'Admin'|
+|zabbix_api_pass|sting|Пароль|'zabbix'|
+|graphs_period_default|int|Период за который присылается изображение графика в секундах.|43200  # 24h|
+|zabbix_graff_chart|sting|Шаблон формирования линка до chart3.php|[Default](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L65)|
+|zabbix_host_link|sting|Шаблон формирования линка до узла сети|"{zabbix_server}zabbix.php?action=search&search={host}"|
+|zabbix_graff_link|sting|Шаблон формирования линка до графика "Элемент данных" (item)|"{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"|
+|zabbix_akk_link|sting|Шаблон формирования линка до ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|"{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"|
+|zabbix_event_link|sting|Шаблон формирования линка до ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|"{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"|
+|zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "Information": "💙", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
 
 
 Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action).
