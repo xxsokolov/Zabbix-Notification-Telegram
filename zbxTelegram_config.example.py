@@ -42,7 +42,7 @@ body_messages_url_emoji_no_url = '➖'
 body_messages_url_emoji_notes = 'ℹ️'  # URL in trigger
 body_messages_url_emoji_graphs = '📊'  # URL history graph item
 body_messages_url_emoji_host = '📟'  # URL host
-body_messages_url_emoji_akk = '✉️'  # URL update problem
+body_messages_url_emoji_ack = '✉️'  # URL update problem
 body_messages_url_emoji_event = '📋'  # URL in event
 
 body_messages_tags = True
@@ -88,8 +88,8 @@ zabbix_graph_chart = '{zabbix_server}chart3.php?' \
 
 zabbix_host_link = "{zabbix_server}zabbix.php?action=search&search={host}"
 zabbix_graph_link = "{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"
-#zabbix_akk_link = "{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"  # Zabbix Server ver > 5
-zabbix_akk_link = "{zabbix_server}zabbix.php?action=popup&popup_action=acknowledge.edit&eventids[0]={eventid}" # Zabbix Server ver <= 5
+#zabbix_ack_link = "{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"  # Zabbix Server ver > 5
+zabbix_ack_link = "{zabbix_server}zabbix.php?action=popup&popup_action=acknowledge.edit&eventids[0]={eventid}" # Zabbix Server ver <= 5
 zabbix_event_link = "{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"
 
 

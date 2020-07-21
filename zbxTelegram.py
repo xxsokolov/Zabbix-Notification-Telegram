@@ -32,9 +32,9 @@ class System:
     def __init__(self, debug=False):
         # configuring log
         if debug:
-            self.log_level=logging.DEBUG
+            self.log_level = logging.DEBUG
         else:
-            self.log_level=logging.INFO
+            self.log_level = logging.INFO
 
         log_format = logging.Formatter('[%(asctime)s] - PID:%(process)s - %(funcName)s() - %(filename)s:%(lineno)d - %(levelname)s: %(message)s')
         self.log = logging.getLogger()
@@ -495,10 +495,10 @@ def main():
                                  _type=body_messages_url_emoji_host)
 
     ack_url = create_links_list(_bool=True if data_zabbix.get('settings_acklinks_bool') and body_messages_url_ack else False,
-                                url=zabbix_akk_link.format(
+                                url=zabbix_ack_link.format(
                                     zabbix_server=zabbix_api_url,
                                     eventid=data_zabbix.get('eventid')),
-                                _type=body_messages_url_emoji_akk)
+                                _type=body_messages_url_emoji_ack)
 
     event_url = create_links_list(_bool=True if data_zabbix.get('settings_eventlinks_bool') and body_messages_url_event else False,
                                   url=zabbix_event_link.format(
@@ -552,9 +552,9 @@ def main():
         messages='{body}{links}{tags}'.format(
             body=html.escape(data_zabbix['message']),
             links=body_messages_url_template_line.format(
-                links=' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
+                links=body_messages_url_delimiter.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
             tags=body_messages_tags_template_line.format(
-                tags=' '.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
+                tags=body_messages_tags_delimiter.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
 
     send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)
