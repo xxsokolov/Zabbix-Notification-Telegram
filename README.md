@@ -107,7 +107,6 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_api_url|sting|Урл до Zabbix сервера|'http://127.0.0.1/zabbix/'|
 |zabbix_api_login|sting|Учетная запись|'Admin'|
 |zabbix_api_pass|sting|Пароль|'zabbix'|
-|zabbix_graph|bool|Добавление изображения графика к сообщению|True|
 |zabbix_graph_period_default|int|Период за который присылается изображение графика в секундах.|43200  # 24h|
 |zabbix_graph_chart|sting|Шаблон формирования линка до chart3.php|[Default](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L65)|
 |zabbix_host_link|sting|Шаблон формирования линка до узла сети|"{zabbix_server}zabbix.php?action=search&search={host}"|
