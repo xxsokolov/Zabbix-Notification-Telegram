@@ -16,7 +16,10 @@ import xmltodict
 from zbxTelegram_config import *
 import requests
 import urllib3
-import re, sys, os, time
+import re
+import sys
+import os
+import time
 import io
 from PIL import Image, ImageDraw, ImageFont
 import json
@@ -548,8 +551,10 @@ def main():
         subject=html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
         messages='{body}{links}{tags}'.format(
             body=html.escape(data_zabbix['message']),
-            links='\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
-            tags='\n\n{}'.format(' '.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
+            links=body_messages_url_template_line.format(
+                links=' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
+            tags=body_messages_tags_template_line.format(
+                tags=' '.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
 
     send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)
