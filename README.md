@@ -45,7 +45,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 
 Давайте разберем каждый параметр подробно:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
-|---|---|  ---|---|
+|---|-----------|--------|------------|
 |config_debug_mode|bool|Логирование в режиме debug| False|
 |config_exc_info|bool|Более детальный режим debug|False|
 |config_cache_file|string|Абсолютный путь до кеш файла|'/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache'|
@@ -61,16 +61,21 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |watermark_rotate|string||0|
 |watermark_expand|bool||True|
 |watermark_text_color|string|Цвет текста в RGB|(60, 60, 60)|
-|body_messages|string|Формирование тела сообщения. *Сообщение состоит из двух частей: subject и messages(xml```<messages></messages>``` + линки + тэги)* |'<b>{subject}</b>\n\n{messages}'|
+|body_messages|string|Шаблон формирование тела сообщения. *Сообщение состоит из двух частей: subject и messages(xml```<messages></messages>``` + линки + тэги)* |'<b>{subject}</b>\n\n{messages}'|
 |body_messages_title|string|Шаблон формирования заголовка изображения графика.  *```{title}``` формируется из секции xml```<title></title>``` и ```<graphs_period></graphs_period>```или ```graphs_period_default``` в конфиг файле*|'{title} ({period_hour}h)'|
 |body_messages_url|bool|Добавление линков в сообщение|True|
+|body_messages_url_notes = True|bool|Добавление линка из триггера в сообщение|True|
+|body_messages_url_graphs = True|bool|Добавление линка на график "Элемент данных" (item) в сообщение|True|
+|body_messages_url_host = True|bool|Добавление линка на "Узел сети" (host) в сообщение|True|
+|#body_messages_url_akk = True|bool|Добавление линка на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges) в сообщение|True|
+|#body_messages_url_event = True|bool|Добавление линка на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events) в сообщение|True|
 |body_messages_url_template|sting|Шаблон формирование линка|'<a href="{url}">{icon}</a>'|
-|body_messages_no_url|emoji|Иконка при отсутствии [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'➖'|
-|body_messages_url_notes|emoji|Иконка ссылки [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'ℹ️'|
-|body_messages_url_ld_graphs|emoji|Иконка ссылки на график "Элемент данных" (item)|'📊'|
-|body_messages_url_host|emoji|Иконка ссылки на "Узел сети" (host)|'📟'|
-|body_messages_url_akk|emoji|Иконка ссылки на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|'✉️'|
-|body_messages_url_event|emoji|Иконка ссылки на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|'📋'|
+|body_messages_url_emoji_no_url|emoji|Иконка при отсутствии [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'➖'|
+|body_messages_url_emoji_notes|emoji|Иконка ссылки [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'ℹ️'|
+|body_messages_url_emoji_graphs|emoji|Иконка ссылки на график "Элемент данных" (item)|'📊'|
+|body_messages_url_emoji_host|emoji|Иконка ссылки на "Узел сети" (host)|'📟'|
+|body_messages_url_emoji_akk|emoji|Иконка ссылки на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|'✉️'|
+|body_messages_url_emoji_event|emoji|Иконка ссылки на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|'📋'|
 |body_messages_tags|bool|Добавление всех тэгов в сообщение|True|
 |body_messages_add_tags_event|bool|Добавление eventid тэгов в сообщение|True|
 |body_messages_add_tags_item|bool|Добавление itemid тэгов в сообщение|True|
@@ -91,13 +96,14 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_api_url|sting|Урл до Zabbix сервера|'http://127.0.0.1/zabbix/'|
 |zabbix_api_login|sting|Учетная запись|'Admin'|
 |zabbix_api_pass|sting|Пароль|'zabbix'|
-|graphs_period_default|int|Период за который присылается изображение графика в секундах.|43200  # 24h|
-|zabbix_graff_chart|sting|Шаблон формирования линка до chart3.php|[Default](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L65)|
+|zabbix_graph|bool|Добавление изображения графика к сообщению|True|
+|zabbix_graph_period_default|int|Период за который присылается изображение графика в секундах.|43200  # 24h|
+|zabbix_graph_chart|sting|Шаблон формирования линка до chart3.php|[Default](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L65)|
 |zabbix_host_link|sting|Шаблон формирования линка до узла сети|"{zabbix_server}zabbix.php?action=search&search={host}"|
-|zabbix_graff_link|sting|Шаблон формирования линка до графика "Элемент данных" (item)|"{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"|
+|zabbix_graph_link|sting|Шаблон формирования линка до графика "Элемент данных" (item)|"{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"|
 |zabbix_akk_link|sting|Шаблон формирования линка до ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|"{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"|
 |zabbix_event_link|sting|Шаблон формирования линка до ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|"{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"|
-|zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "Information": "💙", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
+|zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "InformWikipedia", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
 
 
 Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action).
@@ -106,27 +112,28 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 
 Также разберем эти параметры:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
-|---|---|  ---|---|
+|---|-----------|--------|------------|
 |```<messages></messages>```|string||[Default](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example#L4)|
-|```<graphs></graphs>```|bool||True|
-|```<hostlinks></hostlinks>```|bool||True|
-|```<graphlinks></graphlinks>```|bool||True|
-|```<triggerlinks></triggerlinks>```|bool||True|
-|```<tag></tag>```|bool||True|
-|```<keyboard></keyboard>```|bool||True|
-|```<graphs_period></graphs_period>```|string||10800|
-|```<host></host>```|string||{HOST.ID1}|
-|```<itemid></itemid>```|string||{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}|
-|```<triggerid></triggerid>```|string||{TRIGGER.ID}|
-|```<eventid></eventid>```|string||{EVENT.ID}|
-|```<actionid></actionid>```|string||{ACTION.ID}|
-|```<title><![CDATA[]]></title>```|string||{HOST.HOST} - {EVENT.NAME}|
-|```<triggerurl><![CDATA[]]></triggerurl>```|string||{TRIGGER.URL}|
-|```<tags><![CDATA[]]></tags>```|string||{EVENT.TAGS}|
+|```<graphs></graphs>```|bool|Добавление изображения графика в сообщение.|True|
+|```<hostlinks></hostlinks>```|bool|Добавление линка на "Узел сети" (host) в сообщение.|True|
+|```<graphlinks></graphlinks>```|bool|Добавление линка на график "Элемент данных" (item) в сообщение.|True|
+|```<triggerlinks></triggerlinks>```|bool|Добавление линка из триггера в сообщение.|True|
+|```<tag></tag>```|bool|Добавление всех тэгов в сообщение.|True|
+|```<keyboard></keyboard>```|bool|Добавление кнопок к сообщению (*В стадии разработки*).|True|
+|```<graphs_period></graphs_period>```|string|Период за который присылается изображение графика в секундах.|10800|
+|```<host></host>```|string|Макрос узла сети.|{HOST.ID1}*|
+|```<itemid></itemid>```|string|Макросы ид элементов данных.|{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}|
+|```<triggerid></triggerid>```|string|Макрос ид триггера.|{TRIGGER.ID}|
+|```<eventid></eventid>```|string|Макрос ид события.|{EVENT.ID}|
+|```<actionid></actionid>```|string|Макрос ид действия.|{ACTION.ID}|
+|```<title><![CDATA[]]></title>```|string|Шаблон формирования заголовка изображения графика из макросов: имя узла сети и имя события.|{HOST.HOST} - {EVENT.NAME}|
+|```<triggerurl><![CDATA[]]></triggerurl>```|string|Макрос URL триггера.|{TRIGGER.URL}|
+|```<tags><![CDATA[]]></tags>```|string|Макрос тэгов разделенных запятой события|{EVENT.TAGS}|
 
-Zabbix Macros
+**[Макросы поддерживаемые по назначению](https://www.zabbix.com/documentation/current/ru/manual/appendix/macros/supported_by_location)*
 
-```<![CDATA[]]>```
+```<![CDATA[]]>```:
+В XML документах фрагмент, помещенный внутрь CDATA, — это часть содержания элемента, которая помечена для парсера как содержащая только символьные данные, а не разметку. CDATA — это просто альтернативный синтаксис для отображения символьных данных, нет никакой смысловой разницы между символьными данными, которые объявлены как CDATA и символьными данными, которые объявлены в обычном синтаксисе и где «<» и «>» будут представлены как «&lt;» и «&gt;», соответственно.([Wikipedia](https://ru.wikipedia.org/wiki/CDATA))
 
 
 
