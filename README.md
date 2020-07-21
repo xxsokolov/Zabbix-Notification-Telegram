@@ -38,7 +38,7 @@ _shields.io_
 $ cd /usr/lib/zabbix/alertscripts
 $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ```
-После этого нотификтор практически готов к работу, потребуется еще несколько шагов.
+После этого нотификтор практически готов к работе, потребуется еще несколько шагов.
 
 **Подробную инструкцию вы можете найти в нашей wiki: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Установка-нотификатора-Zabbix-Notification-Telegram), ENG (vacant)*
 
@@ -53,6 +53,8 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ## Настраиваем нотификатор
 ### Конфигурационный файл
 Основная конфигурация нотификатора производится через файл [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py). 
+
+## <p align="center"> :exclamation: ВАЖНО! Конфиг файл [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py) имеет преимущество перед XML. :exclamation:
 
 Давайте разберем каждый параметр подробно:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
@@ -78,26 +80,32 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |body_messages_url_notes = True|bool|Добавление линка из триггера в сообщение|True|
 |body_messages_url_graphs = True|bool|Добавление линка на график "Элемент данных" (item) в сообщение|True|
 |body_messages_url_host = True|bool|Добавление линка на "Узел сети" (host) в сообщение|True|
-|#body_messages_url_akk = True|bool|Добавление линка на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges) в сообщение|True|
-|#body_messages_url_event = True|bool|Добавление линка на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events) в сообщение|True|
+|body_messages_url_ack = True|bool|Добавление линка на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges) в сообщение|True|
+|body_messages_url_event = True|bool|Добавление линка на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events) в сообщение|True|
 |body_messages_url_template|sting|Шаблон формирование линка|'<a href="{url}">{icon}</a>'|
+|body_messages_url_template_line|sting|Шаблон формирования поля с линками в сообщении|'\nLinks: {links}'|
+|body_messages_url_delimiter|sting|Разделитель между линками|' '|
 |body_messages_url_emoji_no_url|emoji|Иконка при отсутствии [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'➖'|
 |body_messages_url_emoji_notes|emoji|Иконка ссылки [URL](https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger) в триггере|'ℹ️'|
 |body_messages_url_emoji_graphs|emoji|Иконка ссылки на график "Элемент данных" (item)|'📊'|
 |body_messages_url_emoji_host|emoji|Иконка ссылки на "Узел сети" (host)|'📟'|
-|body_messages_url_emoji_akk|emoji|Иконка ссылки на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|'✉️'|
+|body_messages_url_emoji_ack|emoji|Иконка ссылки на ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|'✉️'|
 |body_messages_url_emoji_event|emoji|Иконка ссылки на ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|'📋'|
 |body_messages_tags|bool|Добавление всех тэгов в сообщение|True|
-|body_messages_add_tags_event|bool|Добавление eventid тэгов в сообщение|True|
-|body_messages_add_tags_item|bool|Добавление itemid тэгов в сообщение|True|
-|body_messages_add_tags_trigger|bool|Добавление triggerid тэгов в сообщение|True|
-|body_messages_add_tags_action|bool|Добавление actionid тэгов в сообщение|True|
-|body_messages_no_tags|sting|Тег при отсутствии тэга в узле сети|'#no_tags'|
-|body_messages_tags_delimiter|sting|Разделитель в имени и значение тэга|' '|
-|body_messages_tag_eventid|sting|Шаблон формирования тэга eventid|'#eid_'|
-|body_messages_tag_itemid|sting|Шаблон формирования тэга itemid|'#iid_'|
-|body_messages_tag_triggerid|sting|Шаблон формирования тэга triggerid|'#tid_'|
-|body_messages_tag_actionid|sting|Шаблон формирования тэга actionid|'#aid_'|
+|body_messages_tags_event|||True|
+|body_messages_tags_eventid|bool|Добавление eventid тэгов в сообщение|True|
+|body_messages_tags_itemid|bool|Добавление itemid тэгов в сообщение|True|
+|body_messages_tags_triggerid|bool|Добавление triggerid тэгов в сообщение|True|
+|body_messages_tags_actionid|bool|Добавление actionid тэгов в сообщение|True|
+|body_messages_tags_hostid|bool|Добавление hostnid тэгов в сообщение|True|
+|body_messages_tags_template_line|sting||'\n\n{tags}'|
+|body_messages_tags_no|sting|Тег при отсутствии тэга в узле сети|'#no_tags'|
+|body_messages_tags_delimiter|sting|Разделитель между тэгами|' '|
+|body_messages_tags_prefix_eventid|sting|Шаблон формирования тэга eventid|'eid_'|
+|body_messages_tags_prefix_itemid|sting|Шаблон формирования тэга itemid|'iid_'|
+|body_messages_tags_prefix_triggerid|sting|Шаблон формирования тэга triggerid|'tid_'|
+|body_messages_tags_prefix_actionid|sting|Шаблон формирования тэга actionid|'aid_'|
+|body_messages_tags_prefix_hostid|sting|Шаблон формирования тэга hostidid|'hid_'|
 |tag_settings_no_graph|sting|Имя тега "Не прикреплять изображение графика"|'no_graph'|
 |zabbix_keyboard|bool|Добавление кнопок к сообщению (*В стадии разработки*)|False|
 |zabbix_keyboard_button_message|sting|Имя кнопки "Добавить сообщение к событию"|'Message'|
@@ -107,18 +115,17 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_api_url|sting|Урл до Zabbix сервера|'http://127.0.0.1/zabbix/'|
 |zabbix_api_login|sting|Учетная запись|'Admin'|
 |zabbix_api_pass|sting|Пароль|'zabbix'|
+|zabbix_graph|bool|Добавление изображения графика к сообщению|True|
 |zabbix_graph_period_default|int|Период за который присылается изображение графика в секундах.|43200  # 24h|
 |zabbix_graph_chart|sting|Шаблон формирования линка до chart3.php|[Default](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L65)|
 |zabbix_host_link|sting|Шаблон формирования линка до узла сети|"{zabbix_server}zabbix.php?action=search&search={host}"|
 |zabbix_graph_link|sting|Шаблон формирования линка до графика "Элемент данных" (item)|"{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"|
-|zabbix_akk_link|sting|Шаблон формирования линка до ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|"{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"|
+|zabbix_ack_link|sting|Шаблон формирования линка до ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|"{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"|
 |zabbix_event_link|sting|Шаблон формирования линка до ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|"{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"|
 |zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "InformWikipedia", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
 
 ### XML разметка
 Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action).
-
-## <p align="center"> :exclamation: ВАЖНО! XML имеет преимущество перед конфиг файлом [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py). :exclamation:
 
 Также разберем эти параметры:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
@@ -138,7 +145,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |```<actionid></actionid>```|string|Макрос ид действия.|{ACTION.ID}|
 |```<title><![CDATA[]]></title>```|string|Шаблон формирования заголовка изображения графика из макросов: имя узла сети и имя события.|{HOST.HOST} - {EVENT.NAME}|
 |```<triggerurl><![CDATA[]]></triggerurl>```|string|Макрос URL триггера.|{TRIGGER.URL}|
-|```<tags><![CDATA[]]></tags>```|string|Макрос тэгов разделенных запятой события|{EVENT.TAGS}|
+|```<tags><![CDATA[]]></tags>```|string|Макрос тэгов события разделенных запятой. Макрос обьеденяет теги из узла сети, шаблона, триггера.|{EVENT.TAGS}|
 
 **[Макросы поддерживаемые по назначению](https://www.zabbix.com/documentation/current/ru/manual/appendix/macros/supported_by_location)*
 
