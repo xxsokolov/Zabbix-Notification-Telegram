@@ -2,11 +2,13 @@
 
 <p align="center">Нотификатор оповещений в Telegram для <a href="https://www.zabbix.com/features#notification">Zabbix</a>.
 
+[Rating Popular на www.zabbix.com](https://www.zabbix.com/integrations/telegram#tab:3rd_party)
+
+[Rating Popular на share.zabbix.com](https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram)
+
 _shields.io_
 
-<p align="right">[Rating Popular на www.zabbix.com](https://www.zabbix.com/integrations/telegram#tab:3rd_party)
 
-<p align="right">[Rating Popular на share.zabbix.com](https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram)
 
 * [Возможности.](#возможности)
 * [С чего начать](#с-чего-начать)
