@@ -16,7 +16,12 @@ Duration: {EVENT.AGE}]]>
 		<acklinks>True</acklinks>
 		<eventlinks>True</eventlinks>
 		<triggerlinks>True</triggerlinks>
-		<tag>True</tag>
+		<eventtag>True</eventtag>
+		<eventidtag>True</eventidtag>
+		<itemidtag>True</itemidtag>
+		<triggeridtag>True</triggeridtag>
+		<actionidtag>True</actionidtag>
+		<hostidtag>True</hostidtag>
 		<keyboard>True</keyboard>
 		<graphs_period>10800</graphs_period>
 		<host>{HOST.ID1}</host>
@@ -24,8 +29,9 @@ Duration: {EVENT.AGE}]]>
 		<triggerid>{TRIGGER.ID}</triggerid>
 		<eventid>{EVENT.ID}</eventid>
 		<actionid>{ACTION.ID}</actionid>
+		<hostid>{HOST.ID1}</hostid>
 		<title><![CDATA[{HOST.HOST} - {EVENT.NAME}]]></title>
 		<triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
-		<tags><![CDATA[{EVENT.TAGS}]]></tags>
+		<eventtags><![CDATA[{EVENT.TAGS}]]></eventtags>
 	</settings>
 </root>

@@ -76,7 +76,14 @@ def xml_parsing(data):
         settings_hostlinks_bool = data['settings']['hostlinks']
         settings_acklinks_bool = data['settings']['acklinks']
         settings_eventlinks_bool = data['settings']['eventlinks']
-        settings_tag_bool = data['settings']['tag']
+
+        settings_eventtag_bool = data['settings']['eventtag']
+        settings_eventidtag_bool = data['settings']['eventidtag']
+        settings_itemidtag_bool = data['settings']['itemidtag']
+        settings_triggeridtag_bool = data['settings']['triggeridtag']
+        settings_actionidtag_bool = data['settings']['actionidtag']
+        settings_hostidtag_bool = data['settings']['hostidtag']
+
         settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
@@ -85,22 +92,29 @@ def xml_parsing(data):
         settings_triggerid = data['settings']['triggerid']
         settings_eventid = data['settings']['eventid']
         settings_actionid = data['settings']['actionid']
+        settings_hostid = data['settings']['hostid']
         settings_title = data['settings']['title']
         settings_trigger_url = data['settings']['triggerurl']
 
-        settings_tags = data['settings']['tags']
+        settings_eventtags = data['settings']['eventtags']
 
-        return dict(title=settings_title, message=message, tags=settings_tags,
+        return dict(title=settings_title, message=message, eventtags=settings_eventtags,
                     settings_graphs_bool=eval(settings_graphs_bool.capitalize()),
                     settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
                     settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
                     settings_hostlinks_bool=eval(settings_hostlinks_bool.capitalize()),
                     settings_acklinks_bool=eval(settings_acklinks_bool.capitalize()),
                     settings_eventlinks_bool=eval(settings_eventlinks_bool.capitalize()),
-                    settings_tag_bool=eval(settings_tag_bool.capitalize()),
+                    settings_eventtag_bool=eval(settings_eventtag_bool.capitalize()),
+                    settings_eventidtag_bool=eval(settings_eventidtag_bool.capitalize()),
+                    settings_itemidtag_bool=eval(settings_itemidtag_bool.capitalize()),
+                    settings_triggeridtag_bool=eval(settings_triggeridtag_bool.capitalize()),
+                    settings_actionidtag_bool=eval(settings_actionidtag_bool.capitalize()),
+                    settings_hostidtag_bool=eval(settings_hostidtag_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
-                    graphs_period=settings_graphs_period, host=settings_host, itemid=settings_itemid, triggerid=settings_triggerid,
-                    triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
+                    graphs_period=settings_graphs_period, host=settings_host, itemid=settings_itemid,
+                    triggerid=settings_triggerid, triggerurl=settings_trigger_url, eventid=settings_eventid,
+                    actionid=settings_actionid, hostid=settings_hostid)
 
     except Exception as err:
         loggings.error("Exception occurred: {} (xml parsing error)".format(err), exc_info=config_exc_info), exit(1)
@@ -166,40 +180,32 @@ def get_chart_png(itemid, graff_name, period=None):
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
-def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_triggerid, settings_actionid):
+def create_tags_list(_bool=None, tag=None, _type=None):
     tags_list = []
     try:
-        if settings_tags and (re.search(r'\w', settings_tags)):
-            for tags in settings_tags.split(', '):
-                if tags:
-                    if tags.find(':') != -1:
-                        tag, value = tags.split(':')
-                        tags_list.append('#{tag}_{value}'.format(tag=re.sub(r"\W+", "_", tag),
-                                                                 value=re.sub(r"\W+", "_", value)))
+        if _bool:
+            if tag and (re.search(r'\w', tag)):
+                for tags in tag.split(', '):
+                    if tags:
+                        if tags.find(':') != -1:
+                            tag, value = tags.split(':')
+                            tags_list.append('#{tag}_{value}'.format(
+                                tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
+                                value=re.sub(r"\W+", "_", value)))
+                        else:
+                            tags_list.append('#{tag}'.format(
+                                tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
                     else:
-                        tags_list.append('#{tag}'.format(tag=re.sub(r"\W+", "_", tags)))
-                else:
-                    tags_list.append(body_messages_no_tags)
+                        tags_list.append(body_messages_tags_no)
+            else:
+                tags_list.append(body_messages_tags_no)
         else:
-            tags_list.append(body_messages_no_tags)
+            return False
+
     except ValueError:
-        tags_list.append(body_messages_no_tags)
-
-    if body_messages_add_tags_event:
-        tags_list.append(body_messages_tag_eventid + settings_eventid)
-
-    if body_messages_add_tags_item:
-        for item_id in list(set([x for x in settings_itemid.split()])):
-            if re.findall(r"\d+", item_id):
-                tags_list.append(body_messages_tag_itemid + item_id)
-
-    if body_messages_add_tags_trigger:
-        tags_list.append(body_messages_tag_triggerid + settings_triggerid)
-
-    if body_messages_add_tags_action:
-        tags_list.append(body_messages_tag_actionid + settings_actionid)
-
-    return body_messages_tags_delimiter.join(tags_list)
+        tags_list.append(body_messages_tags_no)
+    else:
+        return body_messages_tags_delimiter.join(tags_list)
 
 
 def create_links_list(_bool=None, url=None, _type=None, url_list=None):
@@ -444,11 +450,36 @@ def main():
     data_zabbix = xml_parsing(args.messages)
 
     # if tags_list
-    tags_list = create_tags_list(data_zabbix['tags'],
-                                 data_zabbix['eventid'],
-                                 data_zabbix['itemid'],
-                                 data_zabbix['triggerid'],
-                                 data_zabbix['actionid'])
+    # tags_list = create_tags_list(_bool=, data_zabbix['tags'])
+    event_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_eventtag_bool') and body_messages_tags_event else False,
+        tag=data_zabbix['eventtags'], _type=None)
+
+    eventid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_eventidtag_bool') and body_messages_tags_eventid else False,
+        tag=data_zabbix['eventid'], _type=body_messages_tags_prefix_eventid)
+
+    itemid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_itemidtag_bool') and body_messages_tags_itemid else False,
+        tag=data_zabbix['itemid'], _type=body_messages_tags_prefix_itemid)
+
+    triggerid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_triggeridtag_bool') and body_messages_tags_triggerid else False,
+        tag=data_zabbix['triggerid'], _type=body_messages_tags_prefix_triggerid)
+    actionid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_actionidtag_bool') and body_messages_tags_actionid else False,
+        tag=data_zabbix['actionid'], _type=body_messages_tags_prefix_actionid)
+    hostid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_hostidtag_bool') and body_messages_tags_hostid else False,
+        tag=data_zabbix['hostid'], _type=body_messages_tags_prefix_hostid)
+
+    tags_list = []
+    tags_list.append(event_tags) if event_tags else None
+    tags_list.append(eventid_tags) if eventid_tags else None
+    tags_list.append(itemid_tags) if itemid_tags else None
+    tags_list.append(triggerid_tags) if triggerid_tags else None
+    tags_list.append(actionid_tags) if actionid_tags else None
+    tags_list.append(hostid_tags) if hostid_tags else None
 
     trigger_url = create_links_list(_bool=True if data_zabbix.get('settings_triggerlinks_bool') and body_messages_url_notes else False,
                                     url=data_zabbix.get('triggerurl'),
@@ -518,7 +549,7 @@ def main():
         messages='{body}{links}{tags}'.format(
             body=html.escape(data_zabbix['message']),
             links='\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
-            tags='\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
+            tags='\n\n{}'.format(' '.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
 
     send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
     exit(0)

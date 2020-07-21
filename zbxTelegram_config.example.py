@@ -45,16 +45,19 @@ body_messages_url_emoji_akk = '✉️'  # URL update problem
 body_messages_url_emoji_event = '📋'  # URL in event
 
 body_messages_tags = True
-body_messages_add_tags_event = True
-body_messages_add_tags_item = True
-body_messages_add_tags_trigger = True
-body_messages_add_tags_action = True
-body_messages_no_tags = '#no_tags'
+body_messages_tags_event = True
+body_messages_tags_eventid = True
+body_messages_tags_itemid = True
+body_messages_tags_triggerid = True
+body_messages_tags_actionid = True
+body_messages_tags_hostid = True
+body_messages_tags_no = '#no_tags'
 body_messages_tags_delimiter = ' '
-body_messages_tag_eventid = '#eid_'
-body_messages_tag_itemid = '#iid_'
-body_messages_tag_triggerid = '#tid_'
-body_messages_tag_actionid = '#aid_'
+body_messages_tags_prefix_eventid = 'eid_'
+body_messages_tags_prefix_itemid = 'iid_'
+body_messages_tags_prefix_triggerid = 'tid_'
+body_messages_tags_prefix_actionid = 'aid_'
+body_messages_tags_prefix_hostid = 'hid_'
 
 tag_settings_no_graph = 'no_graph'
 
