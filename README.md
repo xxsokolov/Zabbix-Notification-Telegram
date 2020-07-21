@@ -8,7 +8,18 @@ _shields.io_
 
 [Rating Popular на share.zabbix.com](https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram)
 
-### Возможности
+* [Возможности.](#возможности)
+* [С чего начать](#с-чего-начать)
+* [Создаем первое оповещение](#создаем-первое-оповещение)
+  * [Получаем API token](#получаем-api-token)
+* [Настраиваем нотификатор](#настраиваем-нотификатор)
+  * [Конфигурационный файл](#конфигурационный-файл)
+  * [XML разметка](#xml-разметка)
+* [Логирование](#логирование)
+* [Последние значимые изменения](#последние-значимые-изменения)
+* [Помощь. Обсуждение. Чат.](#помощь-обсуждение-чат)
+
+## Возможности
 - [x] Отправка графиков и последних значений **в одном сообщении**
 - [x] Передача данных из [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action) разметкой XML 
 - [x] Формирование списка urls в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)
@@ -39,8 +50,8 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 
 Если у Вас нет бота, то мы расскажем как [это сделать быстро](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Регистрация-нового-бота-в-Telegram).
 
-### Настраиваем нотификатор
-
+## Настраиваем нотификатор
+### Конфигурационный файл
 Основная конфигурация нотификатора производится через файл [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py). 
 
 Давайте разберем каждый параметр подробно:
@@ -105,7 +116,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_event_link|sting|Шаблон формирования линка до ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|"{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"|
 |zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "InformWikipedia", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
 
-
+### XML разметка
 Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action).
 
 ## <p align="center"> :exclamation: ВАЖНО! XML имеет преимущество перед конфиг файлом [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py). :exclamation:
