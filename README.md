@@ -12,6 +12,7 @@ _shields.io_
 
 * [Возможности.](#возможности)
 * [С чего начать](#с-чего-начать)
+    * [Установка из source](#установка_из_source)
 * [Создаем первое оповещение](#создаем-первое-оповещение)
   * [Получаем API token](#получаем-api-token)
 * [Настраиваем нотификатор](#настраиваем-нотификатор)
@@ -34,8 +35,8 @@ _shields.io_
 - [x] Отправка метрик по запросу от бота <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
 
 ## С чего начать
-Нам для работы потребуется Python 3+ и Zabbix 3+. Пока есть один путь установки, но мы работаем над расширением:
-* Установка из source (git requires)*:
+Нам для работы потребуется Python 3+ и Zabbix 3+. Пока есть один путь установки, но мы работаем над расширением вариантов:
+#### Установка из source (git requires)*:
 ```
 $ cd /usr/lib/zabbix/alertscripts
 $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
@@ -165,6 +166,11 @@ _В XML документах фрагмент, помещенный внутрь
 ## Логирование
 
 Все основные (отправка, добавления в кеш файл, изменение группы в суппергруппу, ошибки, дебаг) события логируются в файле ```znt.log```, Вы можете его найти по-умолчанию ```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log``` ([config_log_file](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L15))
+Поддерживаются три режима логирования:
+1. Обычный(по-умолчанию), ведется минимальный лог об операциях в нотификаторе;
+2. [Debug](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L12), более детальный лог, требцется только для анализа ошибок в работе нотификатора *(по-умолчанию False)*;
+3. [exc_info](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L13), полный Traceback ошибок *(по-умолчанию False)*;
+
 
 
 ## Последние значимые изменения
