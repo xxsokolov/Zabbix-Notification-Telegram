@@ -2,10 +2,10 @@
 
 <p align="center">Нотификатор оповещений в Telegram для <a href="https://www.zabbix.com/features#notification">Zabbix.</a>.
 
-<p align="right"><a href="https://www.zabbix.com/integrations/telegram#tab:3rd_party">Rating Popular на www.zabbix.com</a>
-<p align="right"><a href="https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram">Rating Popular на share.zabbix.com</a>
+<p align="center"><a href="https://www.zabbix.com/integrations/telegram#tab:3rd_party">Rating Popular на www.zabbix.com</a>
+<p align="center"><a href="https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram">Rating Popular на share.zabbix.com</a>
 
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxxsokolov%2FZabbix-Notification-Telegram)](https://hits.seeyoufarm.com)
+
 <img alt="AppVeyor" src="https://img.shields.io/github/last-commit/xxsokolov/Zabbix-Notification-Telegram">
 <img alt="AppVeyor" src="https://img.shields.io/badge/python-3-blue">
 <img alt="AppVeyor" src="https://img.shields.io/github/license/xxsokolov/Zabbix-Notification-Telegram">
