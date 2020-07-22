@@ -18,6 +18,7 @@
   * [Конфигурационный файл](#конфигурационный-файл)
   * [XML разметка](#xml-разметка)
 * [Логирование](#логирование)
+* [F.A.Q](#faq)
 * [Последние значимые изменения](#последние-значимые-изменения)
 * [Помощь Обсуждение Чат](#помощь-обсуждение-чат)
 
@@ -169,6 +170,8 @@ _В XML документах фрагмент, помещенный внутрь
 2. [Debug](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L12), более детальный лог, требуется только для анализа ошибок в работе нотификатора *(по-умолчанию False)*;
 3. [exc_info](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L13), полный Traceback ошибок *(по-умолчанию False)*;
 
+## F.A.Q
+#### Сообщения не приходят
 
 
 ## Последние значимые изменения
