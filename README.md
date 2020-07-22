@@ -146,11 +146,11 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |```<keyboard></keyboard>```|bool|Добавление кнопок к сообщению (*В стадии разработки*).|True|
 |```<graphs_period></graphs_period>```|string|Период за который присылается изображение графика в секундах.|10800|
 |```<host></host>```|string|Макрос имени узла сети.|{HOST.ID1}|
-|```<itemid></itemid>```|string|Макросы ид элементов данных.|{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}|
-|```<triggerid></triggerid>```|string|Макрос ид триггера.|{TRIGGER.ID}|
-|```<eventid></eventid>```|string|Макрос ид события.|{EVENT.ID}|
-|```<actionid></actionid>```|string|Макрос ид действия.|{ACTION.ID}|
-|```<hostid></hostid>```|||Макрос ид узла сети.|{HOST.ID1}|
+|```<itemid></itemid>```|string|Макросы ИД элементов данных.|{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}|
+|```<triggerid></triggerid>```|string|Макрос ИД триггера.|{TRIGGER.ID}|
+|```<eventid></eventid>```|string|Макрос ИД события.|{EVENT.ID}|
+|```<actionid></actionid>```|string|Макрос ИД действия.|{ACTION.ID}|
+|```<hostid></hostid>```|string|Макрос ИД узла сети.|{HOST.ID1}|
 |```<title><![CDATA[]]></title>```|string|Шаблон формирования заголовка изображения графика из макросов: имя узла сети и имя события.|{HOST.HOST} - {EVENT.NAME}|
 |```<triggerurl><![CDATA[]]></triggerurl>```|string|Макрос URL триггера.|{TRIGGER.URL}|
 |```<eventtags><![CDATA[]]></eventtags>```|string|Макрос тэгов события разделенных запятой. Макрос объединяет теги из узла сети, шаблона, триггера.|{EVENT.TAGS}|
@@ -185,5 +185,6 @@ _В XML документах фрагмент, помещенный внутрь
 ---
 <a id="note1" href="#note1ref"><sup>1</sup></a>Формирование списка urls в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)<br />
 <a id="note2" href="#note2ref"><sup>2</sup></a> Формирование списка tags в теле сообщения для быстрого поиска событий в Telegram (Trigger Tags, Eventid, Itemid, Triggeid, Actionid)<br />
-<a id="note3" href="#note3ref"><sup>3</sup></a> Кешфайл<br />
+<a id="note3" href="#note3ref"><sup>3</sup></a> Кеш файл это json массив содержащий имена юзуров, групп, суппергруп и их идентификаторы(ИД). Безопасность Telegram не позволяет напрямую писать по имени, только по ИД. Чтобы получить данный ИД надо написать лично Вашему боту или бот должен быть добавлен в группу . Только после этого нотификатор "подключается" к боту и получает все обновления которые произошли у бота (getUpdates). Далее мы находим никнейм или имя групп, куда решили отправить нотификацию, и их ИД, которые и кладем в кэш файл.
+[FAQ Telegram](https://core.telegram.org/bots/faq#what-messages-will-my-bot-get)<br />
 <a id="note4" href="#note4ref"><sup>4</sup></a> Управление через Trigger Tags (Не прикреплять график, не отправлять уведомление, без push в Telegram *dev* и т.п.)
