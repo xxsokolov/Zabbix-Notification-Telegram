@@ -138,16 +138,23 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |```<graphlinks></graphlinks>```|bool|Добавление линка на график "Элемент данных" (item) в сообщение.|True|
 |```<triggerlinks></triggerlinks>```|bool|Добавление линка из триггера в сообщение.|True|
 |```<tag></tag>```|bool|Добавление всех тэгов в сообщение.|True|
+|```<eventtag></eventtag>```|bool|Добавление тэгов события в сообщение.|True|
+|```<eventidtag></eventidtag>```|bool|Добавление тэгa c eventid в сообщение.|True|
+|```<itemidtag></itemidtag>```|bool|Добавление тэгa c itemid в сообщение.|True|
+|```<triggeridtag></triggeridtag>```|bool|Добавление тэгa c triggerid в сообщение.|True|
+|```<actionidtag></actionidtag>```|bool|Добавление тэгa c actionid в сообщение.|True|
+|```<hostidtag></hostidtag>```|bool|Добавление тэгa c hostid в сообщение.|True|
 |```<keyboard></keyboard>```|bool|Добавление кнопок к сообщению (*В стадии разработки*).|True|
 |```<graphs_period></graphs_period>```|string|Период за который присылается изображение графика в секундах.|10800|
-|```<host></host>```|string|Макрос узла сети.|{HOST.ID1}|
+|```<host></host>```|string|Макрос имени узла сети.|{HOST.ID1}|
 |```<itemid></itemid>```|string|Макросы ид элементов данных.|{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}|
 |```<triggerid></triggerid>```|string|Макрос ид триггера.|{TRIGGER.ID}|
 |```<eventid></eventid>```|string|Макрос ид события.|{EVENT.ID}|
 |```<actionid></actionid>```|string|Макрос ид действия.|{ACTION.ID}|
+|```<hostid></hostid>```|||Макрос ид узла сети.|{HOST.ID1}|
 |```<title><![CDATA[]]></title>```|string|Шаблон формирования заголовка изображения графика из макросов: имя узла сети и имя события.|{HOST.HOST} - {EVENT.NAME}|
 |```<triggerurl><![CDATA[]]></triggerurl>```|string|Макрос URL триггера.|{TRIGGER.URL}|
-|```<tags><![CDATA[]]></tags>```|string|Макрос тэгов события разделенных запятой. Макрос обьеденяет теги из узла сети, шаблона, триггера.|{EVENT.TAGS}|
+|```<eventtags><![CDATA[]]></eventtags>```|string|Макрос тэгов события разделенных запятой. Макрос обьеденяет теги из узла сети, шаблона, триггера.|{EVENT.TAGS}|
 
 **[Макросы поддерживаемые по назначению](https://www.zabbix.com/documentation/current/ru/manual/appendix/macros/supported_by_location)*
 
