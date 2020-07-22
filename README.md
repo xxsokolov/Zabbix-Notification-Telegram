@@ -63,10 +63,10 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |---|-----------|--------|------------|
 |config_debug_mode|bool|Логирование в режиме debug| False|
 |config_exc_info|bool|Более детальный режим debug|False|
-|config_cache_file|string|Абсолютный путь до кеш файла|'/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache'|
-|config_log_file|string|Абсолютный путь до лог файла|'/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log'|
+|config_cache_file|string|Абсолютный путь до кеш файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache```|
+|config_log_file|string|Абсолютный путь до лог файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log```|
 |tg_proxy|bool|Использовать прокси для отправки сообщений в Telegram|True|
-|tg_proxy_server|dict|Урл до Вашего прокси|{'https': 'socks5://username:password@domen:port'}
+|tg_proxy_server|dict|Урл до Вашего прокси|```{'https': 'socks5://username:password@domen:port'}```
 |tg_token|string|Тот самый token, который Вы получали у [@BotFather](https://core.telegram.org/bots#botfather)|'123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'|
 |watermark|bool|Наносить ватермарку на изображение графика|True|
 |watermark_label|string|Текст наносимый на изображение графика|'Dmitry Sokolov (https://github.com/xxsokolov)'|
