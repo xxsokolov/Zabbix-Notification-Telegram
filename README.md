@@ -21,9 +21,9 @@
 * [Помощь. Обсуждение. Чат.](#помощь-обсуждение-чат)
 
 ## Возможности
-Графки, информативные заголовки, ссылки[^1], тэги[^2] обьеденены в **одно единое сообщение**.
-Формирование и обновление кэш файла (privat, group, group -> supergroup)[^3]
-Гибкая настройка через конфигурационный файл, XML разметку в [действиях триггеров](https://www.zabbix.com/documentation/current/manual/config/notifications/action) и Trigger Tags[^4]
+Графки, информативные заголовки, ссылки<a href="#note1" id="note1ref"><sup>1</sup></a>, тэги<a href="#note2" id="note2ref"><sup>2</sup></a> обьеденены в **одно единое сообщение**.
+Формирование и обновление кэш файла (privat, group, group -> supergroup)<a href="#note3" id="note3ref"><sup>3</sup></a>]
+Гибкая настройка через конфигурационный файл, XML разметку в [действиях триггеров](https://www.zabbix.com/documentation/current/manual/config/notifications/action) и Trigger Tags<a href="#note4" id="note4ref"><sup>4</sup></a>
 Маппинг Emoji статуса и важности события.
 Наложение watermark на изображен
 
@@ -182,7 +182,7 @@ _В XML документах фрагмент, помещенный внутрь
 
 
 ---
-[^1]: Формирование списка urls в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)
-[^2]: Формирование списка tags в теле сообщения для быстрого поиска событий в Telegram (Trigger Tags, Eventid, Itemid, Triggeid, Actionid)
-[^3]: Кешфайл
-[^4]: Управление через Trigger Tags (Не прикреплять график, не отправлять уведомление, без push в Telegram *dev* и т.п.)
+<a id="note1" href="#note1ref"><sup>1</sup></a>Формирование списка urls в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)<br />
+<a id="note2" href="#note2ref"><sup>2</sup></a> Формирование списка tags в теле сообщения для быстрого поиска событий в Telegram (Trigger Tags, Eventid, Itemid, Triggeid, Actionid)<br />
+<a id="note3" href="#note3ref"><sup>3</sup></a> Кешфайл<br />
+<a id="note4" href="#note4ref"><sup>4</sup></a> Управление через Trigger Tags (Не прикреплять график, не отправлять уведомление, без push в Telegram *dev* и т.п.)
