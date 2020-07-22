@@ -9,6 +9,7 @@
 
 
 * [Возможности.](#возможности)
+* [Планы](#планы)
 * [С чего начать](#с-чего-начать)
    * [Установка из source](#установка-из-source-git-requires)
 * [Создаем первое оповещение](#создаем-первое-оповещение)
@@ -21,11 +22,11 @@
 * [Помощь. Обсуждение. Чат.](#помощь-обсуждение-чат)
 
 ## Возможности
-Графки, информативные заголовки, ссылки<a href="#note1" id="note1ref"><sup>1</sup></a>, тэги<a href="#note2" id="note2ref"><sup>2</sup></a> обьеденены в **одно единое сообщение**.
-Формирование и обновление кэш файла (privat, group, group -> supergroup)<a href="#note3" id="note3ref"><sup>3</sup></a>]
-Гибкая настройка через конфигурационный файл, XML разметку в [действиях триггеров](https://www.zabbix.com/documentation/current/manual/config/notifications/action) и Trigger Tags<a href="#note4" id="note4ref"><sup>4</sup></a>
-Маппинг Emoji статуса и важности события.
-Наложение watermark на изображен
+- Графики, информативные заголовки, ссылки<a href="#note1" id="note1ref"><sup>1</sup></a> и тэги<a href="#note2" id="note2ref"><sup>2</sup></a> объедены в **одно единое сообщение**.
+- Формирование и обновление кэш файла (privat, group, group -> supergroup)<a href="#note3" id="note3ref"><sup>3</sup></a>
+- Гибкая настройка через конфигурационный файл, XML разметку в [действиях триггеров](https://www.zabbix.com/documentation/current/manual/config/notifications/action) и Trigger Tags<a href="#note4" id="note4ref"><sup>4</sup></a>
+- Маппинг Emoji статуса и важности события.
+- Наложение watermark на изображен
 
 ## Планы
 - Обработка быстрых команд ботом <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
@@ -64,7 +65,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |config_cache_file|string|Абсолютный путь до кеш файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache```|
 |config_log_file|string|Абсолютный путь до лог файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log```|
 |tg_proxy|bool|Использовать прокси для отправки сообщений в Telegram|True|
-|tg_proxy_server|dict|Урл до Вашего прокси|```{'https': 'socks5://username:password@domen:port'}```
+|tg_proxy_server|dict|Ссылка до Вашего прокси|```{'https': 'socks5://username:password@domen:port'}```
 |tg_token|string|Тот самый token, который Вы получали у [@BotFather](https://core.telegram.org/bots#botfather)|```123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s```|
 |watermark|bool|Наносить ватермарку на изображение графика|True|
 |watermark_label|string|Текст наносимый на изображение графика|'Dmitry Sokolov (https://github.com/xxsokolov)'|
@@ -110,7 +111,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_keyboard|bool|Добавление кнопок к сообщению (*В стадии разработки*)|False|
 |zabbix_keyboard_button_message|sting|Имя кнопки "Добавить сообщение к событию"|```Message```|
 |zabbix_keyboard_button_acknowledge|sting|Имя кнопки "Подтверждение события"|```Acknowledge```|
-|zabbix_keyboard_button_history|sting|Имя кнопки "Прислать сообщение (пять последних событий)" по данному эелементу данных|```History```|
+|zabbix_keyboard_button_history|sting|Имя кнопки "Прислать сообщение (пять последних событий)" по данному элементу данных|```History```|
 |zabbix_keyboard_row_width|int|Количество кнопок в строке|3|
 |zabbix_api_url|sting|Урл до Zabbix сервера|```http://127.0.0.1/zabbix/```|
 |zabbix_api_login|sting|Учетная запись|```Admin```|
@@ -152,7 +153,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |```<hostid></hostid>```|||Макрос ид узла сети.|{HOST.ID1}|
 |```<title><![CDATA[]]></title>```|string|Шаблон формирования заголовка изображения графика из макросов: имя узла сети и имя события.|{HOST.HOST} - {EVENT.NAME}|
 |```<triggerurl><![CDATA[]]></triggerurl>```|string|Макрос URL триггера.|{TRIGGER.URL}|
-|```<eventtags><![CDATA[]]></eventtags>```|string|Макрос тэгов события разделенных запятой. Макрос обьеденяет теги из узла сети, шаблона, триггера.|{EVENT.TAGS}|
+|```<eventtags><![CDATA[]]></eventtags>```|string|Макрос тэгов события разделенных запятой. Макрос объединяет теги из узла сети, шаблона, триггера.|{EVENT.TAGS}|
 
 **[Макросы поддерживаемые по назначению](https://www.zabbix.com/documentation/current/ru/manual/appendix/macros/supported_by_location)*
 
@@ -162,10 +163,10 @@ _В XML документах фрагмент, помещенный внутрь
 
 ## Логирование
 
-Все основные (отправка, добавления в кеш файл, изменение группы в суппергруппу, ошибки, дебаг) события логируются в файле ```znt.log```, Вы можете его найти по-умолчанию ```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log``` ([config_log_file](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L15))
+Все основные события (отправка, добавления в кеш файл, изменение группы в суппергруппу, ошибки, дебаг) логируются в файле ```znt.log```, Вы можете его найти по-умолчанию ```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log``` ([config_log_file](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L15))
 Поддерживаются три режима логирования:
 1. Обычный(по-умолчанию), ведется минимальный лог об операциях в нотификаторе;
-2. [Debug](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L12), более детальный лог, требцется только для анализа ошибок в работе нотификатора *(по-умолчанию False)*;
+2. [Debug](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L12), более детальный лог, требуется только для анализа ошибок в работе нотификатора *(по-умолчанию False)*;
 3. [exc_info](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L13), полный Traceback ошибок *(по-умолчанию False)*;
 
 
