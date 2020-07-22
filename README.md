@@ -21,16 +21,15 @@
 * [Помощь. Обсуждение. Чат.](#помощь-обсуждение-чат)
 
 ## Возможности
-- [x] Отправка графиков и последних значений **в одном сообщении**
-- [x] Передача данных из [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action) разметкой XML 
-- [x] Формирование списка urls в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)
-- [x] Формирование списка tags в теле сообщения для быстрого поиска событий в Telegram (Trigger Tags, Eventid, Itemid, Triggeid, Actionid)
-- [x] Настраиваемый Emoji mapping статуса и важности события
-- [x] Наложение watermark на изображение
-- [x] Формирование и обновление кэш файла (privat, group, group -> supergroup)
-- [x] Управление через Trigger Tags (Не прикреплять график, не отправлять уведомление, без push в Telegram *dev* и т.п.)
-- [x] Обработка быстрых команд ботом <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
-- [x] Отправка метрик по запросу от бота <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
+Графки, информативные заголовки, ссылки[^1], тэги[^2] обьеденены в **одно единое сообщение**.
+Формирование и обновление кэш файла (privat, group, group -> supergroup)[^3]
+Гибкая настройка через конфигурационный файл, XML разметку в [действиях триггеров](https://www.zabbix.com/documentation/current/manual/config/notifications/action) и Trigger Tags[^4]
+Маппинг Emoji статуса и важности события.
+Наложение watermark на изображен
+
+## Планы
+- Обработка быстрых команд ботом <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
+- Отправка метрик по запросу от бота <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
 
 ## С чего начать
 Нам для работы потребуется Python 3+ и Zabbix 3+. Пока есть один путь установки, но мы работаем над расширением вариантов:
@@ -181,3 +180,9 @@ _В XML документах фрагмент, помещенный внутрь
 
 * Присоединяйтесь [ZNTGroup](https://t.me/ZbxNTg) и [ZNTChannel](https://t.me/ZNTChannel).
 
+
+---
+[^1]: Формирование списка urls в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)
+[^2]: Формирование списка tags в теле сообщения для быстрого поиска событий в Telegram (Trigger Tags, Eventid, Itemid, Triggeid, Actionid)
+[^3]: Кешфайл
+[^4]: Управление через Trigger Tags (Не прикреплять график, не отправлять уведомление, без push в Telegram *dev* и т.п.)
