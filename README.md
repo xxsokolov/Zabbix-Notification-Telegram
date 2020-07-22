@@ -1,11 +1,8 @@
 # <p align="center">Zabbix Notification Telegram
-
-<p align="center">Нотификатор оповещений в Telegram для <a href="https://www.zabbix.com/features#notification">Zabbix.</a>.
-
-<p align="center"><a href="https://www.zabbix.com/integrations/telegram#tab:3rd_party">Rating Popular на www.zabbix.com</a>
-<p align="center"><a href="https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram">Rating Popular на share.zabbix.com</a>
-
-
+<p align="center">Нотификатор оповещений в Telegram для <a href="https://www.zabbix.com/features#notification">Zabbix</a>.<br />
+Простая установка, гибкая настройка, информативные сообщения.
+<p align="center"><a href="https://www.zabbix.com/integrations/telegram#tab:3rd_party">Popular на www.zabbix.com</a><a href="https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram"> и share.zabbix.com</a>
+<br />
 <img alt="AppVeyor" src="https://img.shields.io/github/last-commit/xxsokolov/Zabbix-Notification-Telegram">
 <img alt="AppVeyor" src="https://img.shields.io/badge/python-3-blue">
 <img alt="AppVeyor" src="https://img.shields.io/github/license/xxsokolov/Zabbix-Notification-Telegram">
