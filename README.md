@@ -8,9 +8,7 @@
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxxsokolov%2FZabbix-Notification-Telegram)](https://hits.seeyoufarm.com)
 <img alt="AppVeyor" src="https://img.shields.io/github/last-commit/xxsokolov/Zabbix-Notification-Telegram">
 <img alt="AppVeyor" src="https://img.shields.io/badge/python-3-blue">
-<img alt="AppVeyor" src="https://img.shields.io/badge/zabbix-3-red">
-<img alt="AppVeyor" src="https://img.shields.io/badge/zabbix-4-red">
-<img alt="AppVeyor" src="https://img.shields.io/badge/zabbix-5-red">
+<img alt="AppVeyor" src="https://img.shields.io/github/license/xxsokolov/Zabbix-Notification-Telegram">
 
 
 * [Возможности.](#возможности)
