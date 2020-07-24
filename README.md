@@ -1,6 +1,6 @@
 # <p align="center">Zabbix Notification Telegram
 <p align="center">Нотификатор оповещений в Telegram для <a href="https://www.zabbix.com/features#notification">Zabbix</a>.<br />
-Простая установка, гибкая настройка, информативные сообщения.
+Легкая установка, гибкая настройка, информативные сообщения.
 <p align="center"><a href="https://www.zabbix.com/integrations/telegram#tab:3rd_party">Popular на www.zabbix.com</a><a href="https://share.zabbix.com/zabbix-tools-and-utilities/cat-notifications/zabbix-notification-telegram"> и share.zabbix.com</a>
 <br />
 <img alt="AppVeyor" src="https://img.shields.io/github/last-commit/xxsokolov/Zabbix-Notification-Telegram">
@@ -18,39 +18,39 @@
   * [Конфигурационный файл](#конфигурационный-файл)
   * [XML разметка](#xml-разметка)
 * [Логирование](#логирование)
-* [F.A.Q](#faq)
+* [F.A.Q.](#faq)
 * [Последние значимые изменения](#последние-значимые-изменения)
-* [Помощь Обсуждение Чат](#помощь-обсуждение-чат)
+* [Помощь](#помощь)
 
 ## Возможности
-- Графики, информативные заголовки, ссылки<a href="#note1" id="note1ref"><sup>1</sup></a> и тэги<a href="#note2" id="note2ref"><sup>2</sup></a> объедены в **одно единое сообщение**.
-- Формирование и обновление кэш файла (privat, group, group -> supergroup)<a href="#note3" id="note3ref"><sup>3</sup></a>
+- Графики, информативные заголовки, ссылки<a href="#note1" id="note1ref"><sup>1</sup></a> и тэги<a href="#note2" id="note2ref"><sup>2</sup></a> объединены в **одно сообщение**.
+- Формирование и обновление cash файла (privat, group, group -> supergroup)<a href="#note3" id="note3ref"><sup>3</sup></a>
 - Гибкая настройка через конфигурационный файл, XML разметку в [действиях триггеров](https://www.zabbix.com/documentation/current/manual/config/notifications/action) и Trigger Tags<a href="#note4" id="note4ref"><sup>4</sup></a>
 - Маппинг Emoji статуса и важности события.
-- Наложение watermark на изображен
+- Наложение watermark на изображение.
 
 ## Планы
 - Обработка быстрых команд ботом <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
 - Отправка метрик по запросу от бота <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
 
 ## С чего начать
-Нам для работы потребуется Python 3+ и Zabbix 3+. Пока есть один путь установки, но мы работаем над расширением вариантов:
+Для работы потребуется Python 3+ и Zabbix 3+.
 #### Установка из source (git requires)*:
 ```
 $ cd /usr/lib/zabbix/alertscripts
 $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ```
-После этого нотификтор практически готов к работе, потребуется еще несколько шагов.
+После этого нотификатор практически готов к работе, потребуется еще несколько шагов.
 
-*Подробную инструкцию вы можете найти на нашей wiki: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Установка-нотификатора-Zabbix-Notification-Telegram), ENG (vacant)*
+*Подробную инструкцию вы можете найти на wiki: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Установка-нотификатора-Zabbix-Notification-Telegram), ENG (vacant)*
 
 
 ## Создаем первое оповещение
 ### Получаем API token
 
-Наверное Вы уже [получили API token от @BotFather](https://core.telegram.org/bots#botfather) который будем использовать в [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py): [tg_token](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L19).
+Получили [API token от @BotFather](https://core.telegram.org/bots#botfather) который будем использовать в [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py): [tg_token](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L19).
 
-*Если у Вас нет бота, то мы расскажем как это сделать быстро: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Регистрация-нового-бота-в-Telegram), ENG (vacant)*
+*Если у Вас нет бота, я расскажу как это сделать: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Регистрация-нового-бота-в-Telegram), ENG (vacant)*
 
 ## Настраиваем нотификатор
 ### Конфигурационный файл
@@ -63,8 +63,8 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |---|-----------|--------|------------|
 |config_debug_mode|bool|Логирование в режиме debug| False|
 |config_exc_info|bool|Более детальный режим debug|False|
-|config_cache_file|string|Абсолютный путь до кеш файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache```|
-|config_log_file|string|Абсолютный путь до лог файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log```|
+|config_cache_file|string|Абсолютный путь до cash файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache```|
+|config_log_file|string|Абсолютный путь до log файла|```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log```|
 |tg_proxy|bool|Использовать прокси для отправки сообщений в Telegram|True|
 |tg_proxy_server|dict|Ссылка до Вашего прокси|```{'https': 'socks5://username:password@domen:port'}```
 |tg_token|string|Тот самый token, который Вы получали у [@BotFather](https://core.telegram.org/bots#botfather)|```123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s```|
@@ -164,30 +164,30 @@ _В XML документах фрагмент, помещенный внутрь
 
 ## Логирование
 
-Все основные события (отправка, добавления в кеш файл, изменение группы в суппергруппу, ошибки, дебаг) логируются в файле ```znt.log```, Вы можете его найти по-умолчанию ```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log``` ([config_log_file](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L15))
+Все основные события (отправка, добавления в cash файл, изменение группы в суппергруппу, ошибки, дебаг) логируются в файле ```znt.log```, Вы можете его найти по умолчанию ```/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log``` ([config_log_file](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L15))
 Поддерживаются три режима логирования:
-1. Обычный(по-умолчанию), ведется минимальный лог об операциях в нотификаторе;
-2. [Debug](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L12), более детальный лог, требуется только для анализа ошибок в работе нотификатора *(по-умолчанию False)*;
+1. Обычный(по-умолчанию), ведется минимальный log об операциях в нотификаторе;
+2. [Debug](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L12), более детальный log, требуется только для анализа ошибок в работе нотификатора *(по-умолчанию False)*;
 3. [exc_info](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L13), полный Traceback ошибок *(по-умолчанию False)*;
 
-## F.A.Q
+## F.A.Q.
 #### Сообщения не приходят
 
 
 ## Последние значимые изменения
 
-* Добавлены и изменены переменные в конфиг файле
-* Изменен XML
+* Добавлены и изменены переменные в конфиг файле.
+* Изменен XML.
 
 
-## Помощь. Обсуждение. Чат.
+## Помощь
 
-* Присоединяйтесь [ZNTGroup](https://t.me/ZbxNTg) и [ZNTChannel](https://t.me/ZNTChannel).
+* Welcome! [ZNTGroup](https://t.me/ZbxNTg) и [ZNTChannel](https://t.me/ZNTChannel).
 
 
 ---
 <a id="note1" href="#note1ref"><sup>1</sup></a>Формирование списка urls в теле сообщения для быстрого перехода в разделы Zabbix (Trigger, History, Event, Acknowledget, Host)<br />
 <a id="note2" href="#note2ref"><sup>2</sup></a> Формирование списка tags в теле сообщения для быстрого поиска событий в Telegram (Trigger Tags, Eventid, Itemid, Triggeid, Actionid)<br />
-<a id="note3" href="#note3ref"><sup>3</sup></a> Кеш файл это json массив содержащий имена юзуров, групп, суппергруп и их идентификаторы(ИД). Безопасность Telegram не позволяет напрямую писать по имени, только по ИД. Чтобы получить данный ИД надо написать лично Вашему боту или бот должен быть добавлен в группу . Только после этого нотификатор "подключается" к боту и получает все обновления которые произошли у бота (getUpdates). Далее мы находим никнейм или имя групп, куда решили отправить нотификацию, и их ИД, которые и кладем в кэш файл.
+<a id="note3" href="#note3ref"><sup>3</sup></a> Кеш файл это json массив содержащий имена юзуров, групп, суппергруп и их идентификаторы(ИД). Безопасность Telegram не позволяет напрямую писать по имени, только по ИД. Чтобы получить данный ИД надо написать лично Вашему боту или бот должен быть добавлен в группу . Только после этого нотификатор "подключается" к боту и получает все обновления которые произошли у бота (getUpdates). Далее мы находим никнейм или имя групп, куда решили отправить нотификацию, и их ИД, которые и кладем в cash файл.
 [FAQ Telegram](https://core.telegram.org/bots/faq#what-messages-will-my-bot-get)<br />
 <a id="note4" href="#note4ref"><sup>4</sup></a> Управление через Trigger Tags (Не прикреплять график, не отправлять уведомление, без push в Telegram *dev* и т.п.)
