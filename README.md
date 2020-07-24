@@ -42,7 +42,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ```
 После этого нотификтор практически готов к работе, потребуется еще несколько шагов.
 
-**Подробную инструкцию вы можете найти в нашей wiki: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Установка-нотификатора-Zabbix-Notification-Telegram), ENG (vacant)*
+*Подробную инструкцию вы можете найти на нашей wiki: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Установка-нотификатора-Zabbix-Notification-Telegram), ENG (vacant)*
 
 
 ## Создаем первое оповещение
@@ -50,7 +50,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 
 Наверное Вы уже [получили API token от @BotFather](https://core.telegram.org/bots#botfather) который будем использовать в [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py): [tg_token](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py#L19).
 
-Если у Вас нет бота, то мы расскажем как [это сделать быстро](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Регистрация-нового-бота-в-Telegram).
+*Если у Вас нет бота, то мы расскажем как это сделать быстро: [RU](https://github.com/xxsokolov/Zabbix-Notification-Telegram/wiki/Регистрация-нового-бота-в-Telegram), ENG (vacant)*
 
 ## Настраиваем нотификатор
 ### Конфигурационный файл
