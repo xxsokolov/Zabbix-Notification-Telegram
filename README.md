@@ -17,6 +17,7 @@
 * [Настраиваем нотификатор](#настраиваем-нотификатор)
   * [Конфигурационный файл](#конфигурационный-файл)
   * [XML разметка](#xml-разметка)
+  * [Тэги ZNTSettings](#тэги-zntsettings)
 * [Логирование](#логирование)
 * [F.A.Q.](#faq)
 * [Последние значимые изменения](#последние-значимые-изменения)
@@ -160,6 +161,20 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 
 ```<![CDATA[]]>```:
 _В XML документах фрагмент, помещенный внутрь CDATA, — это часть содержания элемента, которая помечена для парсера как содержащая только символьные данные, а не разметку. CDATA — это просто альтернативный синтаксис для отображения символьных данных, нет никакой смысловой разницы между символьными данными, которые объявлены как CDATA и символьными данными, которые объявлены в обычном синтаксисе и где «<» и «>» будут представлены как «&lt;» и «&gt;», соответственно. ([Wikipedia](https://ru.wikipedia.org/wiki/CDATA))_
+
+### Тэги ZNTSettings
+|Имя|Описание|По умолчанию|
+|---|--------|------------|
+|trigger_settings_tag||'ZNTSettings'|
+|trigger_settings_tag_no_graph||'no_graph'|
+|trigger_settings_tag_no_alert||'no_alert'|
+|trigger_settings_tag_not_notify||'not_notify'|
+|trigger_settings_tag_graph_normal||'graph_normal'|
+|trigger_settings_tag_graph_stacked||'graph_stacked'|
+|trigger_settings_tag_graph_pie||'graph_pie'|
+|trigger_settings_tag_graph_exploded||'graph_exploded'|
+|trigger_settings_tag_graph_period||'period:'  # period:43200|
+
 
 
 ## Логирование
