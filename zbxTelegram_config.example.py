@@ -5,6 +5,7 @@
 # xx.sokolov@gmail.com #
 #  https://t.me/ZbxNTg #
 ########################
+# Detailed instructions for all parameters on https://github.com/xxsokolov/Zabbix-Notification-Telegram
 __author__ = "Sokolov Dmitry"
 __maintainer__ = "Sokolov Dmitry"
 __license__ = "MIT"
@@ -38,6 +39,7 @@ body_messages_url_ack = True
 body_messages_url_event = True
 body_messages_url_template = '<a href="{url}">{icon}</a>'
 body_messages_url_template_line = '\nLinks: {links}'
+body_messages_url_delimiter = ' '
 body_messages_url_emoji_no_url = '➖'
 body_messages_url_emoji_notes = 'ℹ️'  # URL in trigger
 body_messages_url_emoji_graphs = '📊'  # URL history graph item
@@ -52,6 +54,7 @@ body_messages_tags_itemid = True
 body_messages_tags_triggerid = True
 body_messages_tags_actionid = True
 body_messages_tags_hostid = True
+body_messages_tags_trigger_settings = True
 body_messages_tags_template_line = '\n\n{tags}'
 body_messages_tags_no = '#no_tags'
 body_messages_tags_delimiter = ' '
@@ -61,7 +64,6 @@ body_messages_tags_prefix_triggerid = 'tid_'
 body_messages_tags_prefix_actionid = 'aid_'
 body_messages_tags_prefix_hostid = 'hid_'
 
-tag_settings_no_graph = 'no_graph'
 
 zabbix_keyboard = False
 zabbix_keyboard_button_message = 'Message'
@@ -89,17 +91,19 @@ zabbix_graph_chart = '{zabbix_server}chart3.php?' \
 zabbix_host_link = "{zabbix_server}zabbix.php?action=search&search={host}"
 zabbix_graph_link = "{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"
 #zabbix_ack_link = "{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"  # Zabbix Server ver > 5
-zabbix_ack_link = "{zabbix_server}zabbix.php?action=popup&popup_action=acknowledge.edit&eventids[0]={eventid}" # Zabbix Server ver <= 5
+zabbix_ack_link = "{zabbix_server}zabbix.php?action=popup&popup_action=acknowledge.edit&eventids[0]={eventid}"  # Zabbix Server ver <= 5
 zabbix_event_link = "{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"
 
 
 zabbix_status_emoji_map = {
     "Problem": "🚨",
-    "Resolved":"✅",
+    "Resolved": "✅",
     "Update": "🚧",
+    "Not classified": "⁉️",
     "Information": "💙",
-    "Warning":"💛",
-    "Average":"🧡",
-    "High":"❤️",
+    "Warning": "💛",
+    "Average": "🧡",
+    "High": "❤️",
     "Disaster": "💔",
     "Test": "🚽💩"}
+
