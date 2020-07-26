@@ -5,7 +5,6 @@
 <![CDATA[
 Host: {HOST.HOST} [{HOST.IP}]
 Last value: {ITEM.LASTVALUE1} ({TIME})
-DESC: {INVENTORY.NOTES1}
 Duration: {EVENT.AGE}]]>
 		</messages>
 	</body>

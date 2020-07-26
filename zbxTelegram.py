@@ -5,6 +5,7 @@
 # xx.sokolov@gmail.com #
 #  https://t.me/ZbxNTg #
 ########################
+# https://github.com/xxsokolov/Zabbix-Notification-Telegram
 __author__ = "Sokolov Dmitry"
 __maintainer__ = "Sokolov Dmitry"
 __license__ = "MIT"
@@ -36,7 +37,8 @@ class System:
         else:
             self.log_level = logging.INFO
 
-        log_format = logging.Formatter('[%(asctime)s] - PID:%(process)s - %(funcName)s() - %(filename)s:%(lineno)d - %(levelname)s: %(message)s')
+        log_format = logging.Formatter(
+            '[%(asctime)s] - PID:%(process)s - %(funcName)s() - %(filename)s:%(lineno)d - %(levelname)s: %(message)s')
         self.log = logging.getLogger()
         self.log.setLevel(self.log_level)
 
@@ -428,7 +430,8 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
             else:
                 try:
                     bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
-                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None,
+                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard
+                                     else None,
                                      disable_notification=disable_notification)
                 except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
@@ -448,8 +451,8 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
 
 
 def main():
-    loggings.debug("sys.argv: {}".format(sys.argv[1:])) if loggings.debug else None
-    loggings.info("Send to {} action: {}".format(args.username, args.subject)) if not loggings.debug else None
+    loggings.info("Send to {} action: {}".format(args.username, args.subject))
+    loggings.debug("sys.argv: {}".format(sys.argv[1:]))
     loggings.debug("Send to {}\naction: {}\nxml: {}".format(args.username, args.subject, args.messages))
 
     if args.subject in ['Test subject', 'test'] or args.messages in ['This is the test message from Zabbix', 'test']:
@@ -476,8 +479,6 @@ def main():
 
     data_zabbix = xml_parsing(args.messages)
 
-    # if tags_list
-    # tags_list = create_tags_list(_bool=, data_zabbix['tags'])
     event_tags = create_tags_list(
         _bool=True if data_zabbix.get('settings_eventtag_bool') and body_messages_tags_event else False,
         tag=data_zabbix['eventtags'], _type=None)
@@ -500,8 +501,14 @@ def main():
         _bool=True if data_zabbix.get('settings_hostidtag_bool') and body_messages_tags_hostid else False,
         tag=data_zabbix['hostid'], _type=body_messages_tags_prefix_hostid)
     zntsettings_tags = create_tags_list(
-        _bool=True if data_zabbix.get('settings_zntsettingstag_bool') and body_messages_tags_trigger_settings else False,
+        _bool=True if data_zabbix.get('settings_zntsettingstag_bool') and body_messages_tags_trigger_settings
+        else False,
         tag=data_zabbix['eventtags'], _type=None, zntsettingstag=True)
+
+    if trigger_settings_tag_no_alert in zntsettings_tags['ZNTSettings']:
+        loggings.info("Found tag: {}:{}, message sending is canceled".format(
+            trigger_settings_tag, trigger_settings_tag_no_alert))
+        exit(1)
 
     tags_list = []
     tags_list.append(event_tags) if event_tags else None
@@ -553,7 +560,8 @@ def main():
             zabbix_graph_period_default if not data_zabbix['graphs_period']
             else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
-    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not in zntsettings_tags['ZNTSettings']:
+    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not \
+            in zntsettings_tags['ZNTSettings']:
         if len(data_zabbix['itemid'].split()) == 1:
             graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                        graff_name=graphs_name,
@@ -581,7 +589,8 @@ def main():
                 tags=body_messages_tags_delimiter.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
 
     send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'),
-                  disable_notification=True if trigger_settings_tag_not_notify in zntsettings_tags['ZNTSettings'] else False)
+                  disable_notification=True if trigger_settings_tag_not_notify in zntsettings_tags['ZNTSettings']
+                  else False)
     exit(0)
 
 
