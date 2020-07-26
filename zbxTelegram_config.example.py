@@ -64,6 +64,15 @@ body_messages_tags_prefix_triggerid = 'tid_'
 body_messages_tags_prefix_actionid = 'aid_'
 body_messages_tags_prefix_hostid = 'hid_'
 
+trigger_settings_tag = 'ZNTSettings'
+trigger_settings_tag_no_graph = 'no_graph'
+trigger_settings_tag_no_alert = 'no_alert'
+trigger_settings_tag_not_notify = 'not_notify'
+trigger_settings_tag_graph_normal = 'graph_normal'
+trigger_settings_tag_graph_stacked = 'graph_stacked'
+trigger_settings_tag_graph_pie = 'graph_pie'
+trigger_settings_tag_graph_exploded = 'graph_exploded'
+trigger_settings_tag_graph_period = 'period:'  # period:43200
 
 zabbix_keyboard = False
 zabbix_keyboard_button_message = 'Message'

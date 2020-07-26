@@ -86,6 +86,7 @@ def xml_parsing(data):
         settings_triggeridtag_bool = data['settings']['triggeridtag']
         settings_actionidtag_bool = data['settings']['actionidtag']
         settings_hostidtag_bool = data['settings']['hostidtag']
+        settings_zntsettingstag_bool = data['settings']['zntsettingstag']
 
         settings_keyboard = data['settings']['keyboard']
 
@@ -114,6 +115,7 @@ def xml_parsing(data):
                     settings_triggeridtag_bool=eval(settings_triggeridtag_bool.capitalize()),
                     settings_actionidtag_bool=eval(settings_actionidtag_bool.capitalize()),
                     settings_hostidtag_bool=eval(settings_hostidtag_bool.capitalize()),
+                    settings_zntsettingstag_bool=eval(settings_zntsettingstag_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
                     graphs_period=settings_graphs_period, host=settings_host, itemid=settings_itemid,
                     triggerid=settings_triggerid, triggerurl=settings_trigger_url, eventid=settings_eventid,
@@ -183,21 +185,38 @@ def get_chart_png(itemid, graff_name, period=None):
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
-def create_tags_list(_bool=None, tag=None, _type=None):
+def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
     tags_list = []
+    settings_list = []
     try:
         if _bool:
             if tag and (re.search(r'\w', tag)):
                 for tags in tag.split(', '):
                     if tags:
-                        if tags.find(':') != -1:
-                            tag, value = tags.split(':')
-                            tags_list.append('#{tag}_{value}'.format(
-                                tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
-                                value=re.sub(r"\W+", "_", value)))
+                        if not zntsettingstag:
+                            if tags.find(':') != -1:
+                                tag, value = tags.split(':')
+                                if tag != trigger_settings_tag:
+                                    tags_list.append('#{tag}_{value}'.format(
+                                        tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
+                                        value=re.sub(r"\W+", "_", value)))
+                                else:
+                                    continue
+                            else:
+                                tags_list.append('#{tag}'.format(
+                                    tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
                         else:
-                            tags_list.append('#{tag}'.format(
-                                tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
+                            if tags.find(':') != -1:
+                                tag, value = tags.split(':')
+                                if tag == trigger_settings_tag:
+                                    tags_list.append('#{tag}_{value}'.format(
+                                        tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
+                                        value=re.sub(r"\W+", "_", value)))
+                                    settings_list.append(value)
+                                else:
+                                    continue
+                            else:
+                                continue
                     else:
                         tags_list.append(body_messages_tags_no)
             else:
@@ -208,7 +227,9 @@ def create_tags_list(_bool=None, tag=None, _type=None):
     except ValueError:
         tags_list.append(body_messages_tags_no)
     else:
-        return body_messages_tags_delimiter.join(tags_list)
+        return body_messages_tags_delimiter.join(tags_list) if not zntsettingstag else {
+            'tags': body_messages_tags_delimiter.join(tags_list),
+            trigger_settings_tag: settings_list}
 
 
 def create_links_list(_bool=None, url=None, _type=None, url_list=None):
@@ -357,7 +378,7 @@ def gen_markup(eventid):
     return markup
 
 
-def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=None):
+def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=None, disable_notification=False):
     try:
         sent_id = get_send_id(sent_to)
         if message and sent_to:
@@ -365,7 +386,7 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
                 try:
                     graphs_png[0].caption = message
                     graphs_png[0].parse_mode = "HTML"
-                    bot.send_media_group(chat_id=sent_id, media=graphs_png)
+                    bot.send_media_group(chat_id=sent_id, media=graphs_png, disable_notification=disable_notification)
                 except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in err.result.text:
                         migrate_group_id(sent_to, sent_id, err)
@@ -382,18 +403,20 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
             elif graphs_png and graphs_png.get('img'):
                 try:
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
-                                   reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
+                                   reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None,
+                                   disable_notification=disable_notification)
                 except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in err.result.text:
                         migrate_group_id(sent_to, sent_id, err)
-                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard, disable_notification)
                     elif 'IMAGE_PROCESS_FAILED' in err.result.text:
                         bot.send_photo(chat_id=sent_id, photo=open(
                               file='{0}/zbxTelegram_files/error_send_photo.png'.format(
                                   os.path.dirname(os.path.realpath(__file__))),
                               mode='rb').read(), caption=message, parse_mode="HTML",
                                        reply_markup=gen_markup(
-                                           eventid) if zabbix_keyboard and settings_keyboard else None)
+                                           eventid) if zabbix_keyboard and settings_keyboard else None,
+                                       disable_notification=disable_notification)
                     else:
                         loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info),
                         exit(1)
@@ -405,11 +428,12 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
             else:
                 try:
                     bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
-                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
+                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None,
+                                     disable_notification=disable_notification)
                 except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
                         migrate_group_id(sent_to, sent_id, err)
-                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard, disable_notification)
                     else:
                         loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
                         exit(1)
@@ -475,6 +499,9 @@ def main():
     hostid_tags = create_tags_list(
         _bool=True if data_zabbix.get('settings_hostidtag_bool') and body_messages_tags_hostid else False,
         tag=data_zabbix['hostid'], _type=body_messages_tags_prefix_hostid)
+    zntsettings_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_zntsettingstag_bool') and body_messages_tags_trigger_settings else False,
+        tag=data_zabbix['eventtags'], _type=None, zntsettingstag=True)
 
     tags_list = []
     tags_list.append(event_tags) if event_tags else None
@@ -483,40 +510,37 @@ def main():
     tags_list.append(triggerid_tags) if triggerid_tags else None
     tags_list.append(actionid_tags) if actionid_tags else None
     tags_list.append(hostid_tags) if hostid_tags else None
+    tags_list.append(zntsettings_tags['tags']) if zntsettings_tags['tags'] else None
 
-    trigger_url = create_links_list(_bool=True if data_zabbix.get('settings_triggerlinks_bool') and body_messages_url_notes else False,
-                                    url=data_zabbix.get('triggerurl'),
-                                    _type=body_messages_url_emoji_notes)
+    trigger_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_triggerlinks_bool') and body_messages_url_notes else False,
+        url=data_zabbix.get('triggerurl'),
+        _type=body_messages_url_emoji_notes)
 
-    host_url = create_links_list(_bool=True if data_zabbix.get('settings_hostlinks_bool') and body_messages_url_host else False,
-                                 url=zabbix_host_link.format(
-                                              zabbix_server=zabbix_api_url,
-                                              host=data_zabbix.get('host')),
-                                 _type=body_messages_url_emoji_host)
+    host_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_hostlinks_bool') and body_messages_url_host else False,
+        url=zabbix_host_link.format(zabbix_server=zabbix_api_url, host=data_zabbix.get('host')),
+        _type=body_messages_url_emoji_host)
 
-    ack_url = create_links_list(_bool=True if data_zabbix.get('settings_acklinks_bool') and body_messages_url_ack else False,
-                                url=zabbix_ack_link.format(
-                                    zabbix_server=zabbix_api_url,
-                                    eventid=data_zabbix.get('eventid')),
-                                _type=body_messages_url_emoji_ack)
+    ack_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_acklinks_bool') and body_messages_url_ack else False,
+        url=zabbix_ack_link.format(zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid')),
+        _type=body_messages_url_emoji_ack)
 
-    event_url = create_links_list(_bool=True if data_zabbix.get('settings_eventlinks_bool') and body_messages_url_event else False,
-                                  url=zabbix_event_link.format(
-                                      zabbix_server=zabbix_api_url,
-                                      eventid=data_zabbix.get('eventid'),
-                                      triggerid=data_zabbix.get('triggerid')),
-                                  _type=body_messages_url_emoji_event)
+    event_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_eventlinks_bool') and body_messages_url_event else False,
+        url=zabbix_event_link.format(zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'),
+                                     triggerid=data_zabbix.get('triggerid')), _type=body_messages_url_emoji_event)
 
     url_list = []
     url_list.append(trigger_url) if trigger_url else None
     for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
         if re.findall(r"\d+", item_id):
-            items_link = create_links_list(_bool=True if data_zabbix.get('settings_graphlinks_bool') and body_messages_url_graphs else False,
-                                           url=zabbix_graph_link.format(
-                                              zabbix_server=zabbix_api_url,
-                                              itemid=item_id,
-                                              range_time=data_zabbix['graphs_period']),
-                                           _type=body_messages_url_emoji_graphs
+            items_link = create_links_list(
+                _bool=True if data_zabbix.get('settings_graphlinks_bool') and body_messages_url_graphs else False,
+                url=zabbix_graph_link.format(zabbix_server=zabbix_api_url, itemid=item_id,
+                                             range_time=data_zabbix['graphs_period']),
+                _type=body_messages_url_emoji_graphs
                                            )
             url_list.append(items_link) if items_link else None
     url_list.append(event_url) if event_url else None
@@ -529,7 +553,7 @@ def main():
             zabbix_graph_period_default if not data_zabbix['graphs_period']
             else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
 
-    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and tag_settings_no_graph not in tags_list:
+    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not in zntsettings_tags['ZNTSettings']:
         if len(data_zabbix['itemid'].split()) == 1:
             graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                        graff_name=graphs_name,
@@ -556,7 +580,8 @@ def main():
             tags=body_messages_tags_template_line.format(
                 tags=body_messages_tags_delimiter.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
 
-    send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
+    send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'),
+                  disable_notification=True if trigger_settings_tag_not_notify in zntsettings_tags['ZNTSettings'] else False)
     exit(0)
 
 

@@ -22,6 +22,7 @@ Duration: {EVENT.AGE}]]>
 		<triggeridtag>True</triggeridtag>
 		<actionidtag>True</actionidtag>
 		<hostidtag>True</hostidtag>
+		<zntsettingstag>True</zntsettingstag>
 		<keyboard>True</keyboard>
 		<graphs_period>10800</graphs_period>
 		<host>{HOST.ID1}</host>
