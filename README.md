@@ -125,7 +125,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_graph_link|sting|Шаблон формирования линка до графика "Элемент данных" (item)|```{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}```|
 |zabbix_ack_link|sting|Шаблон формирования линка до ["Подтверждение проблем"](https://www.zabbix.com/documentation/current/ru/manual/acknowledges)|```{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}```|
 |zabbix_event_link|sting|Шаблон формирования линка до ["Детали события"](https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events)|```{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}```|
-|zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved":"✅", "Update": "🚧", "InformWikipedia", "Warning":"💛", "Average":"🧡", "High":"❤️", "Disaster": "💔", "Test": "🚽💩"}|
+|zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved": "✅", "Update": "🚧", "Not classified": "⁉️", "Information": "💙", "Warning": "💛",n"Average": "🧡", "High": "❤️", "Disaster": "💔", "Test": "🚽💩"}|
 
 ### XML разметка
 Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в [Zabbix Action](https://www.zabbix.com/documentation/current/manual/config/notifications/action).
