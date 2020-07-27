@@ -29,7 +29,7 @@ watermark_expand = True
 watermark_text_color = (60, 60, 60)
 
 body_messages = '<b>{subject}</b>\n\n{messages}'
-body_messages_title = '{title} ({period_hour}h)'
+body_messages_title = '{title} ({period_time})'
 
 body_messages_url = True
 body_messages_url_notes = True
@@ -72,7 +72,7 @@ trigger_settings_tag_graph_normal = 'graph_normal'
 trigger_settings_tag_graph_stacked = 'graph_stacked'
 trigger_settings_tag_graph_pie = 'graph_pie'
 trigger_settings_tag_graph_exploded = 'graph_exploded'
-trigger_settings_tag_graph_period = 'period:'  # period:43200
+trigger_settings_tag_graph_period = 'period='  # period=43200
 
 zabbix_keyboard = False
 zabbix_keyboard_button_message = 'Message'
@@ -85,7 +85,7 @@ zabbix_api_login = 'Admin'
 zabbix_api_pass = 'zabbix'
 
 zabbix_graph = True
-zabbix_graph_period_default = 43200  # 24h
+zabbix_graph_period_default = 10800  # 3h
 zabbix_graph_chart = '{zabbix_server}chart3.php?' \
                      'name={name}&' \
                      'from=now-{range_time}&' \

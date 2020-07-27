@@ -20,7 +20,6 @@ import urllib3
 import re
 import sys
 import os
-import time
 import io
 from PIL import Image, ImageDraw, ImageFont
 import json
@@ -171,7 +170,7 @@ def get_chart_png(itemid, graff_name, period=None):
             name=graff_name,
             itemid=itemid,
             zabbix_server=zabbix_api_url,
-            range_time=zabbix_graph_period_default if not period else period),
+            range_time=period),
             cookies=get_cookie(),
             verify=False)
 
@@ -450,7 +449,22 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
+def set_period_day_hour(seconds):
+    seconds = int(seconds)
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    if days > 0:
+        return '{}d {}h'.format(days, hours) if hours > 0 else '{}d'.format(days)
+    elif hours > 0:
+        return '{}h {}m'.format(hours, minutes) if minutes > 0 else '{}h'.format(hours)
+    elif minutes > 0:
+        return '{}m'.format(minutes)
+
+
 def main():
+    graph_period = None
+    graph_period_raw = None
     loggings.info("Send to {} action: {}".format(args.username, args.subject))
     loggings.debug("sys.argv: {}".format(sys.argv[1:]))
     loggings.debug("Send to {}\naction: {}\nxml: {}".format(args.username, args.subject, args.messages))
@@ -554,18 +568,31 @@ def main():
     url_list.append(ack_url) if ack_url else None
     url_list.append(host_url) if host_url else None
 
+    if not all(settings.find(trigger_settings_tag_graph_period) and len(settings) > 0 for settings in zntsettings_tags['ZNTSettings']):
+        try:
+            graph_period_raw = [settings if settings.find(trigger_settings_tag_graph_period) == 0 else False for
+                                settings in zntsettings_tags['ZNTSettings']][0]
+            graph_period = int(graph_period_raw.split('=')[1])
+        except Exception as err:
+            loggings.error("Exception occurred: {}:{}, {}".format(
+                trigger_settings_tag, graph_period_raw, err), exc_info=config_exc_info), exit(1)
+    elif data_zabbix['graphs_period'] == 'default':
+        graph_period = zabbix_graph_period_default
+    elif data_zabbix['graphs_period'] != 'default':
+        graph_period = data_zabbix['graphs_period']
+    else:
+        graph_period = zabbix_graph_period_default
+
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
-        period_hour=time.strftime("%H", time.gmtime(
-            zabbix_graph_period_default if not data_zabbix['graphs_period']
-            else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
+        period_time=set_period_day_hour(graph_period))
 
     if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not \
             in zntsettings_tags['ZNTSettings']:
         if len(data_zabbix['itemid'].split()) == 1:
             graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                        graff_name=graphs_name,
-                                       period=data_zabbix['graphs_period'])
+                                       period=graph_period)
         else:
             graphs_png_group = []
             #  get the unique itemid
@@ -574,7 +601,7 @@ def main():
                     graphs_png_group.append(InputMediaPhoto(get_chart_png(
                         itemid=item_id,
                         graff_name=graphs_name,
-                        period=data_zabbix['graphs_period']).get('img')))
+                        period=graph_period).get('img')))
             graphs_png = graphs_png_group
     else:
         graphs_png = False
