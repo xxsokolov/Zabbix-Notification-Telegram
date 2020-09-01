@@ -519,10 +519,12 @@ def main():
         else False,
         tag=data_zabbix['eventtags'], _type=None, zntsettingstag=True)
 
-    if trigger_settings_tag_no_alert in zntsettings_tags['ZNTSettings']:
-        loggings.info("Found tag: {}:{}, message sending is canceled".format(
-            trigger_settings_tag, trigger_settings_tag_no_alert))
-        exit(1)
+    if len(zntsettings_tags[trigger_settings_tag]) > 0:
+        loggings.info("Found settings tag: {}: {}".format(trigger_settings_tag, ', '.join(zntsettings_tags[trigger_settings_tag])))
+
+        if trigger_settings_tag_no_alert in zntsettings_tags[trigger_settings_tag]:
+            loggings.info("Message sending canceled: {}:{}".format(trigger_settings_tag, trigger_settings_tag_no_alert))
+            exit(1)
 
     tags_list = []
     tags_list.append(event_tags) if event_tags else None
