@@ -8,6 +8,19 @@
 __author__ = "Sokolov Dmitry"
 __maintainer__ = "Sokolov Dmitry"
 __license__ = "MIT"
+import subprocess
+
+
+def get_version():
+    get_ver = ['zabbix_server', '-V']
+    try:
+        proc = subprocess.Popen(get_ver, stdout=subprocess.PIPE)
+    except Exception as err:
+        return f'Error get version zabbix server: {err}'
+    else:
+        result = proc.communicate()[0].decode('utf-8')
+        return int(result.split('\n')[0][-5])
+
 
 config_debug_mode = False
 config_exc_info = False
@@ -58,6 +71,7 @@ zabbix_keyboard_button_acknowledge = 'Acknowledge'
 zabbix_keyboard_button_history = 'History'
 zabbix_keyboard_row_width = 3
 
+zabbix_version = '5'
 zabbix_api_url = 'http://127.0.0.1/zabbix/'
 zabbix_api_login = 'Admin'
 zabbix_api_pass = 'zabbix'
@@ -73,9 +87,11 @@ zabbix_graff_chart = '{zabbix_server}chart3.php?' \
                      'showtriggers=1&' \
                      'showworkperiod=1'
 
+zab_ver = get_version() if not zabbix_version else int(zabbix_version)
 zabbix_host_link = "{zabbix_server}zabbix.php?action=search&search={host}"
 zabbix_graff_link = "{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"
-zabbix_akk_link = "{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"
+zabbix_akk_link = '{zabbix_server}zabbix.php?action=popup&popup_action=acknowledge.edit&eventids[0]={eventid}' \
+                  if zab_ver >= 5 else '{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}'
 zabbix_event_link = "{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"
 
 zabbix_status_emoji_map = {
