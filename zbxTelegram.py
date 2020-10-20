@@ -160,28 +160,32 @@ def get_cookie():
     if 'zbx_sessionid' not in cookie:
         loggings.error(
             'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
-        return
+        return False
     return cookie
 
 
 def get_chart_png(itemid, graff_name, period=None):
     try:
-        response = requests.get(zabbix_graph_chart.format(
-            name=graff_name,
-            itemid=itemid,
-            zabbix_server=zabbix_api_url,
-            range_time=period),
-            cookies=get_cookie(),
-            verify=False)
+        cookies = get_cookie()
+        if cookies:
+            response = requests.get(zabbix_graph_chart.format(
+                name=graff_name,
+                itemid=itemid,
+                zabbix_server=zabbix_api_url,
+                range_time=period),
+                cookies=cookies,
+                verify=False)
 
-        if watermark:
-            wmt = watermark_text(response.content)
-            if wmt:
-                return dict(img=wmt, url=response.url)
+            if watermark:
+                wmt = watermark_text(response.content)
+                if wmt:
+                    return dict(img=wmt, url=response.url)
+                else:
+                    return dict(img=response.content, url=response.url)
             else:
                 return dict(img=response.content, url=response.url)
         else:
-            return dict(img=response.content, url=response.url)
+            return dict(img=None, url=None)
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
@@ -520,8 +524,8 @@ def main():
         tag=data_zabbix['eventtags'], _type=None, zntsettingstag=True)
 
     if len(zntsettings_tags[trigger_settings_tag]) > 0:
-        loggings.info("Found settings tag: {}: {}".format(trigger_settings_tag, ', '.join(zntsettings_tags[trigger_settings_tag])))
-
+        loggings.info("Found settings tag: {}: {}".format(trigger_settings_tag,
+                                                          ', '.join(zntsettings_tags[trigger_settings_tag])))
         if trigger_settings_tag_no_alert in zntsettings_tags[trigger_settings_tag]:
             loggings.info("Message sending canceled: {}:{}".format(trigger_settings_tag, trigger_settings_tag_no_alert))
             exit(1)
