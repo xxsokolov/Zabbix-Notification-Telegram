@@ -123,7 +123,8 @@ def xml_parsing(data):
                     actionid=settings_actionid, hostid=settings_hostid)
 
     except Exception as err:
-        loggings.error("Exception occurred: {} (xml parsing error)".format(err), exc_info=config_exc_info), exit(1)
+        loggings.error("Exception occurred: No XML in zabbix actions or it's not valid (xml parsing error). XML: {} ".format(
+            err), exc_info=config_exc_info), exit(1)
 
 
 def watermark_text(img):
