@@ -506,15 +506,13 @@ def main():
     event_tags = create_tags_list(
         _bool=True if data_zabbix.get('settings_eventtag_bool') and body_messages_tags_event else False,
         tag=data_zabbix['eventtags'], _type=None)
-
     eventid_tags = create_tags_list(
         _bool=True if data_zabbix.get('settings_eventidtag_bool') and body_messages_tags_eventid else False,
         tag=data_zabbix['eventid'], _type=body_messages_tags_prefix_eventid)
-
     itemid_tags = create_tags_list(
         _bool=True if data_zabbix.get('settings_itemidtag_bool') and body_messages_tags_itemid else False,
-        tag=data_zabbix['itemid'], _type=body_messages_tags_prefix_itemid)
-
+        tag=' '.join([item_id for item_id in data_zabbix['itemid'].split() if re.findall(r"\d+", item_id)]),
+        _type=body_messages_tags_prefix_itemid)
     triggerid_tags = create_tags_list(
         _bool=True if data_zabbix.get('settings_triggeridtag_bool') and body_messages_tags_triggerid else False,
         tag=data_zabbix['triggerid'], _type=body_messages_tags_prefix_triggerid)
