@@ -147,12 +147,12 @@ ps://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger" tar
 |```<hostidtag></hostidtag>```|bool|Добавление тэгa c hostid в сообщение.|True|
 |```<keyboard></keyboard>```|bool|Добавление кнопок к сообщению.<br>(*В стадии разработки*).|True|
 |```<graphs_period></graphs_period>```|string|Период за который присылается изображение графика в секундах.|10800|
-|```<host></host>```|string|Макрос имени узла сети.|{HOST.ID1}|
+|```<host></host>```|string|Макрос имени узла сети.|{HOST.HOST}|
 |```<itemid></itemid>```|string|Макросы ИД элементов данных.|{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}|
 |```<triggerid></triggerid>```|string|Макрос ИД триггера.|{TRIGGER.ID}|
 |```<eventid></eventid>```|string|Макрос ИД события.|{EVENT.ID}|
 |```<actionid></actionid>```|string|Макрос ИД действия.|{ACTION.ID}|
-|```<hostid></hostid>```|string|Макрос ИД узла сети.|{HOST.ID1}|
+|```<hostid></hostid>```|string|Макрос ИД узла сети.|{HOST.ID}|
 |```<title><![CDATA[]]></title>```|string|Шаблон формирования заголовка изображения графика из макросов: имя узла сети и имя события.|{HOST.HOST} - {EVENT.NAME}|
 |```<triggerurl><![CDATA[]]></triggerurl>```|string|Макрос URL триггера.|{TRIGGER.URL}|
 |```<eventtags><![CDATA[]]></eventtags>```|string|Макрос тэгов события разделенных запятой. Макрос объединяет теги из узла сети, шаблона, триггера.|{EVENT.TAGS}|

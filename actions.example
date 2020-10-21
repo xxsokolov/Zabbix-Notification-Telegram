@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <root>
 	<body>
 		<messages>
@@ -24,12 +24,12 @@ Duration: {EVENT.AGE}]]>
 		<zntsettingstag>True</zntsettingstag>
 		<keyboard>True</keyboard>
 		<graphs_period>default</graphs_period>
-		<host>{HOST.ID1}</host>
+		<host>{HOST.HOST}</host>
 		<itemid>{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}</itemid>
 		<triggerid>{TRIGGER.ID}</triggerid>
 		<eventid>{EVENT.ID}</eventid>
 		<actionid>{ACTION.ID}</actionid>
-		<hostid>{HOST.ID1}</hostid>
+		<hostid>{HOST.ID}</hostid>
 		<title><![CDATA[{HOST.HOST} - {EVENT.NAME}]]></title>
 		<triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
 		<eventtags><![CDATA[{EVENT.TAGS}]]></eventtags>
