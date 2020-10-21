@@ -209,8 +209,13 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
                                 else:
                                     continue
                             else:
-                                tags_list.append('#{tag}'.format(
-                                    tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
+                                if len(tags.split()) > 0:
+                                    for tg_s in tags.split():
+                                        tags_list.append('#{tag}'.format(
+                                            tag=_type + re.sub(r"\W+", "_", tg_s) if _type else re.sub(r"\W+", "_", tg_s)))
+                                else:
+                                    tags_list.append('#{tag}'.format(
+                                        tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
                         else:
                             if tags.find(':') != -1:
                                 tag, value = tags.split(':')
@@ -613,10 +618,33 @@ def main():
     else:
         graphs_png = False
 
+    # body_amount_symbol = len(data_zabbix['message'])
+    # xxx1 = len(body_messages_url_template_line.format(links=body_messages_url_delimiter.join(url_list)) if body_messages_url and len(url_list) != 0 else '')
+    # xxx2 = len(body_messages_tags_template_line.format(tags=body_messages_tags_delimiter.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else '')
+
+    body_symbol_max = 500
+    body_symbol_box = True
+
+    if len(data_zabbix['message']) > body_symbol_max:
+        cut_body = data_zabbix['message'][:body_symbol_max]
+        symbol_box = "[{}:{}]".format(len(cut_body), body_symbol_max)
+
+        smart_body = "{}\n{}".format(data_zabbix['message'][:body_symbol_max], symbol_box)
+    else:
+        symbol_box = "[{}:{}]".format(len(data_zabbix['message']), body_symbol_max)
+        smart_body = "{}\n{}".format(data_zabbix['message'][:body_symbol_max], symbol_box)
+
+
+
+    # x = data_zabbix['message'][:body_symbol_max] + '[{}:{}]'.format(len(data_zabbix['message']), body_symbol_max) if len(data_zabbix['message']) > 500 else data_zabbix['message']
+    # xxx3 = len(data_zabbix['message'])
+
+    # xxx3 = xxx0 - (1024+xxx1+xxx2)
+
     message = body_messages.format(
         subject=html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
         messages='{body}{links}{tags}'.format(
-            body=html.escape(data_zabbix['message']),
+            body=html.escape(smart_body),
             links=body_messages_url_template_line.format(
                 links=body_messages_url_delimiter.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
             tags=body_messages_tags_template_line.format(
