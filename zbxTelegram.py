@@ -479,7 +479,8 @@ def main():
     loggings.debug("sys.argv: {}".format(sys.argv[1:]))
     loggings.debug("Send to {}\naction: {}\nxml: {}".format(args.username, args.subject, args.messages))
 
-    if args.subject in ['Test subject', 'test'] or args.messages in ['This is the test message from Zabbix', 'test']:
+    if args.subject in ['Test subject', 'test', 'Тестовая тема'] or args.messages in \
+            ['This is the test message from Zabbix', 'test', 'Это тестовое сообщение от Zabbix']:
         if get_cookie():
             loggings.info('Connection check passed ({})'.format(zabbix_api_url))
             test_graph_file = '{0}/zbxTelegram_files/test.png'
