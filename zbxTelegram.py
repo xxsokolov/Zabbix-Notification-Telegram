@@ -599,7 +599,7 @@ def main():
         period_time=set_period_day_hour(graph_period))
 
     if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not \
-            in zntsettings_tags['ZNTSettings']:
+            in zntsettings_tags[trigger_settings_tag]:
         if len(data_zabbix['itemid'].split()) == 1:
             graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
                                        graff_name=graphs_name,
@@ -614,14 +614,22 @@ def main():
                         graff_name=graphs_name,
                         period=graph_period).get('img')))
             graphs_png = graphs_png_group
+    else:
+        graphs_png = False
 
     subject = html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map)))
+
+    if body_messages_cut_symbol and len(data_zabbix['message']) > body_messages_max_symbol:
+        truncated = True
+        loggings.info("Message truncated to {} characters".format(body_messages_max_symbol))
+    else:
+        truncated = False
 
     body = '{}<a href="{}">...</a>'.format(
         html.escape(data_zabbix['message'])[:body_messages_max_symbol],
         zabbix_event_link.format(
-            zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'), triggerid=data_zabbix.get('triggerid'))
-    ) if body_messages_cut_symbol else html.escape(data_zabbix['message'])
+            zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'),
+            triggerid=data_zabbix.get('triggerid'))) if truncated else html.escape(data_zabbix['message'])
 
     links = body_messages_url_delimiter.join(url_list) if body_messages_url and len(url_list) != 0 else ''
 
