@@ -28,7 +28,9 @@ watermark_rotate = 0
 watermark_expand = True
 watermark_text_color = (60, 60, 60)
 
-body_messages = '<b>{subject}</b>\n\n{messages}'
+body_messages = '<b>{subject}</b>\n\n{body}\nLinks: {links}\n\n{tags}'
+body_messages_cut_symbol = True
+body_messages_max_symbol = 600
 body_messages_title = '{title} ({period_time})'
 
 body_messages_url = True
@@ -38,7 +40,6 @@ body_messages_url_host = True
 body_messages_url_ack = True
 body_messages_url_event = True
 body_messages_url_template = '<a href="{url}">{icon}</a>'
-body_messages_url_template_line = '\nLinks: {links}'
 body_messages_url_delimiter = ' '
 body_messages_url_emoji_no_url = '➖'
 body_messages_url_emoji_notes = 'ℹ️'  # URL in trigger
@@ -55,7 +56,6 @@ body_messages_tags_triggerid = True
 body_messages_tags_actionid = True
 body_messages_tags_hostid = True
 body_messages_tags_trigger_settings = True
-body_messages_tags_template_line = '\n\n{tags}'
 body_messages_tags_no = '#no_tags'
 body_messages_tags_delimiter = ' '
 body_messages_tags_prefix_eventid = 'eid_'

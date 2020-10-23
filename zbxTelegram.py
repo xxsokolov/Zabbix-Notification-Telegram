@@ -614,40 +614,20 @@ def main():
                         graff_name=graphs_name,
                         period=graph_period).get('img')))
             graphs_png = graphs_png_group
-    else:
-        graphs_png = False
 
-    # body_amount_symbol = len(data_zabbix['message'])
-    # xxx1 = len(body_messages_url_template_line.format(links=body_messages_url_delimiter.join(url_list)) if body_messages_url and len(url_list) != 0 else '')
-    # xxx2 = len(body_messages_tags_template_line.format(tags=body_messages_tags_delimiter.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else '')
+    subject = html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map)))
 
-    body_symbol_max = 500
-    body_symbol_box = True
+    body = '{}<a href="{}">...</a>'.format(
+        html.escape(data_zabbix['message'])[:body_messages_max_symbol],
+        zabbix_event_link.format(
+            zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'), triggerid=data_zabbix.get('triggerid'))
+    ) if body_messages_cut_symbol else html.escape(data_zabbix['message'])
 
-    if len(data_zabbix['message']) > body_symbol_max:
-        cut_body = data_zabbix['message'][:body_symbol_max]
-        symbol_box = "[{}:{}]".format(len(cut_body), body_symbol_max)
+    links = body_messages_url_delimiter.join(url_list) if body_messages_url and len(url_list) != 0 else ''
 
-        smart_body = "{}\n{}".format(data_zabbix['message'][:body_symbol_max], symbol_box)
-    else:
-        symbol_box = "[{}:{}]".format(len(data_zabbix['message']), body_symbol_max)
-        smart_body = "{}\n{}".format(data_zabbix['message'][:body_symbol_max], symbol_box)
+    tags = body_messages_tags_delimiter.join(tags_list) if body_messages_tags and len(tags_list) != 0 else ''
 
-
-
-    # x = data_zabbix['message'][:body_symbol_max] + '[{}:{}]'.format(len(data_zabbix['message']), body_symbol_max) if len(data_zabbix['message']) > 500 else data_zabbix['message']
-    # xxx3 = len(data_zabbix['message'])
-
-    # xxx3 = xxx0 - (1024+xxx1+xxx2)
-
-    message = body_messages.format(
-        subject=html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
-        messages='{body}{links}{tags}'.format(
-            body=html.escape(smart_body),
-            links=body_messages_url_template_line.format(
-                links=body_messages_url_delimiter.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
-            tags=body_messages_tags_template_line.format(
-                tags=body_messages_tags_delimiter.join(tags_list)) if body_messages_tags and len(tags_list) != 0 else ''))
+    message = body_messages.format(subject=subject, body=body, links=links, tags=tags)
 
     send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'),
                   disable_notification=True if trigger_settings_tag_not_notify in zntsettings_tags['ZNTSettings']
