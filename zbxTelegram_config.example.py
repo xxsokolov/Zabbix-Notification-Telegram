@@ -56,6 +56,7 @@ body_messages_tags_triggerid = True
 body_messages_tags_actionid = True
 body_messages_tags_hostid = True
 body_messages_tags_trigger_settings = True
+body_messages_mentions = True
 body_messages_tags_no = '#no_tags'
 body_messages_tags_delimiter = ' '
 body_messages_tags_prefix_eventid = 'eid_'
@@ -73,6 +74,8 @@ trigger_settings_tag_graph_stacked = 'graph_stacked'
 trigger_settings_tag_graph_pie = 'graph_pie'
 trigger_settings_tag_graph_exploded = 'graph_exploded'
 trigger_settings_tag_graph_period = 'period='  # period=43200
+
+trigger_info_mentions_tag = 'ZNTMentions'
 
 zabbix_keyboard = False
 zabbix_keyboard_button_message = 'Message'

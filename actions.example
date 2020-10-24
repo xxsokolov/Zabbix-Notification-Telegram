@@ -22,6 +22,7 @@ Duration: {EVENT.AGE}]]>
 		<actionidtag>True</actionidtag>
 		<hostidtag>True</hostidtag>
 		<zntsettingstag>True</zntsettingstag>
+		<zntmentions>True</zntmentions>
 		<keyboard>True</keyboard>
 		<graphs_period>default</graphs_period>
 		<host>{HOST.HOST}</host>

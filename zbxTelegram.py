@@ -89,6 +89,8 @@ def xml_parsing(data):
         settings_hostidtag_bool = data['settings']['hostidtag']
         settings_zntsettingstag_bool = data['settings']['zntsettingstag']
 
+        settings_mentions_bool = data['settings']['zntmentions']
+
         settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
@@ -117,6 +119,7 @@ def xml_parsing(data):
                     settings_actionidtag_bool=eval(settings_actionidtag_bool.capitalize()),
                     settings_hostidtag_bool=eval(settings_hostidtag_bool.capitalize()),
                     settings_zntsettingstag_bool=eval(settings_zntsettingstag_bool.capitalize()),
+                    settings_zntmentions_bool=eval(settings_mentions_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
                     graphs_period=settings_graphs_period, host=settings_host, itemid=settings_itemid,
                     triggerid=settings_triggerid, triggerurl=settings_trigger_url, eventid=settings_eventid,
@@ -242,6 +245,19 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
             'tags': body_messages_tags_delimiter.join(tags_list),
             trigger_settings_tag: settings_list}
 
+
+def create_mentions_list(_bool=False, mentions=None):
+    mentions_list = []
+    if _bool:
+        for tags in mentions.split(', '):
+            if tags.find(':') != -1:
+                tag, value = tags.split(':')
+                if tag == trigger_info_mentions_tag:
+                    for username in value.split():
+                        mentions_list.append(username)
+        return mentions_list
+    else:
+        return
 
 def create_links_list(_bool=None, url=None, _type=None, url_list=None):
     try:
@@ -527,6 +543,10 @@ def main():
         _bool=True if data_zabbix.get('settings_zntsettingstag_bool') and body_messages_tags_trigger_settings
         else False,
         tag=data_zabbix['eventtags'], _type=None, zntsettingstag=True)
+
+    mentions = create_mentions_list(
+        _bool=True if data_zabbix.get('settings_zntmentions_bool') and body_messages_mentions_settings else False,
+        mentions=data_zabbix['eventtags'])
 
     if len(zntsettings_tags[trigger_settings_tag]) > 0:
         loggings.info("Found settings tag: {}: {}".format(trigger_settings_tag,
