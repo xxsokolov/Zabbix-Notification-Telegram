@@ -248,16 +248,20 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
 
 def create_mentions_list(_bool=False, mentions=None):
     mentions_list = []
-    if _bool:
-        for tags in mentions.split(', '):
-            if tags.find(':') != -1:
-                tag, value = tags.split(':')
-                if tag == trigger_info_mentions_tag:
-                    for username in value.split():
-                        mentions_list.append(username)
-        return mentions_list
-    else:
-        return False
+    try:
+        if _bool and mentions:
+            for tags in mentions.split(', '):
+                if tags.find(':') != -1:
+                    tag, value = tags.split(':')
+                    if tag == trigger_info_mentions_tag:
+                        for username in value.split():
+                            mentions_list.append(username)
+            return mentions_list
+        else:
+            return False
+    except Exception as err:
+        loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
+
 
 def create_links_list(_bool=None, url=None, _type=None, url_list=None):
     try:
