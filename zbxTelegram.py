@@ -623,10 +623,10 @@ def main():
         title=data_zabbix['title'],
         period_time=set_period_day_hour(graph_period))
 
-    if isinstance(zntsettings_tags, dict) and (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not \
-            in zntsettings_tags[trigger_settings_tag]:
-        if len(data_zabbix['itemid'].split()) == 1:
-            graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
+    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not in zntsettings_tags[trigger_settings_tag]:
+        num_items_id = [item_id for item_id in data_zabbix['itemid'].split() if re.findall(r"\d+", item_id)]
+        if len(num_items_id) == 1:
+            graphs_png = get_chart_png(itemid=num_items_id[0],
                                        graff_name=graphs_name,
                                        period=graph_period)
         else:
