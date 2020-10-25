@@ -76,7 +76,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |watermark_rotate|string||0|
 |watermark_expand|bool||True|
 |watermark_text_color|string|Цвет текста в RGB|(60, 60, 60)|
-|body_messages|string|Шаблон формирование тела сообщения.<br>*Сообщение состоит из: subject, body, links, tags|
+|body_messages|string|Шаблон формирование тела сообщения.<br>*Сообщение состоит из: subject, body, links, tags, mentions|
 |body_messages_cut_symbol|bool|Урезать тело сообщения|True|
 |body_messages_max_symbol|string|Максимальное кол-во символов в теле сообщения|600|
 |body_messages_title|string|Шаблон формирования заголовка изображения графика.  *```{title}``` формируется из секции xml```<title></title>``` и ```<graphs_period></graphs_period>```или ```graphs_period_default``` в конфиг файле*|```{title} ({period_hour}h)```|
@@ -88,8 +88,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |body_messages_url_event = True|bool|Добавление линка на <a href="https://www.zabbix.com/documentation/3.0/manual/web_interface/frontend_sections/monitoring/events" target="_blank">"Детали события"</a> в сообщение|True|
 |body_messages_url_template|sting|Шаблон формирование линка|```<a href="{url}">{icon}</a>```|
 |body_messages_url_delimiter|sting|Разделитель между линками|'&nbsp; '|
-|body_messages_url_emoji_no_url|emoji|Иконка при отсутствии <a href="htt
-ps://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger" target="_blank">URL</a> в триггере|➖|
+|body_messages_url_emoji_no_url|emoji|Иконка при отсутствии <a href="https://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger" target="_blank">URL</a> в триггере|➖|
 |body_messages_url_emoji_notes|emoji|Иконка ссылки URL в триггере|ℹ️|
 |body_messages_url_emoji_graphs|emoji|Иконка ссылки на график "Элемент данных" (item)|📊|
 |body_messages_url_emoji_host|emoji|Иконка ссылки на "Узел сети" (host)|📟|
@@ -102,6 +101,8 @@ ps://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger" tar
 |body_messages_tags_triggerid|bool|Добавление triggerid тэгов в сообщение|True|
 |body_messages_tags_actionid|bool|Добавление actionid тэгов в сообщение|True|
 |body_messages_tags_hostid|bool|Добавление hostnid тэгов в сообщение|True|
+|body_messages_tags_trigger_settings|bool||True|
+|body_messages_mentions_settings|bool||True|
 |body_messages_tags_no|sting|Тег при отсутствии тэга в узле сети|```#no_tags```|
 |body_messages_tags_delimiter|sting|Разделитель между тэгами|'&nbsp; '|
 |body_messages_tags_prefix_eventid|sting|Шаблон формирования тэга eventid|```eid_```|
@@ -109,7 +110,16 @@ ps://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger" tar
 |body_messages_tags_prefix_triggerid|sting|Шаблон формирования тэга triggerid|```tid_```|
 |body_messages_tags_prefix_actionid|sting|Шаблон формирования тэга actionid|```aid_```|
 |body_messages_tags_prefix_hostid|sting|Шаблон формирования тэга hostidid|```hid_```|
-|tag_settings_no_graph|sting|Имя тега "Не прикреплять изображение графика"|```no_graph```|
+|trigger_settings_tag|sting||'ZNTSettings'|
+|trigger_settings_tag_no_graph|sting||'no_graph'|
+|trigger_settings_tag_no_alert|sting||'no_alert'|
+|trigger_settings_tag_not_notify|sting||'not_notify'|
+|trigger_settings_tag_graph_normal|sting||'graph_normal'|
+|trigger_settings_tag_graph_stacked|sting||'graph_stacked'|
+|trigger_settings_tag_graph_pie|sting||'graph_pie'|
+|trigger_settings_tag_graph_exploded|sting||'graph_exploded'|
+|trigger_settings_tag_graph_period|sting||'period='|
+|trigger_info_mentions_tag|sting||'ZNTMentions'|
 |zabbix_keyboard|bool|Добавление кнопок к сообщению. <br>(*В стадии разработки*)|False|
 |zabbix_keyboard_button_message|sting|Имя кнопки "Добавить сообщение к событию"|```Message```|
 |zabbix_keyboard_button_acknowledge|sting|Имя кнопки "Подтверждение события"|```Acknowledge```|
@@ -145,6 +155,8 @@ ps://www.zabbix.com/documentation/current/ru/manual/config/triggers/trigger" tar
 |```<triggeridtag></triggeridtag>```|bool|Добавление тэгa c triggerid в сообщение.|True|
 |```<actionidtag></actionidtag>```|bool|Добавление тэгa c actionid в сообщение.|True|
 |```<hostidtag></hostidtag>```|bool|Добавление тэгa c hostid в сообщение.|True|
+|```<zntsettingstag></zntsettingstag>```|bool||True|
+|```<zntmentions></zntmentions>```|bool||True|
 |```<keyboard></keyboard>```|bool|Добавление кнопок к сообщению.<br>(*В стадии разработки*).|True|
 |```<graphs_period></graphs_period>```|string|Период за который присылается изображение графика в секундах.|10800|
 |```<host></host>```|string|Макрос имени узла сети.|{HOST.HOST}|

@@ -205,7 +205,7 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
                         if not zntsettingstag:
                             if tags.find(':') != -1:
                                 tag, value = tags.split(':')
-                                if tag != trigger_settings_tag:
+                                if tag != trigger_settings_tag and tag != trigger_info_mentions_tag:
                                     tags_list.append('#{tag}_{value}'.format(
                                         tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
                                         value=re.sub(r"\W+", "_", value)))
@@ -257,7 +257,7 @@ def create_mentions_list(_bool=False, mentions=None):
                         mentions_list.append(username)
         return mentions_list
     else:
-        return
+        return False
 
 def create_links_list(_bool=None, url=None, _type=None, url_list=None):
     try:
@@ -548,21 +548,22 @@ def main():
         _bool=True if data_zabbix.get('settings_zntmentions_bool') and body_messages_mentions_settings else False,
         mentions=data_zabbix['eventtags'])
 
-    if len(zntsettings_tags[trigger_settings_tag]) > 0:
+    tags_list = []
+    if isinstance(zntsettings_tags, dict) and len(zntsettings_tags[trigger_settings_tag]) > 0:
         loggings.info("Found settings tag: {}: {}".format(trigger_settings_tag,
                                                           ', '.join(zntsettings_tags[trigger_settings_tag])))
+        tags_list.append(zntsettings_tags['tags']) if zntsettings_tags['tags'] else None
         if trigger_settings_tag_no_alert in zntsettings_tags[trigger_settings_tag]:
             loggings.info("Message sending canceled: {}:{}".format(trigger_settings_tag, trigger_settings_tag_no_alert))
             exit(1)
 
-    tags_list = []
     tags_list.append(event_tags) if event_tags else None
     tags_list.append(eventid_tags) if eventid_tags else None
     tags_list.append(itemid_tags) if itemid_tags else None
     tags_list.append(triggerid_tags) if triggerid_tags else None
     tags_list.append(actionid_tags) if actionid_tags else None
     tags_list.append(hostid_tags) if hostid_tags else None
-    tags_list.append(zntsettings_tags['tags']) if zntsettings_tags['tags'] else None
+
 
     trigger_url = create_links_list(
         _bool=True if data_zabbix.get('settings_triggerlinks_bool') and body_messages_url_notes else False,
@@ -599,7 +600,7 @@ def main():
     url_list.append(ack_url) if ack_url else None
     url_list.append(host_url) if host_url else None
 
-    if not all(settings.find(trigger_settings_tag_graph_period) and len(settings) > 0 for settings in zntsettings_tags['ZNTSettings']):
+    if isinstance(zntsettings_tags, dict) and not all(settings.find(trigger_settings_tag_graph_period) and len(settings) > 0 for settings in zntsettings_tags[trigger_settings_tag]):
         try:
             graph_period_raw = [settings if settings.find(trigger_settings_tag_graph_period) == 0 else False for
                                 settings in zntsettings_tags['ZNTSettings']][0]
@@ -618,7 +619,7 @@ def main():
         title=data_zabbix['title'],
         period_time=set_period_day_hour(graph_period))
 
-    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not \
+    if isinstance(zntsettings_tags, dict) and (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not \
             in zntsettings_tags[trigger_settings_tag]:
         if len(data_zabbix['itemid'].split()) == 1:
             graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
@@ -655,10 +656,12 @@ def main():
 
     tags = body_messages_tags_delimiter.join(tags_list) if body_messages_tags and len(tags_list) != 0 else ''
 
-    message = body_messages.format(subject=subject, body=body, links=links, tags=tags)
+    mentions = ' '.join(mentions) if not isinstance(mentions, bool) and body_messages_mentions_settings and len(mentions) != 0 else ''
+
+    message = body_messages.format(subject=subject, body=body, links=links, tags=tags, mentions=mentions)
 
     send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'),
-                  disable_notification=True if trigger_settings_tag_not_notify in zntsettings_tags['ZNTSettings']
+                  disable_notification=True if isinstance(zntsettings_tags, dict) and trigger_settings_tag_not_notify in zntsettings_tags[trigger_settings_tag]
                   else False)
     exit(0)
 
