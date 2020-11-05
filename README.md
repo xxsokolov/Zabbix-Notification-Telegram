@@ -174,7 +174,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ```<![CDATA[]]>```:
 _В XML документах фрагмент, помещенный внутрь CDATA, — это часть содержания элемента, которая помечена для парсера как содержащая только символьные данные, а не разметку. CDATA — это просто альтернативный синтаксис для отображения символьных данных, нет никакой смысловой разницы между символьными данными, которые объявлены как CDATA и символьными данными, которые объявлены в обычном синтаксисе и где «<» и «>» будут представлены как «&lt;» и «&gt;», соответственно. (<a href="https://ru.wikipedia.org/wiki/CDATA" target="_blank">Wikipedia</a>)_
 
-### Тэги ZNTSettings
+### Тэги ZNTSettings+ 
 Более детальную настройку нотификатора можно произвести через тэги в <a href="https://www.zabbix.com/documentation/current/ru/manual/config/event_correlation/trigger/event_tags" target="_blank">триггерах</a>.
 
 Разберем эти параметры:
@@ -189,6 +189,10 @@ _В XML документах фрагмент, помещенный внутрь
 |trigger_settings_tag_graph_pie||'graph_pie'|
 |trigger_settings_tag_graph_exploded||'graph_exploded'|
 |trigger_settings_tag_graph_period|Значение тэга 'ZNTSettings' при котором будет задан период за какой присылать изображение графика. Указывается после разделителя ```=``` в секундах.<br>Приоритет: tag, xml, config*|'period='|
+
+|Имя|Описание|По умолчанию|
+|---|--------|------------|
+|trigger_info_mentions_tag|Тэг упоминания юзера|'ZNTMentions'|
 
 <details><summary>Пример:</summary>
   <img src="https://i.imgur.com/vKQWZ7V.png" alt="Kitten"	title="A cute kitten" width="100%"/>
