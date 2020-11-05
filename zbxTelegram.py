@@ -5,6 +5,7 @@
 # xx.sokolov@gmail.com #
 #  https://t.me/ZbxNTg #
 ########################
+# https://github.com/xxsokolov/Zabbix-Notification-Telegram
 __author__ = "Sokolov Dmitry"
 __maintainer__ = "Sokolov Dmitry"
 __license__ = "MIT"
@@ -16,7 +17,9 @@ import xmltodict
 from zbxTelegram_config import *
 import requests
 import urllib3
-import re, sys, os, time
+import re
+import sys
+import os
 import io
 from PIL import Image, ImageDraw, ImageFont
 import json
@@ -29,11 +32,12 @@ class System:
     def __init__(self, debug=False):
         # configuring log
         if debug:
-            self.log_level=logging.DEBUG
+            self.log_level = logging.DEBUG
         else:
-            self.log_level=logging.INFO
+            self.log_level = logging.INFO
 
-        log_format = logging.Formatter('[%(asctime)s] - PID:%(process)s - %(funcName)s() - %(filename)s:%(lineno)d - %(levelname)s: %(message)s')
+        log_format = logging.Formatter(
+            '[%(asctime)s] - PID:%(process)s - %(funcName)s() - %(filename)s:%(lineno)d - %(levelname)s: %(message)s')
         self.log = logging.getLogger()
         self.log.setLevel(self.log_level)
 
@@ -74,7 +78,19 @@ def xml_parsing(data):
         settings_graphlinks_bool = data['settings']['graphlinks']
         settings_triggerlinks_bool = data['settings']['triggerlinks']
         settings_hostlinks_bool = data['settings']['hostlinks']
-        settings_tag_bool = data['settings']['tag']
+        settings_acklinks_bool = data['settings']['acklinks']
+        settings_eventlinks_bool = data['settings']['eventlinks']
+
+        settings_eventtag_bool = data['settings']['eventtag']
+        settings_eventidtag_bool = data['settings']['eventidtag']
+        settings_itemidtag_bool = data['settings']['itemidtag']
+        settings_triggeridtag_bool = data['settings']['triggeridtag']
+        settings_actionidtag_bool = data['settings']['actionidtag']
+        settings_hostidtag_bool = data['settings']['hostidtag']
+        settings_zntsettingstag_bool = data['settings']['zntsettingstag']
+
+        settings_mentions_bool = data['settings']['zntmentions']
+
         settings_keyboard = data['settings']['keyboard']
 
         settings_graphs_period = data['settings']['graphs_period']
@@ -83,23 +99,35 @@ def xml_parsing(data):
         settings_triggerid = data['settings']['triggerid']
         settings_eventid = data['settings']['eventid']
         settings_actionid = data['settings']['actionid']
+        settings_hostid = data['settings']['hostid']
         settings_title = data['settings']['title']
         settings_trigger_url = data['settings']['triggerurl']
 
-        settings_tags = data['settings']['tags']
+        settings_eventtags = data['settings']['eventtags']
 
-        return dict(title=settings_title, message=message, tags=settings_tags,
+        return dict(title=settings_title, message=message, eventtags=settings_eventtags,
                     settings_graphs_bool=eval(settings_graphs_bool.capitalize()),
                     settings_graphlinks_bool=eval(settings_graphlinks_bool.capitalize()),
                     settings_triggerlinks_bool=eval(settings_triggerlinks_bool.capitalize()),
                     settings_hostlinks_bool=eval(settings_hostlinks_bool.capitalize()),
-                    settings_tag_bool=eval(settings_tag_bool.capitalize()),
+                    settings_acklinks_bool=eval(settings_acklinks_bool.capitalize()),
+                    settings_eventlinks_bool=eval(settings_eventlinks_bool.capitalize()),
+                    settings_eventtag_bool=eval(settings_eventtag_bool.capitalize()),
+                    settings_eventidtag_bool=eval(settings_eventidtag_bool.capitalize()),
+                    settings_itemidtag_bool=eval(settings_itemidtag_bool.capitalize()),
+                    settings_triggeridtag_bool=eval(settings_triggeridtag_bool.capitalize()),
+                    settings_actionidtag_bool=eval(settings_actionidtag_bool.capitalize()),
+                    settings_hostidtag_bool=eval(settings_hostidtag_bool.capitalize()),
+                    settings_zntsettingstag_bool=eval(settings_zntsettingstag_bool.capitalize()),
+                    settings_zntmentions_bool=eval(settings_mentions_bool.capitalize()),
                     settings_keyboard_bool=eval(settings_keyboard.capitalize()),
-                    graphs_period=settings_graphs_period, host=settings_host,itemid=settings_itemid, triggerid=settings_triggerid,
-                    triggerurl=settings_trigger_url, eventid=settings_eventid, actionid=settings_actionid)
+                    graphs_period=settings_graphs_period, host=settings_host, itemid=settings_itemid,
+                    triggerid=settings_triggerid, triggerurl=settings_trigger_url, eventid=settings_eventid,
+                    actionid=settings_actionid, hostid=settings_hostid)
 
     except Exception as err:
-        loggings.error("Exception occurred: {} (xml parsing error)".format(err), exc_info=config_exc_info), exit(1)
+        loggings.error("Exception occurred: No XML in zabbix actions or it's not valid (xml parsing error). XML: {} ".format(
+            err), exc_info=config_exc_info), exit(1)
 
 
 def watermark_text(img):
@@ -136,65 +164,103 @@ def get_cookie():
     if 'zbx_sessionid' not in cookie:
         loggings.error(
             'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
-        return
+        return False
     return cookie
 
 
 def get_chart_png(itemid, graff_name, period=None):
     try:
-        response = requests.get(zabbix_graff_chart.format(name=graff_name,
-                                                          itemid=itemid,
-                                                          zabbix_server=zabbix_api_url,
-                                                          range_time= graphs_period_default if not period else period),
-                                cookies=get_cookie(),
-                                verify=False)
+        cookies = get_cookie()
+        if cookies:
+            response = requests.get(zabbix_graph_chart.format(
+                name=graff_name,
+                itemid=itemid,
+                zabbix_server=zabbix_api_url,
+                range_time=period),
+                cookies=cookies,
+                verify=False)
 
-        if watermark:
-            wmt = watermark_text(response.content)
-            if wmt:
-                return dict(img=wmt, url=response.url)
+            if watermark:
+                wmt = watermark_text(response.content)
+                if wmt:
+                    return dict(img=wmt, url=response.url)
+                else:
+                    return dict(img=response.content, url=response.url)
             else:
                 return dict(img=response.content, url=response.url)
         else:
-            return dict(img=response.content, url=response.url)
+            return dict(img=None, url=None)
     except Exception as err:
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
-def create_tags_list(settings_tags, settings_eventid, settings_itemid, settings_triggerid, settings_actionid):
+def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
     tags_list = []
+    settings_list = []
     try:
-        if settings_tags and (re.search(r'\w', settings_tags)):
-            for tags in settings_tags.split(', '):
-                if tags:
-                    if tags.find(':') != -1:
-                        tag, value = tags.split(':')
-                        tags_list.append('#{tag}_{value}'.format(tag=re.sub(r"\W+", "_", tag),
-                                                                 value=re.sub(r"\W+", "_", value)))
+        if _bool:
+            if tag and (re.search(r'\w', tag)):
+                for tags in tag.split(', '):
+                    if tags:
+                        if not zntsettingstag:
+                            if tags.find(':') != -1:
+                                tag, value = tags.split(':')
+                                if tag != trigger_settings_tag and tag != trigger_info_mentions_tag:
+                                    tags_list.append('#{tag}_{value}'.format(
+                                        tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
+                                        value=re.sub(r"\W+", "_", value)))
+                                else:
+                                    continue
+                            else:
+                                if len(tags.split()) > 0:
+                                    for tg_s in tags.split():
+                                        tags_list.append('#{tag}'.format(
+                                            tag=_type + re.sub(r"\W+", "_", tg_s) if _type else re.sub(r"\W+", "_", tg_s)))
+                                else:
+                                    tags_list.append('#{tag}'.format(
+                                        tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
+                        else:
+                            if tags.find(':') != -1:
+                                tag, value = tags.split(':')
+                                if tag == trigger_settings_tag:
+                                    tags_list.append('#{tag}_{value}'.format(
+                                        tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
+                                        value=re.sub(r"\W+", "_", value)))
+                                    settings_list.append(value)
+                                else:
+                                    continue
+                            else:
+                                continue
                     else:
-                        tags_list.append('#{tag}'.format(tag=re.sub(r"\W+", "_", tags)))
-                else:
-                    tags_list.append(body_messages_no_tags)
+                        tags_list.append(body_messages_tags_no)
+            else:
+                tags_list.append(body_messages_tags_no)
         else:
-            tags_list.append(body_messages_no_tags)
+            return False
+
     except ValueError:
-        tags_list.append(body_messages_no_tags)
+        tags_list.append(body_messages_tags_no)
+    else:
+        return body_messages_tags_delimiter.join(tags_list) if not zntsettingstag else {
+            'tags': body_messages_tags_delimiter.join(tags_list),
+            trigger_settings_tag: settings_list}
 
-    if body_messages_add_tags_event:
-        tags_list.append(body_messages_tag_eventid + settings_eventid)
 
-    if body_messages_add_tags_item:
-        for item_id in list(set([x for x in settings_itemid.split()])):
-            if re.findall(r"\d+", item_id):
-                tags_list.append(body_messages_tag_itemid + item_id)
-
-    if body_messages_add_tags_trigger:
-        tags_list.append(body_messages_tag_triggerid + settings_triggerid)
-
-    if body_messages_add_tags_action:
-        tags_list.append(body_messages_tag_actionid + settings_actionid)
-
-    return body_messages_tags_delimiter.join(tags_list)
+def create_mentions_list(_bool=False, mentions=None):
+    mentions_list = []
+    try:
+        if _bool and mentions:
+            for tags in mentions.split(', '):
+                if tags.find(':') != -1:
+                    tag, value = tags.split(':')
+                    if tag == trigger_info_mentions_tag:
+                        for username in value.split():
+                            mentions_list.append(username)
+            return mentions_list
+        else:
+            return False
+    except Exception as err:
+        loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
 def create_links_list(_bool=None, url=None, _type=None, url_list=None):
@@ -203,13 +269,13 @@ def create_links_list(_bool=None, url=None, _type=None, url_list=None):
             if url and (re.search(r'\w', url)):
                 return body_messages_url_template.format(url=url, icon=_type)
             else:
-                return body_messages_no_url
+                return body_messages_url_emoji_no_url
         elif url_list:
             return url_list
         else:
             return False
     except ValueError:
-        return body_messages_no_url
+        return body_messages_url_emoji_no_url
 
 
 def get_cache(title):
@@ -343,7 +409,7 @@ def gen_markup(eventid):
     return markup
 
 
-def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=None):
+def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=None, disable_notification=False):
     try:
         sent_id = get_send_id(sent_to)
         if message and sent_to:
@@ -351,7 +417,7 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
                 try:
                     graphs_png[0].caption = message
                     graphs_png[0].parse_mode = "HTML"
-                    bot.send_media_group(chat_id=sent_id, media=graphs_png)
+                    bot.send_media_group(chat_id=sent_id, media=graphs_png, disable_notification=disable_notification)
                 except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in err.result.text:
                         migrate_group_id(sent_to, sent_id, err)
@@ -368,18 +434,20 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
             elif graphs_png and graphs_png.get('img'):
                 try:
                     bot.send_photo(chat_id=sent_id, photo=graphs_png.get('img'), caption=message, parse_mode="HTML",
-                                   reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
+                                   reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None,
+                                   disable_notification=disable_notification)
                 except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in err.result.text:
                         migrate_group_id(sent_to, sent_id, err)
-                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard, disable_notification)
                     elif 'IMAGE_PROCESS_FAILED' in err.result.text:
                         bot.send_photo(chat_id=sent_id, photo=open(
                               file='{0}/zbxTelegram_files/error_send_photo.png'.format(
                                   os.path.dirname(os.path.realpath(__file__))),
                               mode='rb').read(), caption=message, parse_mode="HTML",
                                        reply_markup=gen_markup(
-                                           eventid) if zabbix_keyboard and settings_keyboard else None)
+                                           eventid) if zabbix_keyboard and settings_keyboard else None,
+                                       disable_notification=disable_notification)
                     else:
                         loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info),
                         exit(1)
@@ -391,11 +459,13 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
             else:
                 try:
                     bot.send_message(chat_id=sent_id, text=message, parse_mode="HTML", disable_web_page_preview=True,
-                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard else None)
+                                     reply_markup=gen_markup(eventid) if zabbix_keyboard and settings_keyboard
+                                     else None,
+                                     disable_notification=disable_notification)
                 except apihelper.ApiException as err:
                     if 'migrate_to_chat_id' in json.loads(err.result.text).get('parameters'):
                         migrate_group_id(sent_to, sent_id, err)
-                        send_messages(sent_to, message, graphs_png, settings_keyboard)
+                        send_messages(sent_to, message, graphs_png, settings_keyboard, disable_notification)
                     else:
                         loggings.error("Exception occurred in Api Telegram: {}".format(err), exc_info=config_exc_info)
                         exit(1)
@@ -409,12 +479,28 @@ def send_messages(sent_to, message, graphs_png, eventid=None, settings_keyboard=
         loggings.error("Exception occurred: {}".format(err), exc_info=config_exc_info), exit(1)
 
 
+def set_period_day_hour(seconds):
+    seconds = int(seconds)
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    if days > 0:
+        return '{}d {}h'.format(days, hours) if hours > 0 else '{}d'.format(days)
+    elif hours > 0:
+        return '{}h {}m'.format(hours, minutes) if minutes > 0 else '{}h'.format(hours)
+    elif minutes > 0:
+        return '{}m'.format(minutes)
+
+
 def main():
-    loggings.debug("sys.argv: {}".format(sys.argv[1:])) if loggings.debug else None
-    loggings.info("Send to {} action: {}".format(args.username, args.subject)) if not loggings.debug else None
+    graph_period = None
+    graph_period_raw = None
+    loggings.info("Send to {} action: {}".format(args.username, args.subject))
+    loggings.debug("sys.argv: {}".format(sys.argv[1:]))
     loggings.debug("Send to {}\naction: {}\nxml: {}".format(args.username, args.subject, args.messages))
 
-    if args.subject in ['Test subject', 'test'] or args.messages in ['This is the test message from Zabbix', 'test']:
+    if args.subject in ['Test subject', 'test', 'Тестовая тема'] or args.messages in \
+            ['This is the test message from Zabbix', 'test', 'Это тестовое сообщение от Zabbix']:
         if get_cookie():
             loggings.info('Connection check passed ({})'.format(zabbix_api_url))
             test_graph_file = '{0}/zbxTelegram_files/test.png'
@@ -424,13 +510,12 @@ def main():
             error_code = 1
 
         send_messages(sent_to=args.username, message='🚨 Test 🚽💩: Test message\n'
-                                               'Host: testhost [192.168.0.0]\n'
-                                               'Last value: test (10:00:00)\n'
-                                               'Duration: 1m\n'
-                                               'Description: This message is generated with test data. '
-                                               'To check the connection to Zabbix Server, '
-                                               'specify as the topic and / or zabbix\n\n'
-                                               '#Test, #eid_130144443, #iid_60605, #tid_39303, #aid_22',
+                                                     'Host: testhost [192.168.0.0]\n'
+                                                     'Last value: test (10:00:00)\n'
+                                                     'Duration: 1m\n'
+                                                     'Description: This message is generated with test data. '
+                                                     'specify as the topic and / or zabbix\n\n'
+                                                     '#Test, #eid_130144443, #iid_60605, #tid_39303, #aid_22',
                       graphs_png=dict(
                           img=open(
                               file=test_graph_file.format(os.path.dirname(os.path.realpath(__file__))),
@@ -439,62 +524,111 @@ def main():
 
     data_zabbix = xml_parsing(args.messages)
 
-    # if tags_list
-    tags_list = create_tags_list(data_zabbix['tags'],
-                                 data_zabbix['eventid'],
-                                 data_zabbix['itemid'],
-                                 data_zabbix['triggerid'],
-                                 data_zabbix['actionid'])
+    event_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_eventtag_bool') and body_messages_tags_event else False,
+        tag=data_zabbix['eventtags'], _type=None)
+    eventid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_eventidtag_bool') and body_messages_tags_eventid else False,
+        tag=data_zabbix['eventid'], _type=body_messages_tags_prefix_eventid)
+    itemid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_itemidtag_bool') and body_messages_tags_itemid else False,
+        tag=' '.join([item_id for item_id in data_zabbix['itemid'].split() if re.findall(r"\d+", item_id)]),
+        _type=body_messages_tags_prefix_itemid)
+    triggerid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_triggeridtag_bool') and body_messages_tags_triggerid else False,
+        tag=data_zabbix['triggerid'], _type=body_messages_tags_prefix_triggerid)
+    actionid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_actionidtag_bool') and body_messages_tags_actionid else False,
+        tag=data_zabbix['actionid'], _type=body_messages_tags_prefix_actionid)
+    hostid_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_hostidtag_bool') and body_messages_tags_hostid else False,
+        tag=data_zabbix['hostid'], _type=body_messages_tags_prefix_hostid)
+    zntsettings_tags = create_tags_list(
+        _bool=True if data_zabbix.get('settings_zntsettingstag_bool') and body_messages_tags_trigger_settings
+        else False,
+        tag=data_zabbix['eventtags'], _type=None, zntsettingstag=True)
 
-    trigger_url = create_links_list(_bool=data_zabbix.get('settings_triggerlinks_bool'),
-                                    url=data_zabbix.get('triggerurl'), _type=body_messages_url_notes)
+    mentions = create_mentions_list(
+        _bool=True if data_zabbix.get('settings_zntmentions_bool') and body_messages_mentions_settings else False,
+        mentions=data_zabbix['eventtags'])
 
-    host_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
-                                 url=zabbix_host_link.format(
-                                              zabbix_server=zabbix_api_url,
-                                              host=data_zabbix.get('host')),
-                                 _type=body_messages_url_host)
+    tags_list = []
+    if isinstance(zntsettings_tags, dict) and len(zntsettings_tags[trigger_settings_tag]) > 0:
+        loggings.info("Found settings tag: {}: {}".format(trigger_settings_tag,
+                                                          ', '.join(zntsettings_tags[trigger_settings_tag])))
+        tags_list.append(zntsettings_tags['tags']) if zntsettings_tags['tags'] else None
+        if trigger_settings_tag_no_alert in zntsettings_tags[trigger_settings_tag]:
+            loggings.info("Message sending canceled: {}:{}".format(trigger_settings_tag, trigger_settings_tag_no_alert))
+            exit(1)
 
-    akk_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
-                                url=zabbix_akk_link.format(
-                                    zabbix_server=zabbix_api_url,
-                                    eventid=data_zabbix.get('eventid')),
-                                _type=body_messages_url_akk)
+    tags_list.append(event_tags) if event_tags else None
+    tags_list.append(eventid_tags) if eventid_tags else None
+    tags_list.append(itemid_tags) if itemid_tags else None
+    tags_list.append(triggerid_tags) if triggerid_tags else None
+    tags_list.append(actionid_tags) if actionid_tags else None
+    tags_list.append(hostid_tags) if hostid_tags else None
 
-    event_url = create_links_list(_bool=data_zabbix.get('settings_hostlinks_bool'),
-                                  url=zabbix_event_link.format(
-                                      zabbix_server=zabbix_api_url,
-                                      eventid=data_zabbix.get('eventid'),
-                                      triggerid=data_zabbix.get('triggerid')),
-                                  _type=body_messages_url_event)
+
+    trigger_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_triggerlinks_bool') and body_messages_url_notes else False,
+        url=data_zabbix.get('triggerurl'),
+        _type=body_messages_url_emoji_notes)
+
+    host_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_hostlinks_bool') and body_messages_url_host else False,
+        url=zabbix_host_link.format(zabbix_server=zabbix_api_url, host=data_zabbix.get('host')),
+        _type=body_messages_url_emoji_host)
+
+    ack_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_acklinks_bool') and body_messages_url_ack else False,
+        url=zabbix_ack_link.format(zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid')),
+        _type=body_messages_url_emoji_ack)
+
+    event_url = create_links_list(
+        _bool=True if data_zabbix.get('settings_eventlinks_bool') and body_messages_url_event else False,
+        url=zabbix_event_link.format(zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'),
+                                     triggerid=data_zabbix.get('triggerid')), _type=body_messages_url_emoji_event)
 
     url_list = []
     url_list.append(trigger_url) if trigger_url else None
     for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
         if re.findall(r"\d+", item_id):
-            items_link = create_links_list(_bool=data_zabbix.get('settings_graphlinks_bool'),
-                                           url=zabbix_graff_link.format(
-                                              zabbix_server=zabbix_api_url,
-                                              itemid=item_id,
-                                              range_time=data_zabbix['graphs_period']),
-                                           _type=body_messages_url_ld_graphs
+            items_link = create_links_list(
+                _bool=True if data_zabbix.get('settings_graphlinks_bool') and body_messages_url_graphs else False,
+                url=zabbix_graph_link.format(zabbix_server=zabbix_api_url, itemid=item_id,
+                                             range_time=data_zabbix['graphs_period']),
+                _type=body_messages_url_emoji_graphs
                                            )
             url_list.append(items_link) if items_link else None
     url_list.append(event_url) if event_url else None
-    url_list.append(akk_url) if akk_url else None
+    url_list.append(ack_url) if ack_url else None
     url_list.append(host_url) if host_url else None
+
+    if isinstance(zntsettings_tags, dict) and not all(settings.find(trigger_settings_tag_graph_period) and len(settings) > 0 for settings in zntsettings_tags[trigger_settings_tag]):
+        try:
+            graph_period_raw = [settings if settings.find(trigger_settings_tag_graph_period) == 0 else False for
+                                settings in zntsettings_tags['ZNTSettings']][0]
+            graph_period = int(graph_period_raw.split('=')[1])
+        except Exception as err:
+            loggings.error("Exception occurred: {}:{}, {}".format(
+                trigger_settings_tag, graph_period_raw, err), exc_info=config_exc_info), exit(1)
+    elif data_zabbix['graphs_period'] == 'default':
+        graph_period = zabbix_graph_period_default
+    elif data_zabbix['graphs_period'] != 'default':
+        graph_period = data_zabbix['graphs_period']
+    else:
+        graph_period = zabbix_graph_period_default
 
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
-        period_hour=time.strftime("%H", time.gmtime(
-            graphs_period_default if not data_zabbix['graphs_period']
-            else int(data_zabbix['graphs_period']))).lstrip("0").replace(" 0", " "))
+        period_time=set_period_day_hour(graph_period))
 
-    if data_zabbix.get('settings_graphs_bool') and tag_settings_no_graph not in tags_list:
-        if len(data_zabbix['itemid'].split()) == 1:
-            graphs_png = get_chart_png(itemid=data_zabbix['itemid'],
+    if (data_zabbix.get('settings_graphs_bool') and zabbix_graph) and trigger_settings_tag_no_graph not in zntsettings_tags[trigger_settings_tag]:
+        num_items_id = [item_id for item_id in data_zabbix['itemid'].split() if re.findall(r"\d+", item_id)]
+        if len(num_items_id) == 1:
+            graphs_png = get_chart_png(itemid=num_items_id[0],
                                        graff_name=graphs_name,
-                                       period=data_zabbix['graphs_period'])
+                                       period=graph_period)
         else:
             graphs_png_group = []
             #  get the unique itemid
@@ -503,19 +637,38 @@ def main():
                     graphs_png_group.append(InputMediaPhoto(get_chart_png(
                         itemid=item_id,
                         graff_name=graphs_name,
-                        period=data_zabbix['graphs_period']).get('img')))
+                        period=graph_period).get('img')))
             graphs_png = graphs_png_group
     else:
         graphs_png = False
 
-    message = body_messages.format(
-        subject=html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map))),
-        messages='{body}{links}{tags}'.format(
-            body=html.escape(data_zabbix['message']),
-            links='\nLinks: {}'.format(' '.join(url_list)) if body_messages_url and len(url_list) != 0 else '',
-            tags='\n\n{}'.format(tags_list) if body_messages_tags and data_zabbix.get('settings_tag_bool') else ''))
+    subject = html.escape(args.subject.format_map(FailSafeDict(zabbix_status_emoji_map)))
 
-    send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'))
+    if body_messages_cut_symbol and len(data_zabbix['message']) > body_messages_max_symbol:
+        truncated = True
+        loggings.info("Message truncated to {} characters".format(body_messages_max_symbol))
+    else:
+        truncated = False
+
+    body = '{} <a href="{}">...</a>'.format(
+        html.escape(data_zabbix['message'])[:body_messages_max_symbol],
+        zabbix_event_link.format(
+            zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'),
+            triggerid=data_zabbix.get('triggerid'))) if truncated else html.escape(data_zabbix['message'])
+
+    links = body_messages_url_delimiter.join(url_list) if body_messages_url and len(url_list) != 0 else ''
+
+    tags = body_messages_tags_delimiter.join(tags_list) if body_messages_tags and len(tags_list) != 0 else ''
+
+    mentions = ' '.join(mentions) if not isinstance(mentions, bool) and body_messages_mentions_settings and len(mentions) != 0 else ''
+
+    message = body_messages.format(subject=subject, body='\n\n'+body if body else '',
+                                   links='\n'+links if links else '', tags='\n\n'+tags if tags else '',
+                                   mentions='\n\n'+mentions if mentions else '')
+
+    send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'),
+                  disable_notification=True if isinstance(zntsettings_tags, dict) and trigger_settings_tag_not_notify in zntsettings_tags[trigger_settings_tag]
+                  else False)
     exit(0)
 
 

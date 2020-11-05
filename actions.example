@@ -5,7 +5,6 @@
 <![CDATA[
 Host: {HOST.HOST} [{HOST.IP}]
 Last value: {ITEM.LASTVALUE1} ({TIME})
-DESC: {INVENTORY.NOTES1}
 Duration: {EVENT.AGE}]]>
 		</messages>
 	</body>
@@ -13,17 +12,27 @@ Duration: {EVENT.AGE}]]>
 		<graphs>True</graphs>
 		<hostlinks>True</hostlinks>
 		<graphlinks>True</graphlinks>
+		<acklinks>True</acklinks>
+		<eventlinks>True</eventlinks>
 		<triggerlinks>True</triggerlinks>
-		<tag>True</tag>
+		<eventtag>True</eventtag>
+		<eventidtag>True</eventidtag>
+		<itemidtag>True</itemidtag>
+		<triggeridtag>True</triggeridtag>
+		<actionidtag>True</actionidtag>
+		<hostidtag>True</hostidtag>
+		<zntsettingstag>True</zntsettingstag>
+		<zntmentions>True</zntmentions>
 		<keyboard>True</keyboard>
-		<graphs_period>10800</graphs_period>
-		<host>{HOST.ID1}</host>
+		<graphs_period>default</graphs_period>
+		<host>{HOST.HOST}</host>
 		<itemid>{ITEM.ID1} {ITEM.ID2} {ITEM.ID3} {ITEM.ID4}</itemid>
 		<triggerid>{TRIGGER.ID}</triggerid>
 		<eventid>{EVENT.ID}</eventid>
 		<actionid>{ACTION.ID}</actionid>
+		<hostid>{HOST.ID}</hostid>
 		<title><![CDATA[{HOST.HOST} - {EVENT.NAME}]]></title>
-        <triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
-		<tags><![CDATA[{EVENT.TAGS}]]></tags>
+		<triggerurl><![CDATA[{TRIGGER.URL}]]></triggerurl>
+		<eventtags><![CDATA[{EVENT.TAGS}]]></eventtags>
 	</settings>
 </root>
