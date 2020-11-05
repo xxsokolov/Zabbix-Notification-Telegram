@@ -650,7 +650,7 @@ def main():
     else:
         truncated = False
 
-    body = '{}<a href="{}">...</a>'.format(
+    body = '{} <a href="{}">...</a>'.format(
         html.escape(data_zabbix['message'])[:body_messages_max_symbol],
         zabbix_event_link.format(
             zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'),
@@ -662,7 +662,9 @@ def main():
 
     mentions = ' '.join(mentions) if not isinstance(mentions, bool) and body_messages_mentions_settings and len(mentions) != 0 else ''
 
-    message = body_messages.format(subject=subject, body=body, links=links, tags=tags, mentions=mentions)
+    message = body_messages.format(subject=subject, body='\n\n'+body if body else '',
+                                   links='\n'+links if links else '', tags='\n\n'+tags if tags else '',
+                                   mentions='\n\n'+mentions if mentions else '')
 
     send_messages(args.username, message, graphs_png, data_zabbix['eventid'], data_zabbix.get('settings_keyboard_bool'),
                   disable_notification=True if isinstance(zntsettings_tags, dict) and trigger_settings_tag_not_notify in zntsettings_tags[trigger_settings_tag]
