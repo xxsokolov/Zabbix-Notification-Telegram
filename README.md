@@ -56,8 +56,6 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 ### Конфигурационный файл
 Основная конфигурация нотификатора производится через файл [zbxTelegram_config.py](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py). 
 
-## <p align="center"> :exclamation: ВАЖНО! Конфиг файл <a href="https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/zbxTelegram_config.example.py" target="_blank">zbxTelegram_config.py</a> имеет преимущество перед XML. :exclamation:
-
 Давайте разберем каждый параметр подробно:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
 |---|-----------|--------|------------|
@@ -138,7 +136,7 @@ $ git clone https://github.com/xxsokolov/Zabbix-Notification-Telegram.git .
 |zabbix_status_emoji_map|dict|Словарь соответствия типа события и emoji|{"Problem": "🚨", "Resolved": "✅", "Update": "🚧", "Not classified": "⁉️", "Information": "💙", "Warning": "💛",n"Average": "🧡", "High": "❤️", "Disaster": "💔", "Test": "🚽💩"}|
 
 ### XML разметка
-Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в <a href="https://www.zabbix.com/documentation/current/manual/config/notifications/action" target="_blank">Zabbix Action"</a>].
+Дополнительная конфигурация производится через XML разметку([пример](https://github.com/xxsokolov/Zabbix-Notification-Telegram/blob/master/actions.example)) в <a href="https://www.zabbix.com/documentation/current/manual/config/notifications/action" target="_blank">Zabbix Action</a>.
 
 Также разберем эти параметры:
 |Имя|Аргумент(ы)|Описание|По умолчанию|
