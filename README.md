@@ -24,12 +24,12 @@
 * [Помощь](#помощь)
 
 ## Возможности
-- Графики, информативные заголовки, ссылки<a href="#note1" id="note1ref"><sup>1</sup></a> и тэги<a href="#note2" id="note2ref"><sup>2</sup></a> объединены в **одно сообщение**.
+- Графики, информативные заголовки, ссылки<a href="#note1" id="note1ref"><sup>1</sup></a>, тэги<a href="#note2" id="note2ref"><sup>2</sup></a> и упоминания объединены в **одно сообщение**.
 - Формирование и обновление cash файла (privat, group, group -> supergroup)<a href="#note3" id="note3ref"><sup>3</sup></a>
 - Гибкая настройка через конфигурационный файл, XML разметку в <a href="https://www.zabbix.com/documentation/current/manual/config/notifications/action" target="_blank">действиях триггеров</a> и Trigger Tags<a href="#note4" id="note4ref"><sup>4</sup></a>
 - Маппинг Emoji статуса и важности события.
 - Наложение watermark на изображение.
-- !!! поддержка множественные графики, объедение до 4 графиков группу !!!
+- Обьединение графиков в альбом.
 
 ## Планы
 - Обработка быстрых команд ботом <img alt="AppVeyor" src="https://img.shields.io/static/v1?label=status&message=beta&color=yellow?logo=appveyor">
