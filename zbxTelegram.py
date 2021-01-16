@@ -161,7 +161,7 @@ def get_cookie():
     req_cookie = requests.post(zabbix_api_url, data=data_api, verify=False)
     cookie = req_cookie.cookies
     req_cookie.close()
-    if 'zbx_sessionid' not in cookie:
+    if not any(_ in cookie for _ in ['zbx_session', 'zbx_sessionid']):
         loggings.error(
             'User authorization failed: {} ({})'.format('Login name or password is incorrect.', zabbix_api_url))
         return False
