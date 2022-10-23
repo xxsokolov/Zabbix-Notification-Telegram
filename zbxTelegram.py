@@ -204,7 +204,7 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
                     if tags:
                         if not zntsettingstag:
                             if tags.find(':') != -1:
-                                tag, value = tags.split(':')
+                                tag, value = re.split(r':+',tags, maxsplit=1)
                                 if tag != trigger_settings_tag and tag != trigger_info_mentions_tag:
                                     tags_list.append('#{tag}_{value}'.format(
                                         tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
@@ -221,7 +221,7 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
                                         tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
                         else:
                             if tags.find(':') != -1:
-                                tag, value = tags.split(':')
+                                tag, value = re.split(r':+',tags, maxsplit=1)
                                 if tag == trigger_settings_tag:
                                     tags_list.append('#{tag}_{value}'.format(
                                         tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
@@ -252,7 +252,7 @@ def create_mentions_list(_bool=False, mentions=None):
         if _bool and mentions:
             for tags in mentions.split(', '):
                 if tags.find(':') != -1:
-                    tag, value = tags.split(':')
+                    tag, value = re.split(r':+',tags, maxsplit=1)
                     if tag == trigger_info_mentions_tag:
                         for username in value.split():
                             mentions_list.append(username)
