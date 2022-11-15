@@ -101,7 +101,7 @@ zabbix_graph_chart = '{zabbix_server}chart3.php?' \
                      'showworkperiod=1'
 
 zabbix_host_link = "{zabbix_server}zabbix.php?action=search&search={host}"
-zabbix_graph_link = "{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}"
+zabbix_graph_link = "{zabbix_server}history.php?action=showgraph&itemids[]={itemid}&from=now-{range_time}&to-now"
 #zabbix_ack_link = "{zabbix_server}zabbix.php?action=acknowledge.edit&eventids[0]={eventid}"  # Zabbix Server ver > 5
 zabbix_ack_link = "{zabbix_server}zabbix.php?action=popup&popup_action=acknowledge.edit&eventids[0]={eventid}"  # Zabbix Server ver <= 5
 zabbix_event_link = "{zabbix_server}tr_events.php?triggerid={triggerid}&eventid={eventid}"

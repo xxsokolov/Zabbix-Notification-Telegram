@@ -204,7 +204,7 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
                     if tags:
                         if not zntsettingstag:
                             if tags.find(':') != -1:
-                                tag, value = tags.split(':')
+                                tag, value = re.split(r':+',tags, maxsplit=1)
                                 if tag != trigger_settings_tag and tag != trigger_info_mentions_tag:
                                     tags_list.append('#{tag}_{value}'.format(
                                         tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
@@ -221,7 +221,7 @@ def create_tags_list(_bool=False, tag=None, _type=None, zntsettingstag=False):
                                         tag=_type + re.sub(r"\W+", "_", tags) if _type else re.sub(r"\W+", "_", tags)))
                         else:
                             if tags.find(':') != -1:
-                                tag, value = tags.split(':')
+                                tag, value = re.split(r':+',tags, maxsplit=1)
                                 if tag == trigger_settings_tag:
                                     tags_list.append('#{tag}_{value}'.format(
                                         tag=_type + re.sub(r"\W+", "_", tag) if _type else re.sub(r"\W+", "_", tag),
@@ -252,7 +252,7 @@ def create_mentions_list(_bool=False, mentions=None):
         if _bool and mentions:
             for tags in mentions.split(', '):
                 if tags.find(':') != -1:
-                    tag, value = tags.split(':')
+                    tag, value = re.split(r':+',tags, maxsplit=1)
                     if tag == trigger_info_mentions_tag:
                         for username in value.split():
                             mentions_list.append(username)
@@ -589,6 +589,19 @@ def main():
         url=zabbix_event_link.format(zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'),
                                      triggerid=data_zabbix.get('triggerid')), _type=body_messages_url_emoji_event)
 
+    if isinstance(zntsettings_tags, dict) and not all(settings.find(trigger_settings_tag_graph_period) and len(settings) > 0 for settings in zntsettings_tags[trigger_settings_tag]):
+        try:
+            graph_period_raw = [settings if settings.find(trigger_settings_tag_graph_period) == 0 else False for
+                                settings in zntsettings_tags['ZNTSettings']][0]
+            graph_period = int(graph_period_raw.split('=')[1])
+        except Exception as err:
+            loggings.error("Exception occurred: {}:{}, {}".format(
+                trigger_settings_tag, graph_period_raw, err), exc_info=config_exc_info), exit(1)
+    elif data_zabbix['graphs_period'] != 'default':
+        graph_period = data_zabbix['graphs_period']
+    else:
+        graph_period = zabbix_graph_period_default
+    
     url_list = []
     url_list.append(trigger_url) if trigger_url else None
     for item_id in list(set([x for x in data_zabbix.get('itemid').split()])):
@@ -603,22 +616,7 @@ def main():
     url_list.append(event_url) if event_url else None
     url_list.append(ack_url) if ack_url else None
     url_list.append(host_url) if host_url else None
-
-    if isinstance(zntsettings_tags, dict) and not all(settings.find(trigger_settings_tag_graph_period) and len(settings) > 0 for settings in zntsettings_tags[trigger_settings_tag]):
-        try:
-            graph_period_raw = [settings if settings.find(trigger_settings_tag_graph_period) == 0 else False for
-                                settings in zntsettings_tags['ZNTSettings']][0]
-            graph_period = int(graph_period_raw.split('=')[1])
-        except Exception as err:
-            loggings.error("Exception occurred: {}:{}, {}".format(
-                trigger_settings_tag, graph_period_raw, err), exc_info=config_exc_info), exit(1)
-    elif data_zabbix['graphs_period'] == 'default':
-        graph_period = zabbix_graph_period_default
-    elif data_zabbix['graphs_period'] != 'default':
-        graph_period = data_zabbix['graphs_period']
-    else:
-        graph_period = zabbix_graph_period_default
-
+    
     graphs_name = body_messages_title.format(
         title=data_zabbix['title'],
         period_time=set_period_day_hour(graph_period))
