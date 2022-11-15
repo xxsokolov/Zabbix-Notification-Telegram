@@ -6,7 +6,7 @@
 <img alt="AppVeyor" src="https://img.shields.io/github/last-commit/xxsokolov/Zabbix-Notification-Telegram">
 <img alt="AppVeyor" src="https://img.shields.io/badge/python-3-blue">
 <img alt="AppVeyor" src="https://img.shields.io/github/license/xxsokolov/Zabbix-Notification-Telegram">
-
+<br>Welcome to Telegram! <a href="https://t.me/ZbxNTg" target="_blank">ZNTGroup</a>
 
 * [Возможности](#возможности)
 * [Планы](#планы)
@@ -217,7 +217,7 @@ _В XML документах фрагмент, помещенный внутрь
 
 ## Помощь
 
-* Welcome! <a href="https://t.me/ZbxNTg" target="_blank">ZNTGroup</a> и <a href="https://t.me/ZNTChannel" target="_blank">ZNTChannel</a>.
+* Welcome! <a href="https://t.me/ZbxNTg" target="_blank">ZNTGroup</a>.
 
 
 ---
