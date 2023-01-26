@@ -47,6 +47,7 @@ class ArgParsing:
         self.parser.add_argument('username', nargs='?', help='Set username Telegram')
         self.parser.add_argument('subject', nargs='?', help='Set subject')
         self.parser.add_argument('messages', nargs='?', help='Set message')
+        self.parser.add_argument('token', nargs='?', help='Set token')
         self.parser.add_argument('--debug', type=str, nargs='?', const=True, default=False, help='Debug mode')
         # res = parser.parse_args()
 
