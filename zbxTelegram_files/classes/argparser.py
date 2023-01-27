@@ -48,6 +48,7 @@ class ArgParsing:
         self.parser.add_argument('subject', nargs='?', help='Set subject')
         self.parser.add_argument('messages', nargs='?', help='Set message')
         self.parser.add_argument('--debug', type=str, nargs='?', const=True, default=False, help='Debug mode')
+        self.parser.add_argument('token', nargs='?', help='Set token', default=False)
         # res = parser.parse_args()
 
         return self.parser
