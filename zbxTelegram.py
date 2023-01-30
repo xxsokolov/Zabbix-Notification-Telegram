@@ -63,7 +63,7 @@ class FailSafeDict(dict):
 args = ArgParsing().create_parser().parse_args(sys.argv[1:])
 loggings = System(config_debug_mode if not args.debug else True).log
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-bot = telebot.TeleBot(tg_token)
+bot = telebot.TeleBot(args.token if args.token else tg_token)
 if tg_proxy:
     apihelper.proxy = tg_proxy_server
 
