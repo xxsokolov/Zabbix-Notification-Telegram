@@ -649,10 +649,10 @@ def main():
         truncated = False
 
     body = '{} <a href="{}">...</a>'.format(
-        html.escape(data_zabbix['message'])[:body_messages_max_symbol],
+        html.unescape(data_zabbix['message'])[:body_messages_max_symbol],
         zabbix_event_link.format(
             zabbix_server=zabbix_api_url, eventid=data_zabbix.get('eventid'),
-            triggerid=data_zabbix.get('triggerid'))) if truncated else html.escape(data_zabbix['message'])
+            triggerid=data_zabbix.get('triggerid'))) if truncated else html.unescape(data_zabbix['message'])
 
     links = body_messages_url_delimiter.join(url_list) if body_messages_url and len(url_list) != 0 else ''
 
