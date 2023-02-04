@@ -7,6 +7,8 @@
 <img alt="AppVeyor" src="https://img.shields.io/badge/python-3-blue">
 <img alt="AppVeyor" src="https://img.shields.io/github/license/xxsokolov/Zabbix-Notification-Telegram">
 <br>Welcome to Telegram! <a href="https://t.me/ZbxNTg" target="_blank">ZNTGroup</a>
+  
+## <p align="center">Проект закрыт. This project is deprecated.
 
 * [Возможности](#возможности)
 * [Планы](#планы)
