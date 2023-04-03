@@ -15,7 +15,7 @@ config_exc_info = False
 config_cache_file = '/usr/lib/zabbix/alertscripts/zbxTelegram_files/id.cache'
 config_log_file = '/usr/lib/zabbix/alertscripts/zbxTelegram_files/znt.log'
 
-tg_proxy = True
+tg_proxy = False
 tg_proxy_server = {'https': 'socks5://username:password@domen:port'}
 tg_token = '123123123123:ADDDD_er9beG-fGx33ktYqFkUpAdUtWe2s'
 
